@@ -1,0 +1,6 @@
+[run]
+include = mafipy/*
+# remove test patterns
+omit = 
+	mafipy/tests/*
+	mafipy/*/tests/*
