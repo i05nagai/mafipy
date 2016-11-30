@@ -13,6 +13,7 @@ matrix:
 
 before_install:
   - export COVERAGE="true"
+  - ls -la
 install: sh ci/travis/install.sh
 script: python setup.py tests
 after_success: sh ci/travis/after_success.sh
