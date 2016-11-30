@@ -14,6 +14,8 @@ matrix:
 before_install:
   - export COVERAGE="true"
   - ls -la
-install: sh ci/travis/install.sh
+  - echo ${PATH}
+  - python --version
+install: sh -x ci/travis/install.sh
 script: python setup.py tests
-after_success: sh ci/travis/after_success.sh
+after_success: sh -x ci/travis/after_success.sh

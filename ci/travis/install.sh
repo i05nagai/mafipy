@@ -1,18 +1,11 @@
-#!/bin/bash
+#!/bin/bash -x
 
-set -e
+set -eu
 
-if [ "$COVERAGE" = "true" ]; then
-	pip install coverage
-fi
-
-if [ "$CODECLIMATE_COVERAGE_REPORT" = "true" ]; then
-	pip install codeclimate-test-reporter
-fi
-
-if [ "$SKIP_TESTS" == "true" ]; then
+if [ "${SKIP_TESTS}" == "true" ]; then
     echo "No need to build mafipy when not running the tests"
 else
+
 	# Set up our own virtualenv environment to avoid travis' numpy.
 	# This venv points to the python interpreter of the travis build
 	# matrix.
@@ -26,4 +19,15 @@ else
     python --version
     python -c "import numpy; print('numpy %s' % numpy.__version__)"
     python -c "import scipy; print('scipy %s' % scipy.__version__)"
+
+
+	if [ "${COVERAGE}" = "true" ]; then
+		pip install coverage
+	fi
+
+	if [ "${CODECLIMATE_COVERAGE_REPORT}" = "true" ]; then
+		pip install codeclimate-test-reporter
+	fi
+
 fi
+
