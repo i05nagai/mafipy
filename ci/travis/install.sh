@@ -6,6 +6,10 @@ if [ "$COVERAGE" = "true" ]; then
 	pip install coverage
 fi
 
+if [ "$CODECLIMATE_COVERAGE_REPORT" = "true" ]; then
+	pip install codeclimate-test-reporter
+fi
+
 if [ "$SKIP_TESTS" == "true" ]; then
     echo "No need to build mafipy when not running the tests"
 else
