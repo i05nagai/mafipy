@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-set -eu
+set -e
 
 if [ "${SKIP_TESTS}" == "true" ]; then
     echo "No need to build mafipy when not running the tests"
