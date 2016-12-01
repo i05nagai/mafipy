@@ -2,7 +2,7 @@
 
 set -e
 
-if [[ "${SKIP_TESTS}" == "true" ]]; then
+if [ "${SKIP_TESTS}" == "true" ]; then
     echo "No need to build mafipy when not running the tests"
 else
 
