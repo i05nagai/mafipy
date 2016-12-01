@@ -3,19 +3,18 @@ sudo: false
 env:
   global:
     - secure: "o0oF6E/QqqkgPq5/k5Akcb/yh2F1XC9wzmueV2NJc7BhPGwjPmiIMRyJAZHQZmBL1TzRHdpBp5APCgXOCbY8B2N7ksoAtbGIpLydmvujFMDoRMpyn+IVkajgDVRp1G9k3hqXmJoLH6WvIL/LE4ydHvPM4zI1jQY+0vPIqbjNJbAHYKpPV/NkXIz5udhaeJIFBW5dwizsLg/q+pkS7XsICy0ktp+nn2gU9haVjGXbGW+flItZWkl4HMJgqCKpiipQJUlG4neh/QKTV1aH7DDyQ4rtXixk3cUK6CzWnw9NsUPAefmao8GM4StmHcrgWTkriO9l8AifLukQMWOjNsOzRa+N99oVMETMbu5m5jjKsevUqwvCEOxyJhystSZkzZWShKjNNKqY12towpZmGYSWHGdZFdqMnYE6hlg2W+6iikJNcg8eb0luiD1h4MAOgFPSX+5TesTMC+s0Yl2AL6g7ElIVg5qh4xXOJFewrSK51cd3uufcO/YQt397m5XYaC0zniAPWmgV/jN7b8tPakHjTyFAWUYCPuccR9CenUS/N4oebMo9wQvT7Xy/MojP30XtVmpmtj1zDLhXZwBtdJjnW73TDH3VMvcME6tz5fB8lhjQ/SLaJisY2SWxmDK/k42AJlNVz7b0+lvtRuKnciW0l1xh8oeLmZdQsT+k8Rm/ouM="
-  matrix:
-    include:
-      - python: "2.7"
-        env:
-          - COVERAGE="true"
-          - SKIP_TESTS="false"
-          - CODECLIMATE_COVERAGE_REPORT="false"
-      - python: "3.5"
-        env:
-          - COVERAGE="true"
-          - SKIP_TESTS="false"
-          - CODECLIMATE_COVERAGE_REPORT="true"
-
+matrix:
+  include:
+    - python: "2.7"
+      env:
+        - COVERAGE="true"
+        - SKIP_TESTS="false"
+        - CODECLIMATE_COVERAGE_REPORT="false"
+    - python: "3.5"
+      env:
+        - COVERAGE="true"
+        - SKIP_TESTS="false"
+        - CODECLIMATE_COVERAGE_REPORT="true"
 before_install:
   - pwd
   - ls -la
