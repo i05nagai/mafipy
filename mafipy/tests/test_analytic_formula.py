@@ -77,7 +77,7 @@ class TestAnalytic(object):
         call_value = target.calc_black_scholes_call_formula(
             underlying, strike, rate, maturity, vol)
         discount = math.exp(-rate * maturity)
-        expect = call_value - (underlying - strike) * discount
+        expect = call_value - (underlying - strike * discount)
         actual = target.calc_black_scholes_put_formula(
             underlying, strike, rate, maturity, vol)
         assert actual == approx(expect)
@@ -142,7 +142,6 @@ class TestAnalytic(object):
         actual = target.func_d2(underlying, strike, rate, maturity, vol)
         assert actual == approx(expect)
 
-
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol", [
             # underlying = strike
@@ -152,7 +151,7 @@ class TestAnalytic(object):
             # underlying < strike
             (1.0, 2.0, 1.0, 1.0, 1.0),
         ])
-    def test_derivative_by_strike(self, 
+    def test_derivative_by_strike(self,
                                   underlying, strike, rate, maturity, vol):
         expect_numerator = (math.log(underlying / strike)
                             + (rate - vol * vol * 0.5) * maturity)
