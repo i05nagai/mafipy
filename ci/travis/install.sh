@@ -2,13 +2,14 @@
 
 set -e
 
-if [ "${SKIP_TESTS}" == "true" ]; then
+if [[ "${SKIP_TESTS}" == "true" ]]; then
     echo "No need to build mafipy when not running the tests"
 else
 
 	# Set up our own virtualenv environment to avoid travis' numpy.
 	# This venv points to the python interpreter of the travis build
 	# matrix.
+	deactivate
 	virtualenv --python=python ~/testvenv
 	source ~/testvenv/bin/activate
 	pip install --upgrade pip setuptools
