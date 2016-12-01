@@ -24,7 +24,7 @@ else
     python --version
     python -c "import numpy; print('numpy %s' % numpy.__version__)"
     python -c "import scipy; print('scipy %s' % scipy.__version__)"
-
+    python -c "import pytest; print('pytest %s' % pytest.__version__)"
 
 	if [ "${COVERAGE}" = "true" ]; then
 		pip install coverage
