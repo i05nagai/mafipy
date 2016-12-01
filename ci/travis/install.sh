@@ -3,6 +3,10 @@
 set -e
 set -x
 
+echo 'List files from cached directories'
+echo 'pip:'
+ls $HOME/.cache/pip
+
 if [ "${SKIP_TESTS}" == "true" ]; then
     echo "No need to build mafipy when not running the tests"
 else
