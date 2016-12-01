@@ -17,6 +17,8 @@ else
 	pip install --upgrade pip setuptools
 	pip install numpy
 	pip install scipy
+	pip install pytest
+	pip install pytest-cov
     # Build mafipy in the install.sh script to collapse the verbose
     # build output in the travis output when it succeeds.
     python --version
