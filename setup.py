@@ -3,6 +3,7 @@
 
 from distutils.core import setup
 from setuptools.command.test import test as TestCommand
+import sys
 
 
 NAME = "mafipy"
@@ -29,19 +30,25 @@ Operating System :: MacOS
 
 
 class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
 
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
         self.test_args = ["mafipy", "-v", "--cov=mafipy"]
         self.test_suite = True
 
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+
     def run_tests(self):
         import pytest
-        pytest.main(self.test_args)
+        # errno = pytest.main(shlex.split(self.test_args))
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 
 def main():
-    cmdclass = {'tests': PyTest}
+    cmdclass = {'test': PyTest}
     metadata = dict(
         name=NAME,
         packages=[NAME],
