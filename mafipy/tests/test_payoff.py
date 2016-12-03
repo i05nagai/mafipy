@@ -1,4 +1,7 @@
 #!/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import division
 
 import mafipy.payoff as target
 import pytest

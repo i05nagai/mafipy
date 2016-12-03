@@ -1,14 +1,8 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
 
-import mafipy.payoff as target
-import pytest
-from pytest import approx
-
-
-class TestPricerQuantoCms(object):
+class TestReader:
 
     # before all tests starts
     @classmethod
@@ -28,8 +22,11 @@ class TestPricerQuantoCms(object):
     def teardown(self):
         pass
 
+    def test_calc_black_shocles_call(self):
+        pass
 
-class TestSimpleQuantoCmsPricer(object):
+
+class TestVolatilityReader:
 
     # before all tests starts
     @classmethod
@@ -49,6 +46,5 @@ class TestSimpleQuantoCmsPricer(object):
     def teardown(self):
         pass
 
-    def test_(self):
+    def test_calc_black_shocles_call(self):
         pass
-

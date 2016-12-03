@@ -1,4 +1,5 @@
 #!/bin/python
+# -*- coding: utf-8 -*-
 
 
 def raise_key_erorr(keys, dictionary, dictionary_name):

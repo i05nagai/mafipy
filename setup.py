@@ -61,7 +61,7 @@ def main():
         license=LICENSE,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         long_description=LONG_DESCRIPTION,
-        tests_require=['pytest'],
+        tests_require=['pytest', 'pytest-cov'],
         cmdclass=cmdclass
     )
 

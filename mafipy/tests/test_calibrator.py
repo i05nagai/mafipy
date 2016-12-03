@@ -1,14 +1,10 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
-import mafipy.payoff as target
-import pytest
-from pytest import approx
+import mafipy.calibrator as target
 
 
-class TestPricerQuantoCms(object):
+class TestCalibrator:
 
     # before all tests starts
     @classmethod
@@ -28,8 +24,11 @@ class TestPricerQuantoCms(object):
     def teardown(self):
         pass
 
+    def test_calibrate(self):
+        pass
 
-class TestSimpleQuantoCmsPricer(object):
+
+class TestSabrCalibrator:
 
     # before all tests starts
     @classmethod
@@ -49,6 +48,9 @@ class TestSimpleQuantoCmsPricer(object):
     def teardown(self):
         pass
 
-    def test_(self):
+    def test_calc_poly_alpha(self):
         pass
 
+    def test_calibrate(self):
+        target
+        pass

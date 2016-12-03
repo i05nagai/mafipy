@@ -1,4 +1,8 @@
 #!/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import division
+
 import math
 import numpy as np
 import scipy.special
@@ -13,7 +17,7 @@ def _is_d1_or_d2_infinity(underlying, strike, vol):
     :return: check whether :math:`d_{1}` and :math:`d_{2}` is infinity or not.
     :rtype: bool
     """
-    return (math.isclose(underlying, 0.0)
+    return (np.isclose(underlying, 0.0)
             or strike < 0.0
             or vol < 0.0)
 
