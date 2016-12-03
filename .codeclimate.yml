@@ -1,0 +1,14 @@
+engines:
+	pep8:
+    enabled: true	
+	radon: 
+		enabled: true
+ratings:
+  paths:
+		- "mafipy/**"
+		- "**.py"
+## other configuration excluded from example...
+exclude_paths:
+  - "examples/*"
+  - "ci/*"
+
