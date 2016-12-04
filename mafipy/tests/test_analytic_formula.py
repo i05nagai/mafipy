@@ -31,6 +31,55 @@ class TestAnalytic(object):
         pass
 
     @pytest.mark.parametrize(
+        "underlying, strike, vol, expect", [
+            # underlying = 0
+            (0.0, 2.0, 1.0, True),
+            # underlying != 0 and strike < 0
+            (1.0, -1.0, 1.0, True),
+            # underlying != 0 and strike > 0 and vol < 0
+            (1.0, 2.0, -1.0, True),
+            # underlying != 0 and strike > 0 and vol > 0
+            (1.0, 2.0, 1.0, False),
+        ])
+    def test__is_d1_or_d2_infinity(self, underlying, strike, vol, expect):
+        actual = target._is_d1_or_d2_infinity(underlying, strike, vol)
+        assert expect == actual
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol", [
+            # underlying = strike
+            (2.0, 2.0, 1.0, 1.0, 1.0),
+            # underlying > strike
+            (2.0, 1.0, 1.0, 1.0, 1.0),
+            # underlying < strike
+            (1.0, 2.0, 1.0, 1.0, 1.0),
+        ])
+    def test_func_d1(self, underlying, strike, rate, maturity, vol):
+        expect_numerator = (math.log(underlying / strike)
+                            + (rate + vol * vol * 0.5) * maturity)
+        expect_denominator = vol * math.sqrt(maturity)
+        expect = expect_numerator / expect_denominator
+        actual = target.func_d1(underlying, strike, rate, maturity, vol)
+        assert actual == approx(expect)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol", [
+            # underlying = strike
+            (2.0, 2.0, 1.0, 1.0, 1.0),
+            # underlying > strike
+            (2.0, 1.0, 1.0, 1.0, 1.0),
+            # underlying < strike
+            (1.0, 2.0, 1.0, 1.0, 1.0),
+        ])
+    def test_func_d2(self, underlying, strike, rate, maturity, vol):
+        expect_numerator = (math.log(underlying / strike)
+                            + (rate - vol * vol * 0.5) * maturity)
+        expect_denominator = vol * math.sqrt(maturity)
+        expect = expect_numerator / expect_denominator
+        actual = target.func_d2(underlying, strike, rate, maturity, vol)
+        assert actual == approx(expect)
+
+    @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, expect",
         [
             # underlying = strike
@@ -110,40 +159,6 @@ class TestAnalytic(object):
             underlying, strike, rate, maturity - today, vol)
         actual = target.calc_black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
-        assert actual == approx(expect)
-
-    @pytest.mark.parametrize(
-        "underlying, strike, rate, maturity, vol", [
-            # underlying = strike
-            (2.0, 2.0, 1.0, 1.0, 1.0),
-            # underlying > strike
-            (2.0, 1.0, 1.0, 1.0, 1.0),
-            # underlying < strike
-            (1.0, 2.0, 1.0, 1.0, 1.0),
-        ])
-    def test_func_d1(self, underlying, strike, rate, maturity, vol):
-        expect_numerator = (math.log(underlying / strike)
-                            + (rate + vol * vol * 0.5) * maturity)
-        expect_denominator = vol * math.sqrt(maturity)
-        expect = expect_numerator / expect_denominator
-        actual = target.func_d1(underlying, strike, rate, maturity, vol)
-        assert actual == approx(expect)
-
-    @pytest.mark.parametrize(
-        "underlying, strike, rate, maturity, vol", [
-            # underlying = strike
-            (2.0, 2.0, 1.0, 1.0, 1.0),
-            # underlying > strike
-            (2.0, 1.0, 1.0, 1.0, 1.0),
-            # underlying < strike
-            (1.0, 2.0, 1.0, 1.0, 1.0),
-        ])
-    def test_func_d2(self, underlying, strike, rate, maturity, vol):
-        expect_numerator = (math.log(underlying / strike)
-                            + (rate - vol * vol * 0.5) * maturity)
-        expect_denominator = vol * math.sqrt(maturity)
-        expect = expect_numerator / expect_denominator
-        actual = target.func_d2(underlying, strike, rate, maturity, vol)
         assert actual == approx(expect)
 
     @pytest.mark.parametrize(
