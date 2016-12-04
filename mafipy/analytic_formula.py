@@ -345,7 +345,7 @@ def black_scholes_call_value_fprime_by_strike(
     :math:`T` is maturity,
     :math:`\sigma` is vol,
     :math:`d_{1}, d_{2}` is defined
-        in :py:func:`calc_black_scholes_call_formula`,
+    in :py:func:`calc_black_scholes_call_formula`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 

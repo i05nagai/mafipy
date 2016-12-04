@@ -28,3 +28,10 @@ mathmatical finance in python.
 Relateded 
 =========
 
+
+document
+============
+
+[API document](https://i05nagai.github.io/mafipy_docs/html/).
+
+
