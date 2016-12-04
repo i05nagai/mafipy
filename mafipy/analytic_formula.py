@@ -284,7 +284,7 @@ class BlackScholesPricerHelper(object):
 
         .. math::
 
-            C(K; S, r, T, \sigma) := C(S, K, r, T, \sigma)
+            c(K; S, r, T, \sigma) := c(S, K, r, T, \sigma)
 
         :param float underlying:
         :param float rate:
@@ -292,7 +292,7 @@ class BlackScholesPricerHelper(object):
         :param float vol: volatility.
         :param float today: default value is 0.
         :return: call option pricer as a function of strike.
-        :rtype: funcion
+        :rtype: LambdaType
         """
         return lambda strike: calc_black_scholes_call_value(
             underlying=underlying,

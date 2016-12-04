@@ -185,24 +185,6 @@ class TestAnalytic(object):
         assert actual == approx(expect)
 
     @pytest.mark.parametrize(
-        "underlying, strike, rate, maturity, vol", [
-            # underlying = strike
-            (2.0, 2.0, 1.0, 1.0, 1.0),
-            # underlying > strike
-            (2.0, 1.0, 1.0, 1.0, 1.0),
-            # underlying < strike
-            (1.0, 2.0, 1.0, 1.0, 1.0),
-        ])
-    def test_derivative_by_strike(self,
-                                  underlying, strike, rate, maturity, vol):
-        expect_numerator = (math.log(underlying / strike)
-                            + (rate - vol * vol * 0.5) * maturity)
-        expect_denominator = vol * math.sqrt(maturity)
-        expect = expect_numerator / expect_denominator
-        actual = target.func_d2(underlying, strike, rate, maturity, vol)
-        assert actual == approx(expect)
-
-    @pytest.mark.parametrize(
         "underlying, maturity, alpha, beta, rho, nu, expect", [
         ])
     def test_calc_sabr_atm_implied_vol(
@@ -216,3 +198,41 @@ class TestAnalytic(object):
         actual = target.calc_sabr_model_atm_implied_vol(
             underlying, maturity, alpha, beta, rho, nu)
         assert actual == expect
+
+
+class TestBlackScholesPricerHelper:
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        self.target_class = target.BlackScholesPricerHelper()
+        pass
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    @pytest.mark.parametrize("underlying, rate, maturity, vol, today", [
+        (1.0, 1.0, 0.1, 1.0, 0.1)
+    ])
+    def test_make_call_wrt_strike(
+            self, underlying, rate, maturity, vol, today):
+        expect_func = lambda strike: target.calc_black_scholes_call_value(
+            underlying=underlying,
+            strike=strike,
+            rate=rate,
+            maturity=maturity,
+            vol=vol,
+            today=today)
+        actual_func = self.target_class.make_call_wrt_strike(
+            underlying, rate, maturity, vol, today)
+        assert type(expect_func) == type(actual_func)
