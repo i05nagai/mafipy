@@ -29,7 +29,7 @@ Relateded
 
 document
 ============
-`API document`_
+`API document`_ 
 
-.. _API document: `https://i05nagai.github.io/mafipy_docs/html/`
+.. _API document: https://i05nagai.github.io/mafipy_docs/html/
 
