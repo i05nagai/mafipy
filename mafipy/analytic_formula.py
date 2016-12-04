@@ -66,8 +66,8 @@ def func_d2(underlying, strike, rate, maturity, vol):
     return numerator / denominator
 
 
-def derivative_d_by_strike(underlying, strike, rate, vol, maturity):
-    """derivative_d_by_strike
+def d_fprime_by_strike(underlying, strike, rate, maturity, vol):
+    """d_fprime_by_strike
     derivative of :math:`d_{1}` with respect to :math:`K`
     where :math:`K` is strike.
     See :py:func:`func_d1`.
@@ -87,13 +87,13 @@ def derivative_d_by_strike(underlying, strike, rate, vol, maturity):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float vol:
     :param float maturity: must be non-negative.
+    :param float vol:
     :return: value of derivative.
     :rtype: float
     """
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
     return strike / (math.sqrt(maturity) * vol * underlying)
 
 
@@ -361,8 +361,8 @@ def black_scholes_call_value_fprime_by_strike(
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    d_fprime = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
+    d_fprime = d_fprime_by_strike(
+        underlying, strike, rate, maturity, vol)
 
     term1 = underlying * norm.pdf(d1) * d_fprime
     term2 = math.exp(-rate * maturity) * norm.cdf(d2)
@@ -394,8 +394,8 @@ def black_scholes_call_value_fhess_by_strike(
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
+    derivative_d = d_fprime_by_strike(
+        underlying, strike, rate, maturity, vol)
 
     term1 = underlying * norm.pdf(d1) * derivative_d
     term2 = norm.cdf(d2)
@@ -427,8 +427,8 @@ def black_scholes_call_value_third_by_strike(
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
+    derivative_d = d_fprime_by_strike(
+        underlying, strike, rate, maturity, vol)
 
     term1 = underlying * norm.pdf(d1) * derivative_d
     term2 = norm.cdf(d2)
