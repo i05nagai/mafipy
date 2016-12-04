@@ -328,6 +328,33 @@ def black_scholes_call_value_fhess_by_strike(
     """black_scholes_call_value_fhess_by_strike
     Second derivative of value of call option with respect to strike
     under black scholes model.
+    See :py:func:`calc_black_scholes_call_formula`
+    and :py:func:`black_scholes_call_value_fprime_by_strike`.
+
+    .. math::
+        \\begin{array}{ccl}
+            \\frac{\partial^{2}}{\partial K^{2}} c(0, S; T, K)
+                & = &
+                S\phi^{\prime}(d_{1}(K))(d_{1}^{\prime}(K))^{2}
+                + S\phi(d_{1}(K))d_{1}^{\prime\prime}(K)
+                - \phi(d_{2}(K))d_{2}^{\prime}(K)
+                \\\\
+                & &
+                - \phi(d_{2}(K))d_{2}^{\prime}(K)
+                - K\phi^{\prime}(d_{2}(K))(d_{2}^{\prime}(K))^{2}
+                - K\phi(d_{2}(K))d_{2}^{\prime\prime}(K))
+        \end{array}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is vol,
+    :math:`d_{1}, d_{2}` is defined
+    in :py:func:`calc_black_scholes_call_formula`,
+    :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
+    :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
     :param float underlying:
     :param float strike:
@@ -335,39 +362,6 @@ def black_scholes_call_value_fhess_by_strike(
     :param float maturity: non-negative.
     :param float vol: volatility. non-negative.
     :return: value of second derivative.
-    :rtype: float.
-    """
-    norm = scipy.stats.norm
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
-
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
-    d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = d_fprime_by_strike(
-        underlying, strike, rate, maturity, vol)
-
-    term1 = underlying * norm.pdf(d1) * derivative_d
-    term2 = norm.cdf(d2)
-    term3 = strike * norm.pdf(d2) * derivative_d
-    return term1 - term2 - term3
-
-
-def black_scholes_call_value_third_by_strike(
-        underlying,
-        strike,
-        rate,
-        maturity,
-        vol):
-    """black_scholes_call_value_third_by_strike
-    Third derivative of value of call option with respect to strike
-    under black scholes model.
-
-    :param float underlying:
-    :param float strike:
-    :param float rate:
-    :param float maturity: non-negative.
-    :param float vol: volatility. non-negative.
-    :return: value of third derivative.
     :rtype: float.
     """
     norm = scipy.stats.norm
