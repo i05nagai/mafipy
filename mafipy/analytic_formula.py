@@ -379,29 +379,6 @@ def black_scholes_call_value_fhess_by_strike(
     return term1 - term2 - term3
 
 
-def calc_black_model_payers_swaption_value(
-        swap_rate,
-        strike,
-        option_maturity,
-        vol,
-        swap_annuity):
-    """calc_black_model_payers_swaption_value
-    calculate value of payer's swaption under assumption
-    that swap rate is black scholes model.
-
-    :param float swap_rate:
-    :param float strike:
-    :param float option_maturity: must be non-negative.
-    :param float vol: must be non-negative.
-    :param float swap_annuity:
-    :return: value of payer's swaption.
-    :rtype: float
-    """
-
-    return calc_black_scholes_call_formula(
-        swap_rate, strike, option_maturity, vol)
-
-
 def calc_black_model_recievers_swaption_value(
         swap_rate,
         strike,
