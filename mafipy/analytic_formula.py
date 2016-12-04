@@ -278,14 +278,21 @@ class BlackScholesPricerHelper(object):
             vol,
             today=0.0):
         """make_call_wrt_strike
+        make function of black shcoles call formula with respect to function.
+        This function return :py:func:`calc_black_scholes_call_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            C(K; S, r, T, \sigma) := C(S, K, r, T, \sigma)
 
         :param float underlying:
         :param float rate:
         :param float maturity:
-        :param float vol:
-        :param float today:
+        :param float vol: volatility.
+        :param float today: default value is 0.
         :return: call option pricer as a function of strike.
-        :rtype: func
+        :rtype: funcion
         """
         return lambda strike: calc_black_scholes_call_value(
             underlying=underlying,
