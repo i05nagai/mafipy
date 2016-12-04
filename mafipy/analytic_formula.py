@@ -119,8 +119,8 @@ def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
     :return: value of second derivative of :math:`d_{1}` or :math:`d_{2}`.
     :rtype: float
     """
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
     return 1.0 / (math.sqrt(maturity) * vol * underlying)
 
 
