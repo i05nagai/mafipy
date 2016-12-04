@@ -310,14 +310,21 @@ class BlackScholesPricerHelper(object):
             vol,
             today=0.0):
         """make_put_wrt_strike
+        make function of black shcoles put formula with respect to function.
+        This function return :py:func:`calc_black_scholes_put_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            p(K; S, r, T, \sigma) := p(S, K, r, T, \sigma)
 
         :param float underlying:
         :param float rate:
         :param float maturity:
-        :param float vol:
-        :param float today:
+        :param float vol: volatility
+        :param float today: default value is 0.
         :return: put option pricer as a function of strike.
-        :rtype: func
+        :rtype: LambdaType.
         """
         return lambda strike: calc_black_scholes_put_value(
             underlying=underlying,
