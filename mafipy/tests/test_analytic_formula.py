@@ -91,6 +91,18 @@ class TestAnalytic(object):
         assert expect == approx(actual)
 
     @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol",
+        [
+            (2.0, 1.0, 1.0, 1.0 / 365.0, 0.0001),
+        ])
+    def test_d_fhess_by_strike(
+            self, underlying, strike, rate, maturity, vol):
+        expect = 1.0 / (math.sqrt(maturity) * vol * underlying)
+        actual = target.d_fprime_by_strike(
+            underlying, strike, rate, maturity, vol)
+        assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, expect",
         [
             # underlying = strike
