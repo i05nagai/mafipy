@@ -14,8 +14,6 @@
    :alt: Issue Count
 
 
-
-
 mafipy
 ======
 
@@ -31,7 +29,7 @@ Relateded
 
 document
 ============
+`API document`_
 
-[API document](https://i05nagai.github.io/mafipy_docs/html/).
-
+.. _API document: `https://i05nagai.github.io/mafipy_docs/html/`
 
