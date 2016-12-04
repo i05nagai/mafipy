@@ -300,11 +300,13 @@ def black_scholes_call_value_fprime_by_strike(
     :param float strike:
     :param float rate:
     :param float maturity: must be non-negative.
-    :param float vol:
+    :param float vol: volatility. must be non-negative.
     :return: value of derivative.
     :rtype: float
     """
     norm = scipy.stats.norm
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)

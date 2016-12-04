@@ -3,11 +3,11 @@
 
 
 from __future__ import division
-
+from pytest import approx
 import mafipy.analytic_formula as target
 import math
 import pytest
-from pytest import approx
+import scipy.stats
 
 
 class TestAnalytic(object):
@@ -183,6 +183,46 @@ class TestAnalytic(object):
         actual = target.calc_black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
         assert actual == approx(expect)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today",
+        [
+            # underlying > strike
+            (2.0, 1.0, 1.0, 1.0, 0.1, 0.0),
+            # underlying == strike
+            (1.0, 1.0, 1.0, 1.0, 0.1, 0.0),
+            # underlying < strike
+            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            # maturity < 0 raise AssertionError
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+        ])
+    def test_black_scholes_call_value_fprime_by_strike(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        # raise AssertionError
+        if maturity < 0.0 or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_value_fprime_by_strike(
+                    underlying, strike, rate, maturity, vol)
+        else:
+            norm = scipy.stats.norm
+            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
+            d2 = target.func_d2(underlying, strike, rate, maturity, vol)
+            d_fprime = target.d_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
+            discount = math.exp(-rate * maturity)
+
+            term1 = underlying * norm.pdf(d1) * d_fprime
+            term2 = discount * norm.cdf(d2)
+            term3 = discount * strike * norm.pdf(d2) * d_fprime
+            expect = term1 - term2 - term3
+
+            actual = target.black_scholes_call_value_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
+
+            assert expect == approx(actual)
 
     @pytest.mark.parametrize(
         "underlying, maturity, alpha, beta, rho, nu, expect", [
