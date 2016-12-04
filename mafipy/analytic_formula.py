@@ -97,8 +97,8 @@ def d_fprime_by_strike(underlying, strike, rate, maturity, vol):
     return strike / (math.sqrt(maturity) * vol * underlying)
 
 
-def derivative2_d_by_strike(underlying, strike, rate, vol, maturity):
-    """derivative2_d_by_strike
+def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
+    """d_fhess_by_strike
     second derivative of :math:`d_{i}\ (i = 1, 2)` with respect to :math:`K`,
     where :math:`K` is strike.
 
@@ -114,8 +114,8 @@ def derivative2_d_by_strike(underlying, strike, rate, vol, maturity):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float vol:
     :param float maturity:
+    :param float vol:
     :return: value of second derivative of :math:`d_{1}` or :math:`d_{2}`.
     :rtype: float
     """
