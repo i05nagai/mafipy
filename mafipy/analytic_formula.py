@@ -268,73 +268,6 @@ def calc_black_scholes_put_value(
         underlying, strike, rate, maturity - today, vol)
 
 
-class BlackScholesPricerHelper(object):
-
-    def make_call_wrt_strike(
-            self,
-            underlying,
-            rate,
-            maturity,
-            vol,
-            today=0.0):
-        """make_call_wrt_strike
-        make function of black shcoles call formula with respect to function.
-        This function return :py:func:`calc_black_scholes_call_value`
-        as funciton of a single variable.
-
-        .. math::
-
-            c(K; S, r, T, \sigma) := c(S, K, r, T, \sigma)
-
-        :param float underlying:
-        :param float rate:
-        :param float maturity:
-        :param float vol: volatility.
-        :param float today: default value is 0.
-        :return: call option pricer as a function of strike.
-        :rtype: LambdaType
-        """
-        return lambda strike: calc_black_scholes_call_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
-
-    def make_put_wrt_strike(
-            self,
-            underlying,
-            rate,
-            maturity,
-            vol,
-            today=0.0):
-        """make_put_wrt_strike
-        make function of black shcoles put formula with respect to function.
-        This function return :py:func:`calc_black_scholes_put_value`
-        as funciton of a single variable.
-
-        .. math::
-
-            p(K; S, r, T, \sigma) := p(S, K, r, T, \sigma)
-
-        :param float underlying:
-        :param float rate:
-        :param float maturity:
-        :param float vol: volatility
-        :param float today: default value is 0.
-        :return: put option pricer as a function of strike.
-        :rtype: LambdaType.
-        """
-        return lambda strike: calc_black_scholes_put_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
-
-
 def black_scholes_call_value_fprime_by_strike(
         underlying,
         strike,
@@ -698,3 +631,70 @@ def calc_hunt_kennedy_cms_option_value(
         option_maturity,
         vol)
     return a * unadjusted_value + b * swap_rate * adjusted_value
+
+
+class BlackScholesPricerHelper(object):
+
+    def make_call_wrt_strike(
+            self,
+            underlying,
+            rate,
+            maturity,
+            vol,
+            today=0.0):
+        """make_call_wrt_strike
+        make function of black shcoles call formula with respect to function.
+        This function return :py:func:`calc_black_scholes_call_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            c(K; S, r, T, \sigma) := c(S, K, r, T, \sigma)
+
+        :param float underlying:
+        :param float rate:
+        :param float maturity:
+        :param float vol: volatility.
+        :param float today: default value is 0.
+        :return: call option pricer as a function of strike.
+        :rtype: LambdaType
+        """
+        return lambda strike: calc_black_scholes_call_value(
+            underlying=underlying,
+            strike=strike,
+            rate=rate,
+            maturity=maturity,
+            vol=vol,
+            today=today)
+
+    def make_put_wrt_strike(
+            self,
+            underlying,
+            rate,
+            maturity,
+            vol,
+            today=0.0):
+        """make_put_wrt_strike
+        make function of black shcoles put formula with respect to function.
+        This function return :py:func:`calc_black_scholes_put_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            p(K; S, r, T, \sigma) := p(S, K, r, T, \sigma)
+
+        :param float underlying:
+        :param float rate:
+        :param float maturity:
+        :param float vol: volatility
+        :param float today: default value is 0.
+        :return: put option pricer as a function of strike.
+        :rtype: LambdaType.
+        """
+        return lambda strike: calc_black_scholes_put_value(
+            underlying=underlying,
+            strike=strike,
+            rate=rate,
+            maturity=maturity,
+            vol=vol,
+            today=today)
