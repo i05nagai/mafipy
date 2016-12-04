@@ -230,7 +230,7 @@ def calc_black_scholes_call_value(
         today=0.0):
     """calc_black_scholes_call_value
     calculate call value in the case of today is not zero.
-    :param maturity: - today is time to expiry.
+    (`maturity` - `today`) is treated as time to expiry.
     See :py:func:`calc_black_scholes_call_formula`.
 
     :param float underlying:
