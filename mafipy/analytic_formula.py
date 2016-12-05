@@ -379,29 +379,6 @@ def black_scholes_call_value_fhess_by_strike(
     return term1 - term2 - term3
 
 
-def calc_black_model_recievers_swaption_value(
-        swap_rate,
-        strike,
-        option_maturity,
-        vol,
-        swap_annuity):
-    """calc_black_model_recievers_swaption_value
-    calculate value of reciever's swaption under assumption
-    that swap rate is black scholes model.
-
-    :param float swap_rate:
-    :param float strike:
-    :param float option_maturity:
-    :param float vol:
-    :param float swap_annuity:
-    :return: value of reciever's swaption.
-    :rtype: float
-    """
-
-    return calc_black_scholes_put_formula(
-        swap_rate, strike, option_maturity, vol)
-
-
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,
@@ -570,43 +547,12 @@ def calc_sabr_model_implied_normal_vol(
     return factor1 * factor2 * factor3
 
 
-def calc_hunt_kennedy_cms_option_value(
-        swap_rate,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        swap_maturity,
-        vol):
-    """calc_hunt_kennedy_cms_option_value
-    From chapter14 in Financial Derivatives in Theory and Practice.
-
-    :param float swap_rate:
-    :param float option_strike:
-    :param float swap_annuity:
-    :param float option_maturity:
-    :param float swap_maturity:
-    :param float vol:
-    """
-    a = 1.0 / swap_maturity
-    b = (1.0 / swap_annuity - a) / swap_rate
-    convexity_adjustment = math.exp(vol * vol * option_maturity)
-
-    unadjusted_value = calc_black_model_swaption_value(
-        swap_rate,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        vol)
-    adjusted_value = calc_black_model_swaption_value(
-        swap_rate * convexity_adjustment,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        vol)
-    return a * unadjusted_value + b * swap_rate * adjusted_value
-
-
 class BlackScholesPricerHelper(object):
+    """BlackScholesPricerHelper
+    Helper functions to generate a function with respect to a sigle variable.
+    For instance, black formula as a function of volatility is needed to
+    evaluate market smile by implied volatility.
+    """
 
     def make_call_wrt_strike(
             self,
