@@ -7,6 +7,8 @@ import math
 import numpy as np
 import scipy.special
 
+import mafipy.math_formula
+
 
 def _is_d1_or_d2_infinity(underlying, strike, vol):
     """is_d1_or_d2_infinity
@@ -337,10 +339,9 @@ def black_scholes_call_value_fhess_by_strike(
                 & = &
                 S\phi^{\prime}(d_{1}(K))(d_{1}^{\prime}(K))^{2}
                 + S\phi(d_{1}(K))d_{1}^{\prime\prime}(K)
-                - \phi(d_{2}(K))d_{2}^{\prime}(K)
+                - 2\phi(d_{2}(K))d_{2}^{\prime}(K)
                 \\\\
                 & &
-                - \phi(d_{2}(K))d_{2}^{\prime}(K)
                 - K\phi^{\prime}(d_{2}(K))(d_{2}^{\prime}(K))^{2}
                 - K\phi(d_{2}(K))d_{2}^{\prime\prime}(K))
         \end{array}
@@ -365,18 +366,24 @@ def black_scholes_call_value_fhess_by_strike(
     :rtype: float.
     """
     norm = scipy.stats.norm
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = d_fprime_by_strike(
-        underlying, strike, rate, maturity, vol)
+    d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
+    d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
+    d1_density = norm.pdf(d1)
+    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+    d2_density = norm.pdf(d2)
+    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
 
-    term1 = underlying * norm.pdf(d1) * derivative_d
-    term2 = norm.cdf(d2)
-    term3 = strike * norm.pdf(d2) * derivative_d
-    return term1 - term2 - term3
+    term1 = underlying * d1_density_fprime * d_fprime * d_fprime
+    term2 = underlying * d1_density * d_fhess
+    term3 = 2.0 * d2_density * d_fprime
+    term4 = strike * d2_density_fprime * d_fprime * d_fprime
+    term5 = strike * d2_density * d_fhess
+    return term1 + term2 - term3 - term4 - term5
 
 
 def calc_local_vol_model_implied_vol(

@@ -5,6 +5,7 @@
 from __future__ import division
 from pytest import approx
 import mafipy.analytic_formula as target
+import mafipy.math_formula
 import math
 import pytest
 import scipy.stats
@@ -222,6 +223,55 @@ class TestAnalytic(object):
             actual = target.black_scholes_call_value_fprime_by_strike(
                 underlying, strike, rate, maturity, vol)
 
+            assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today",
+        [
+            # underlying > strike
+            (2.0, 1.0, 1.0, 1.0, 0.1, 0.0),
+            # underlying == strike
+            (1.0, 1.0, 1.0, 1.0, 0.1, 0.0),
+            # underlying < strike
+            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            # maturity < 0 raise AssertionError
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+        ])
+    def test_black_scholes_call_value_fhess_by_strike(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        # raise AssertionError
+        if maturity < 0.0 or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_value_fhess_by_strike(
+                    underlying, strike, rate, maturity, vol)
+        else:
+            norm = scipy.stats.norm
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
+            d2 = target.func_d2(underlying, strike, rate, maturity, vol)
+            d1_density = norm.pdf(d1)
+            d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+            d2_density = norm.pdf(d2)
+            d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
+            d_fprime = target.d_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
+            d_fhess = target.d_fhess_by_strike(
+                underlying, strike, rate, maturity, vol)
+
+            term1 = (underlying * d1_density_fprime * d_fprime * d_fprime)
+            term2 = underlying * d1_density * d_fhess
+            term3 = 2.0 * d2_density * d_fprime
+            term4 = strike * d2_density_fprime * d_fprime * d_fprime
+            term5 = strike * d2_density * d_fhess
+
+            expect = term1 + term2 - term3 - term4 - term5
+
+            actual = target.black_scholes_call_value_fhess_by_strike(
+                underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
     @pytest.mark.parametrize(
