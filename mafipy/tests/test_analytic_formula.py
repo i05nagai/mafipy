@@ -312,6 +312,54 @@ class TestAnalytic(object):
 
             assert expect == actual
         case2()
+
+    # TODO: add more test cases
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_calc_sabr_implied_vol(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        one_minus_beta = 1.0 - beta
+        one_minus_beta2 = one_minus_beta ** 2
+        one_minus_beta4 = one_minus_beta ** 4
+        log_val = math.log(underlying / strike)
+        log_val2 = log_val ** 2
+        log_val4 = log_val ** 4
+        alpha2 = alpha ** 2
+        # factor1
+        factor11 = (underlying * strike) ** (one_minus_beta * 0.5)
+        term11 = 1.0
+        term12 = one_minus_beta2 * log_val2 / 24.0
+        term13 = one_minus_beta4 * log_val4 / 1920.0
+        factor12 = term11 + term12 + term13
+        denominator1 = factor11 * factor12
+        factor1 = alpha / denominator1
+        # factor2
+        z = factor11 * log_val * nu / alpha
+        x_numerator = math.sqrt(1.0 - 2.0 * rho * z + z * z) + z - rho
+        x_denominator = 1.0 - rho
+        x = math.log(x_numerator / x_denominator)
+        factor2 = z / x
+        # factor3
+        numerator31 = one_minus_beta2 * alpha2
+        denominator31 = 24.0 * ((underlying * strike) ** one_minus_beta)
+        term31 = numerator31 / denominator31
+        numerator32 = rho * beta * nu * alpha
+        denominator32 = 4.0 * ((underlying * strike) ** (one_minus_beta * 0.5))
+        term32 = numerator32 / denominator32
+        numerator33 = (2.0 - 3.0 * rho * rho) * nu * nu
+        denominator33 = 24.0
+        term33 = numerator33 / denominator33
+        factor3 = 1 + (term31 + term32 + term33) * maturity
+
+        expect = factor1 * factor2 * factor3
+
+        # actual
+        actual = target.calc_sabr_implied_vol(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+        assert expect == actual
+
     @pytest.mark.parametrize(
         "underlying, maturity, alpha, beta, rho, nu, expect", [
         ])

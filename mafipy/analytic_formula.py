@@ -447,7 +447,7 @@ def calc_local_vol_model_implied_vol(
     return local_vol_val * term
 
 
-def calc_sabr_model_implied_vol(
+def calc_sabr_implied_vol(
         underlying,
         strike,
         maturity,
@@ -458,27 +458,94 @@ def calc_sabr_model_implied_vol(
     """calc_sabr_model_implied_vol
     calculate implied volatility under SABR model.
 
+    .. math::
+        \\begin{eqnarray}
+            \sigma_{B}(K, S; T)
+                & \\approx &
+                \\frac{
+                    \\alpha
+                }{
+                (SK)^{(1-\\beta)/2}
+                \left(
+                    1
+                    + \\frac{(1 - \\beta)^{2}}{24}\log^{2}
+                        \\frac{S}{K}
+                    + \\frac{(1 - \\beta)^{4}}{1920}
+                        \log^{4}\\frac{S}{K}
+                \\right)
+                }
+                \left(
+                    \\frac{z}{x(z)}
+                \\right)
+                \\\\
+                & &
+                \left[
+                    1
+                    +
+                    \left(
+                        \\frac{(1 - \\beta)^{2}}{24}
+                            \\frac{\\alpha^{2}}{(SK)^{1-\\beta}}
+                        + \\frac{1}{4}
+                            \\frac{\\rho\\beta\\nu\\alpha}{(SK)^{(1-\\beta)/2}}
+                        + \\frac{2 - 3\\rho^{2}}{24}\\nu^{2}
+                    \\right) T
+                \\right],
+                \\\\
+            z
+                & := &
+                \\frac{\\nu}{\\alpha}
+                    (SK)^{(1-\\beta)/2}
+                    \log\left( \\frac{S}{K} \\right),
+                \\\\
+            x(z)
+                & := &
+                \log
+                \left(
+                    \\frac{
+                        \sqrt{1 - 2\\rho z + z^{2}} + z - \\rho
+                    }{
+                        1 - \\rho
+                    }
+                \\right)
+        \end{eqnarray}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`T` is maturity,
+    :math:`\\alpha` is alpha,
+    :math:`\\beta` is beta,
+    :math:`\\rho` is rho,
+    :math:`\\nu` is nu.
+
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk. Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
+
     :param float underlying:
     :param float strike:
     :param float maturity:
-    :param float alpha:
+    :param float alpha: alpha is :math:`[0, 1]`.
     :param float beta:
-    :param float rho:
-    :param float nu:
+    :param float rho: correlation of brownian motion.
+        value is in :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be greater than 0.
+    :return: implied volatility.
+    :rtype: float.
     """
-
-    if alpha <= 0:
-        ValueError("alpha must be greater than 0.")
+    if alpha <= 0.0:
+        raise ValueError("alpha must be greater than 0.")
     if rho > 1.0 or rho < -1.0:
-        ValueError("rho must be between -1 and 1.")
+        raise ValueError("rho must be between -1 and 1.")
     if nu <= 0.0:
-        ValueError("nu must be greater than 0.")
+        raise ValueError("nu must be greater than 0.")
     if underlying <= 0.0:
-        ValueError("Approximation not defined for non-positive underlying.")
+        raise ValueError("Approximation not defined for non-positive underlying.")
 
     log_val = math.log(underlying / strike)
-    log_val2 = math.log(underlying / strike) ** 2
-    log_val4 = math.log(underlying / strike) ** 4
+    log_val2 = log_val ** 2
+    log_val4 = log_val ** 4
     one_minus_beta = 1.0 - beta
     one_minus_beta2 = one_minus_beta ** 2
     one_minus_beta4 = one_minus_beta ** 4
