@@ -274,20 +274,51 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
+    def test_calc_local_vol_model_implied_vol(self):
+        underlying = 1.0
+        strike = 0.0
+        maturity = 1.0
+
+        # local_vol_func returns 0
+        def case1():
+            def lv_func(u):
+                return 0.0
+
+            def lv_fhess(u):
+                return 0.0
+            expect = 0.0
+            actual = target.calc_local_vol_model_implied_vol(
+                underlying, strike, maturity, lv_func, lv_fhess)
+            assert expect == actual
+        case1()
+
+        # otherwise
+        def case2():
+
+            def lv_func(u):
+                return u * u
+
+            def lv_fhess(u):
+                return 2.0
+            average_val = 0.5 * (underlying + strike)
+            lv_val = lv_func(average_val)
+            lv_val_fhess = lv_fhess(average_val)
+            numerator = lv_val_fhess * ((underlying - strike) ** 2)
+            denominator = 24.0 * lv_val
+            expect = lv_val * (1.0 + numerator / denominator)
+
+            actual = target.calc_local_vol_model_implied_vol(
+                underlying, strike, maturity, lv_func, lv_fhess)
+
+            assert expect == actual
+        case2()
     @pytest.mark.parametrize(
         "underlying, maturity, alpha, beta, rho, nu, expect", [
         ])
     def test_calc_sabr_atm_implied_vol(
             self, underlying, maturity, alpha, beta, rho, nu, expect):
-        underlying = 100.0
-        maturity = 1.0
-        alpha = 1.0
-        beta = 1.0
-        rho = 0.0
-        nu = 1.0
         actual = target.calc_sabr_model_atm_implied_vol(
             underlying, maturity, alpha, beta, rho, nu)
-        assert actual == expect
 
 
 class TestBlackScholesPricerHelper:
