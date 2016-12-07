@@ -573,22 +573,46 @@ def calc_sabr_implied_vol(
     return factor1 * factor2 * factor3
 
 
-def calc_sabr_model_atm_implied_vol(
+def calc_sabr_atm_implied_vol(
         underlying,
         maturity,
         alpha,
         beta,
         rho,
         nu):
-    """calc_sabr_model_atm_implied_vol
-    calculate implied volatility under SABR model.
+    """calc_sabr_atm_implied_vol
+    calculate implied volatility under SABR model at the money.
+
+    .. math::
+        \sigma_{ATM}(S; T)
+            := \sigma_{B}(S, S; T)
+            \\approx
+            \\frac{\\alpha}{S^{(1-\\beta)}}
+            \left[
+                1
+                +
+                \left(
+                    \\frac{(1 - \\beta)^{2}}{24}
+                        \\frac{\\alpha^{2}}{S^{2 - 2\\beta}}
+                    + \\frac{1}{4}
+                        \\frac{\\rho \\beta \\alpha \\nu}{S^{1-\\beta}}
+                    + \\frac{2 - 3\\rho^{2}}{24} \\nu^{2}
+                \\right) T
+            \\right]
+
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk. Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
 
     :param float underlying:
     :param float maturity:
-    :param float alpha:
-    :param float beta:
-    :param float rho:
-    :param float nu:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+    :return: implied volatility.
+    :rtype: float.
     """
     oneMinusBeta = 1.0 - beta
     A = underlying ** oneMinusBeta

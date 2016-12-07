@@ -360,13 +360,35 @@ class TestAnalytic(object):
             underlying, strike, maturity, alpha, beta, rho, nu)
         assert expect == actual
 
+    # TODO: add more test cases
     @pytest.mark.parametrize(
-        "underlying, maturity, alpha, beta, rho, nu, expect", [
+        "underlying, maturity, alpha, beta, rho, nu", [
+            (0.0357, 2, 0.036, 0.5, -0.25, 0.35)
         ])
     def test_calc_sabr_atm_implied_vol(
-            self, underlying, maturity, alpha, beta, rho, nu, expect):
-        actual = target.calc_sabr_model_atm_implied_vol(
+            self, underlying, maturity, alpha, beta, rho, nu):
+        one_minus_beta = 1.0 - beta
+        one_minus_beta2 = one_minus_beta ** 2
+        alpha2 = alpha ** 2
+        # factor1
+        factor1 = alpha / (underlying ** one_minus_beta)
+        # factor2
+        numerator1 = one_minus_beta2 * alpha2
+        denominator1 = 24.0 * underlying ** (2.0 * one_minus_beta)
+        term1 = numerator1 / denominator1
+        numerator2 = rho * beta * alpha * nu
+        denominator2 = 4.0 * (underlying ** one_minus_beta)
+        term2 = numerator2 / denominator2
+        numerator3 = (2.0 - 3.0 * rho * rho) * nu * nu
+        denominator3 = 24.0
+        term3 = numerator3 / denominator3
+        factor2 = 1.0 + (term1 + term2 + term3) * maturity
+        # expect
+        expect = factor1 * factor2
+        # actual
+        actual = target.calc_sabr_atm_implied_vol(
             underlying, maturity, alpha, beta, rho, nu)
+        assert expect == actual
 
 
 class TestBlackScholesPricerHelper:
