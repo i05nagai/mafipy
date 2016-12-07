@@ -623,65 +623,6 @@ def calc_sabr_atm_implied_vol(
     return vol
 
 
-def calc_sabr_model_implied_normal_vol(
-        underlying,
-        strike,
-        maturity,
-        alpha,
-        beta,
-        rho,
-        nu):
-    """calc_sabr_model_implied_vol
-    calculate implied volatility under SABR model.
-
-    :param float underlying:
-    :param float strike:
-    :param float maturity:
-    :param float alpha:
-    :param float beta:
-    :param float rho:
-    :param float nu:
-    """
-
-    if alpha <= 0:
-        ValueError("alpha must be greater than 0.")
-    if rho > 1.0 or rho < -1.0:
-        ValueError("rho must be between -1 and 1.")
-    if nu <= 0.0:
-        ValueError("nu must be greater than 0.")
-    if underlying <= 0.0:
-        ValueError("Approximation not defined for non-positive underlying.")
-
-    log_val = math.log(underlying / strike)
-    log_val2 = math.log(underlying / strike) ** 2
-    log_val4 = math.log(underlying / strike) ** 4
-    one_minus_beta = 1.0 - beta
-    one_minus_beta2 = one_minus_beta ** 2
-    one_minus_beta4 = one_minus_beta ** 4
-    common_factor1 = (underlying * strike) ** (one_minus_beta * 0.5)
-
-    # factor1
-    term11 = one_minus_beta2 * log_val2 / 24.0
-    term12 = one_minus_beta4 * log_val4 / 1920.0
-    denominator1 = common_factor1 * (1.0 + term11 + term12)
-    factor1 = alpha / denominator1
-    # factor2
-    z = (nu * common_factor1 * log_val / alpha)
-    numerator2 = math.sqrt(1.0 - 2 * rho * z + z * z) + z - rho
-    x = math.log(numerator2 / (1.0 - rho)) if abs(rho - 1.0) > 1E-10 else 1.0
-    factor2 = 1.0 if (abs(x - z) < 1E-10) else z / x
-    # factor3
-    numerator31 = one_minus_beta2 * (alpha ** 2)
-    denominator31 = 24.0 * ((underlying * strike) ** one_minus_beta)
-    term31 = numerator31 / denominator31
-    numerator32 = 0.25 * rho * beta * nu * alpha
-    term32 = numerator32 / common_factor1
-    numerator33 = (2.0 - 3.0 * rho * rho) * nu * nu
-    term33 = numerator33 / 24.0
-    factor3 = 1.0 + (term31 + term32 + term33) * maturity
-    return factor1 * factor2 * factor3
-
-
 class BlackScholesPricerHelper(object):
     """BlackScholesPricerHelper
     Helper functions to generate a function with respect to a sigle variable.
