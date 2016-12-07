@@ -7,6 +7,8 @@ import math
 import numpy as np
 import scipy.special
 
+import mafipy.math_formula
+
 
 def _is_d1_or_d2_infinity(underlying, strike, vol):
     """is_d1_or_d2_infinity
@@ -66,8 +68,8 @@ def func_d2(underlying, strike, rate, maturity, vol):
     return numerator / denominator
 
 
-def derivative_d_by_strike(underlying, strike, rate, vol, maturity):
-    """derivative_d_by_strike
+def d_fprime_by_strike(underlying, strike, rate, maturity, vol):
+    """d_fprime_by_strike
     derivative of :math:`d_{1}` with respect to :math:`K`
     where :math:`K` is strike.
     See :py:func:`func_d1`.
@@ -87,18 +89,18 @@ def derivative_d_by_strike(underlying, strike, rate, vol, maturity):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float vol:
     :param float maturity: must be non-negative.
+    :param float vol:
     :return: value of derivative.
     :rtype: float
     """
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
     return strike / (math.sqrt(maturity) * vol * underlying)
 
 
-def derivative2_d_by_strike(underlying, strike, rate, vol, maturity):
-    """derivative2_d_by_strike
+def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
+    """d_fhess_by_strike
     second derivative of :math:`d_{i}\ (i = 1, 2)` with respect to :math:`K`,
     where :math:`K` is strike.
 
@@ -114,13 +116,13 @@ def derivative2_d_by_strike(underlying, strike, rate, vol, maturity):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float vol:
     :param float maturity:
+    :param float vol:
     :return: value of second derivative of :math:`d_{1}` or :math:`d_{2}`.
     :rtype: float
     """
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
     return 1.0 / (math.sqrt(maturity) * vol * underlying)
 
 
@@ -230,7 +232,7 @@ def calc_black_scholes_call_value(
         today=0.0):
     """calc_black_scholes_call_value
     calculate call value in the case of today is not zero.
-    :param maturity: - today is time to expiry.
+    (`maturity` - `today`) is treated as time to expiry.
     See :py:func:`calc_black_scholes_call_formula`.
 
     :param float underlying:
@@ -268,59 +270,6 @@ def calc_black_scholes_put_value(
         underlying, strike, rate, maturity - today, vol)
 
 
-class BlackScholesPricerHelper(object):
-
-    def make_call_wrt_strike(
-            self,
-            underlying,
-            rate,
-            maturity,
-            vol,
-            today=0.0):
-        """make_call_wrt_strike
-
-        :param float underlying:
-        :param float rate:
-        :param float maturity:
-        :param float vol:
-        :param float today:
-        :return: call option pricer as a function of strike.
-        :rtype: func
-        """
-        return lambda strike: calc_black_scholes_call_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
-
-    def make_put_wrt_strike(
-            self,
-            underlying,
-            rate,
-            maturity,
-            vol,
-            today=0.0):
-        """make_put_wrt_strike
-
-        :param float underlying:
-        :param float rate:
-        :param float maturity:
-        :param float vol:
-        :param float today:
-        :return: put option pricer as a function of strike.
-        :rtype: func
-        """
-        return lambda strike: calc_black_scholes_put_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
-
-
 def black_scholes_call_value_fprime_by_strike(
         underlying,
         strike,
@@ -353,16 +302,18 @@ def black_scholes_call_value_fprime_by_strike(
     :param float strike:
     :param float rate:
     :param float maturity: must be non-negative.
-    :param float vol:
+    :param float vol: volatility. must be non-negative.
     :return: value of derivative.
     :rtype: float
     """
     norm = scipy.stats.norm
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    d_fprime = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
+    d_fprime = d_fprime_by_strike(
+        underlying, strike, rate, maturity, vol)
 
     term1 = underlying * norm.pdf(d1) * d_fprime
     term2 = math.exp(-rate * maturity) * norm.cdf(d2)
@@ -379,6 +330,32 @@ def black_scholes_call_value_fhess_by_strike(
     """black_scholes_call_value_fhess_by_strike
     Second derivative of value of call option with respect to strike
     under black scholes model.
+    See :py:func:`calc_black_scholes_call_formula`
+    and :py:func:`black_scholes_call_value_fprime_by_strike`.
+
+    .. math::
+        \\begin{array}{ccl}
+            \\frac{\partial^{2}}{\partial K^{2}} c(0, S; T, K)
+                & = &
+                S\phi^{\prime}(d_{1}(K))(d_{1}^{\prime}(K))^{2}
+                + S\phi(d_{1}(K))d_{1}^{\prime\prime}(K)
+                - 2\phi(d_{2}(K))d_{2}^{\prime}(K)
+                \\\\
+                & &
+                - K\phi^{\prime}(d_{2}(K))(d_{2}^{\prime}(K))^{2}
+                - K\phi(d_{2}(K))d_{2}^{\prime\prime}(K))
+        \end{array}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is vol,
+    :math:`d_{1}, d_{2}` is defined
+    in :py:func:`calc_black_scholes_call_formula`,
+    :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
+    :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
     :param float underlying:
     :param float strike:
@@ -389,97 +366,24 @@ def black_scholes_call_value_fhess_by_strike(
     :rtype: float.
     """
     norm = scipy.stats.norm
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
 
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
+    d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
+    d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
+    d1_density = norm.pdf(d1)
+    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+    d2_density = norm.pdf(d2)
+    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
 
-    term1 = underlying * norm.pdf(d1) * derivative_d
-    term2 = norm.cdf(d2)
-    term3 = strike * norm.pdf(d2) * derivative_d
-    return term1 - term2 - term3
-
-
-def black_scholes_call_value_third_by_strike(
-        underlying,
-        strike,
-        rate,
-        maturity,
-        vol):
-    """black_scholes_call_value_third_by_strike
-    Third derivative of value of call option with respect to strike
-    under black scholes model.
-
-    :param float underlying:
-    :param float strike:
-    :param float rate:
-    :param float maturity: non-negative.
-    :param float vol: volatility. non-negative.
-    :return: value of third derivative.
-    :rtype: float.
-    """
-    norm = scipy.stats.norm
-    assert(maturity >= 0.0)
-    assert(vol >= 0.0)
-
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
-    d2 = func_d2(underlying, strike, rate, maturity, vol)
-    derivative_d = derivative_d_by_strike(
-        underlying, strike, rate, vol, maturity)
-
-    term1 = underlying * norm.pdf(d1) * derivative_d
-    term2 = norm.cdf(d2)
-    term3 = strike * norm.pdf(d2) * derivative_d
-    return term1 - term2 - term3
-
-
-def calc_black_model_payers_swaption_value(
-        swap_rate,
-        strike,
-        option_maturity,
-        vol,
-        swap_annuity):
-    """calc_black_model_payers_swaption_value
-    calculate value of payer's swaption under assumption
-    that swap rate is black scholes model.
-
-    :param float swap_rate:
-    :param float strike:
-    :param float option_maturity: must be non-negative.
-    :param float vol: must be non-negative.
-    :param float swap_annuity:
-    :return: value of payer's swaption.
-    :rtype: float
-    """
-
-    return calc_black_scholes_call_formula(
-        swap_rate, strike, option_maturity, vol)
-
-
-def calc_black_model_recievers_swaption_value(
-        swap_rate,
-        strike,
-        option_maturity,
-        vol,
-        swap_annuity):
-    """calc_black_model_recievers_swaption_value
-    calculate value of reciever's swaption under assumption
-    that swap rate is black scholes model.
-
-    :param float swap_rate:
-    :param float strike:
-    :param float option_maturity:
-    :param float vol:
-    :param float swap_annuity:
-    :return: value of reciever's swaption.
-    :rtype: float
-    """
-
-    return calc_black_scholes_put_formula(
-        swap_rate, strike, option_maturity, vol)
+    term1 = underlying * d1_density_fprime * d_fprime * d_fprime
+    term2 = underlying * d1_density * d_fhess
+    term3 = 2.0 * d2_density * d_fprime
+    term4 = strike * d2_density_fprime * d_fprime * d_fprime
+    term5 = strike * d2_density * d_fhess
+    return term1 + term2 - term3 - term4 - term5
 
 
 def calc_local_vol_model_implied_vol(
@@ -487,26 +391,63 @@ def calc_local_vol_model_implied_vol(
         strike,
         maturity,
         local_vol_func,
-        second_derivative_local_vol_func,
+        local_vol_fhess,
         today=0.0):
     """calc_local_vol_model_implied_vol
+    implied volatility function under following local volatility model:
+
+    .. math::
+        dF_{t} = \sigma_{loc}(F_{t}) F dW_{t},
+        \quad
+        F_{0} = f.
+
+    where
+    :math:`F` is underlying,
+    :math:`\sigma_{loc}(\cdot)` is local volatility funciton,
+    :math:`W` is brownian motion,
+    :math:`f` is initial value of underlying.
+
+    Implied volatility function of the model is defined as follows:
+
+    .. math::
+        \sigma_{B}(K, f)
+            = \sigma_{loc}(\\frac{1}{2}(f + K))
+            \left(
+                1
+                + \\frac{1}{24} \\frac{
+                    \sigma_{loc}^{\prime\prime}(\\frac{1}{2}(f + K))
+                }{
+                    \sigma_{loc}(\\frac{1}{2}(f + K))
+                }(f - K)^{2} + \cdots
+            \\right).
+
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk. Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
 
     :param float underlying:
     :param float strike:
     :param float maturity:
-    :param object local_vol_func:
-    :param object second_derivative_local_vol_func:
+    :param callable local_vol_func:
+        local volatility function :math:`\sigma_{loc}` .
+    :param callable local_vol_fhess: second derivative of
+        local vol function :math:`\sigma_{loc}^{\prime\prime}`
     :param float today:
+    :return: implied volatility.
+    :rtype: float.
     """
     average_val = 0.5 * (underlying + strike)
     local_vol_val = local_vol_func(average_val)
-    term = (1.0 + second_derivative_local_vol_func(average_val)
-            * ((underlying - strike) ** 2)
+    # escape zero division
+    if np.isclose(local_vol_val, 0.0):
+        return 0.0
+    term = (1.0 + local_vol_fhess(average_val) * ((underlying - strike) ** 2)
             / (24.0 * local_vol_val))
     return local_vol_val * term
 
 
-def calc_sabr_model_implied_vol(
+def calc_sabr_implied_vol(
         underlying,
         strike,
         maturity,
@@ -517,27 +458,94 @@ def calc_sabr_model_implied_vol(
     """calc_sabr_model_implied_vol
     calculate implied volatility under SABR model.
 
+    .. math::
+        \\begin{eqnarray}
+            \sigma_{B}(K, S; T)
+                & \\approx &
+                \\frac{
+                    \\alpha
+                }{
+                (SK)^{(1-\\beta)/2}
+                \left(
+                    1
+                    + \\frac{(1 - \\beta)^{2}}{24}\log^{2}
+                        \\frac{S}{K}
+                    + \\frac{(1 - \\beta)^{4}}{1920}
+                        \log^{4}\\frac{S}{K}
+                \\right)
+                }
+                \left(
+                    \\frac{z}{x(z)}
+                \\right)
+                \\\\
+                & &
+                \left[
+                    1
+                    +
+                    \left(
+                        \\frac{(1 - \\beta)^{2}}{24}
+                            \\frac{\\alpha^{2}}{(SK)^{1-\\beta}}
+                        + \\frac{1}{4}
+                            \\frac{\\rho\\beta\\nu\\alpha}{(SK)^{(1-\\beta)/2}}
+                        + \\frac{2 - 3\\rho^{2}}{24}\\nu^{2}
+                    \\right) T
+                \\right],
+                \\\\
+            z
+                & := &
+                \\frac{\\nu}{\\alpha}
+                    (SK)^{(1-\\beta)/2}
+                    \log\left( \\frac{S}{K} \\right),
+                \\\\
+            x(z)
+                & := &
+                \log
+                \left(
+                    \\frac{
+                        \sqrt{1 - 2\\rho z + z^{2}} + z - \\rho
+                    }{
+                        1 - \\rho
+                    }
+                \\right)
+        \end{eqnarray}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`T` is maturity,
+    :math:`\\alpha` is alpha,
+    :math:`\\beta` is beta,
+    :math:`\\rho` is rho,
+    :math:`\\nu` is nu.
+
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk. Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
+
     :param float underlying:
     :param float strike:
     :param float maturity:
-    :param float alpha:
+    :param float alpha: alpha is :math:`[0, 1]`.
     :param float beta:
-    :param float rho:
-    :param float nu:
+    :param float rho: correlation of brownian motion.
+        value is in :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be greater than 0.
+    :return: implied volatility.
+    :rtype: float.
     """
-
-    if alpha <= 0:
-        ValueError("alpha must be greater than 0.")
+    if alpha <= 0.0:
+        raise ValueError("alpha must be greater than 0.")
     if rho > 1.0 or rho < -1.0:
-        ValueError("rho must be between -1 and 1.")
+        raise ValueError("rho must be between -1 and 1.")
     if nu <= 0.0:
-        ValueError("nu must be greater than 0.")
+        raise ValueError("nu must be greater than 0.")
     if underlying <= 0.0:
-        ValueError("Approximation not defined for non-positive underlying.")
+        raise ValueError("Approximation not defined for non-positive underlying.")
 
     log_val = math.log(underlying / strike)
-    log_val2 = math.log(underlying / strike) ** 2
-    log_val4 = math.log(underlying / strike) ** 4
+    log_val2 = log_val ** 2
+    log_val4 = log_val ** 4
     one_minus_beta = 1.0 - beta
     one_minus_beta2 = one_minus_beta ** 2
     one_minus_beta4 = one_minus_beta ** 4
@@ -565,22 +573,46 @@ def calc_sabr_model_implied_vol(
     return factor1 * factor2 * factor3
 
 
-def calc_sabr_model_atm_implied_vol(
+def calc_sabr_atm_implied_vol(
         underlying,
         maturity,
         alpha,
         beta,
         rho,
         nu):
-    """calc_sabr_model_atm_implied_vol
-    calculate implied volatility under SABR model.
+    """calc_sabr_atm_implied_vol
+    calculate implied volatility under SABR model at the money.
+
+    .. math::
+        \sigma_{ATM}(S; T)
+            := \sigma_{B}(S, S; T)
+            \\approx
+            \\frac{\\alpha}{S^{(1-\\beta)}}
+            \left[
+                1
+                +
+                \left(
+                    \\frac{(1 - \\beta)^{2}}{24}
+                        \\frac{\\alpha^{2}}{S^{2 - 2\\beta}}
+                    + \\frac{1}{4}
+                        \\frac{\\rho \\beta \\alpha \\nu}{S^{1-\\beta}}
+                    + \\frac{2 - 3\\rho^{2}}{24} \\nu^{2}
+                \\right) T
+            \\right]
+
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk. Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
 
     :param float underlying:
     :param float maturity:
-    :param float alpha:
-    :param float beta:
-    :param float rho:
-    :param float nu:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+    :return: implied volatility.
+    :rtype: float.
     """
     oneMinusBeta = 1.0 - beta
     A = underlying ** oneMinusBeta
@@ -591,96 +623,73 @@ def calc_sabr_model_atm_implied_vol(
     return vol
 
 
-def calc_sabr_model_implied_normal_vol(
-        underlying,
-        strike,
-        maturity,
-        alpha,
-        beta,
-        rho,
-        nu):
-    """calc_sabr_model_implied_vol
-    calculate implied volatility under SABR model.
-
-    :param float underlying:
-    :param float strike:
-    :param float maturity:
-    :param float alpha:
-    :param float beta:
-    :param float rho:
-    :param float nu:
+class BlackScholesPricerHelper(object):
+    """BlackScholesPricerHelper
+    Helper functions to generate a function with respect to a sigle variable.
+    For instance, black formula as a function of volatility is needed to
+    evaluate market smile by implied volatility.
     """
 
-    if alpha <= 0:
-        ValueError("alpha must be greater than 0.")
-    if rho > 1.0 or rho < -1.0:
-        ValueError("rho must be between -1 and 1.")
-    if nu <= 0.0:
-        ValueError("nu must be greater than 0.")
-    if underlying <= 0.0:
-        ValueError("Approximation not defined for non-positive underlying.")
+    def make_call_wrt_strike(
+            self,
+            underlying,
+            rate,
+            maturity,
+            vol,
+            today=0.0):
+        """make_call_wrt_strike
+        make function of black shcoles call formula with respect to function.
+        This function return :py:func:`calc_black_scholes_call_value`
+        as funciton of a single variable.
 
-    log_val = math.log(underlying / strike)
-    log_val2 = math.log(underlying / strike) ** 2
-    log_val4 = math.log(underlying / strike) ** 4
-    one_minus_beta = 1.0 - beta
-    one_minus_beta2 = one_minus_beta ** 2
-    one_minus_beta4 = one_minus_beta ** 4
-    common_factor1 = (underlying * strike) ** (one_minus_beta * 0.5)
+        .. math::
 
-    # factor1
-    term11 = one_minus_beta2 * log_val2 / 24.0
-    term12 = one_minus_beta4 * log_val4 / 1920.0
-    denominator1 = common_factor1 * (1.0 + term11 + term12)
-    factor1 = alpha / denominator1
-    # factor2
-    z = (nu * common_factor1 * log_val / alpha)
-    numerator2 = math.sqrt(1.0 - 2 * rho * z + z * z) + z - rho
-    x = math.log(numerator2 / (1.0 - rho)) if abs(rho - 1.0) > 1E-10 else 1.0
-    factor2 = 1.0 if (abs(x - z) < 1E-10) else z / x
-    # factor3
-    numerator31 = one_minus_beta2 * (alpha ** 2)
-    denominator31 = 24.0 * ((underlying * strike) ** one_minus_beta)
-    term31 = numerator31 / denominator31
-    numerator32 = 0.25 * rho * beta * nu * alpha
-    term32 = numerator32 / common_factor1
-    numerator33 = (2.0 - 3.0 * rho * rho) * nu * nu
-    term33 = numerator33 / 24.0
-    factor3 = 1.0 + (term31 + term32 + term33) * maturity
-    return factor1 * factor2 * factor3
+            c(K; S, r, T, \sigma) := c(S, K, r, T, \sigma)
 
+        :param float underlying:
+        :param float rate:
+        :param float maturity:
+        :param float vol: volatility.
+        :param float today: default value is 0.
+        :return: call option pricer as a function of strike.
+        :rtype: LambdaType
+        """
+        return lambda strike: calc_black_scholes_call_value(
+            underlying=underlying,
+            strike=strike,
+            rate=rate,
+            maturity=maturity,
+            vol=vol,
+            today=today)
 
-def calc_hunt_kennedy_cms_option_value(
-        swap_rate,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        swap_maturity,
-        vol):
-    """calc_hunt_kennedy_cms_option_value
-    From chapter14 in Financial Derivatives in Theory and Practice.
+    def make_put_wrt_strike(
+            self,
+            underlying,
+            rate,
+            maturity,
+            vol,
+            today=0.0):
+        """make_put_wrt_strike
+        make function of black shcoles put formula with respect to function.
+        This function return :py:func:`calc_black_scholes_put_value`
+        as funciton of a single variable.
 
-    :param float swap_rate:
-    :param float option_strike:
-    :param float swap_annuity:
-    :param float option_maturity:
-    :param float swap_maturity:
-    :param float vol:
-    """
-    a = 1.0 / swap_maturity
-    b = (1.0 / swap_annuity - a) / swap_rate
-    convexity_adjustment = math.exp(vol * vol * option_maturity)
+        .. math::
 
-    unadjusted_value = calc_black_model_swaption_value(
-        swap_rate,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        vol)
-    adjusted_value = calc_black_model_swaption_value(
-        swap_rate * convexity_adjustment,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        vol)
-    return a * unadjusted_value + b * swap_rate * adjusted_value
+            p(K; S, r, T, \sigma) := p(S, K, r, T, \sigma)
+
+        :param float underlying:
+        :param float rate:
+        :param float maturity:
+        :param float vol: volatility
+        :param float today: default value is 0.
+        :return: put option pricer as a function of strike.
+        :rtype: LambdaType.
+        """
+        return lambda strike: calc_black_scholes_put_value(
+            underlying=underlying,
+            strike=strike,
+            rate=rate,
+            maturity=maturity,
+            vol=vol,
+            today=today)

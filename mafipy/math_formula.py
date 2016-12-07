@@ -13,4 +13,3 @@ def norm_pdf_fprime(x):
     """
     return -x * scipy.stats.norm.pdf(x)
 
-
