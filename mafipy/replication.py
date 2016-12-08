@@ -11,30 +11,63 @@ from . import util
 
 def linear_annuity_mapping_func(underlying, alpha0, alpha1):
     """linear_annuity_mapping_func
+    calculate linear annuity mapping function.
+    Annuity mapping function is model of $P(t, T) / A(t)$
+    so that it's value is positive.
+    linear annuity mapping function calculates following formula:
+
+    .. math::
+        \\alpha(S) := S \\alpha_{0} + \\alpha_{1}.
+
+    where
+    :math:`S` is underlying,
+    :math:`\\alpha_{0}` is alpha0,
+    :math:`\\alpha_{1}` is alpha1.
 
     :param float underlying:
     :param float alpha0:
     :param float alpha1:
+    :return: value of linear annuity mapping function.
+    :rtype: float.
     """
+    assert(underlying * alpha0 + alpha1 > 0)
     return underlying * alpha0 + alpha1
 
 
 def linear_annuity_mapping_fprime(underlying, alpha0, alpha1):
     """linear_annuity_mapping_fprime
+    first derivative of linear annuity mapping function.
+    See :py:func:`linear_annuity_mapping_func`.
+    The function calculates following formula:
+
+    .. math::
+        \\alpha^{\prime}(S) := \\alpha_{0.}
+
+    where
+    :math:`S` is underlying,
+    :math:`\\alpha_{0}` is alpha0.
 
     :param float underlying:
     :param float alpha0:
-    :param float alpha1:
+    :param float alpha1: not used.
+    :return: value of first derivative of linear annuity mapping function.
+    :rtype: float.
     """
     return alpha0
 
 
 def linear_annuity_mapping_fhess(underlying, alpha0, alpha1):
     """linear_annuity_mapping_fhess
+    second derivative of linear annuity mapping function.
+    See :py:func:`linear_annuity_mapping_func`
+    and :py:func:`linear_annuity_mapping_fprime`.
+    The value is 0.
 
-    :param float underlying:
-    :param float alpha0:
-    :param float alpha1:
+    :param float underlying
+    :param float alpha0: not used.
+    :param float alpha1: not used.
+    :return: return 0. value of second derivative.
+    :rtype: float.
     """
     return 0.0
 
