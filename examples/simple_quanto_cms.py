@@ -9,7 +9,7 @@ def main():
     rate = 0.01
     maturity = 1.0
     vol_swap_rate = 0.05
-    swap_rate_cdf = pricer_quanto_cms.make_cdf_black_scholes_model(
+    swap_rate_cdf = pricer_quanto_cms.make_cdf_black_scholes(
         underlying=init_swap_rate,
         rate=rate,
         maturity=maturity,

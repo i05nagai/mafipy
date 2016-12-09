@@ -96,12 +96,13 @@ def make_pdf_fprime_black_scholes(
     return pdf_fprime
 
 
-def make_cdf_black_scholes_model(
+def make_cdf_black_scholes(
         underlying,
         rate,
         maturity,
         vol):
-    """make_cdf_black_scholes_model
+    """make_cdf_black_scholes
+    returns c.d.f. of black scholes model.
 
     :param underlying:
     :param rate:
@@ -109,9 +110,10 @@ def make_cdf_black_scholes_model(
     :param vol:
     :return: distribution of call price under black scholes model
         as a funciton of strike.
-    :rtype: lambda
-
+    :rtype: function
     """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
     return lambda strike: (
         1.0 + analytic_formula.black_scholes_call_value_fprime_by_strike(
             underlying, strike, rate, maturity, vol))
