@@ -28,7 +28,7 @@ def make_pdf_black_scholes(
     :math:`T` is maturity,
     :math:`K` is strike,
     :math:`\Phi_{S}(k)` is p.d.f. of :math:`S`,
-    :math:`c(0, S; T, K)` is value of call option 
+    :math:`c(0, S; T, K)` is value of call option
     with strike :math:`K` and :math:`T` maturity at time 0.
 
     :param float underlying:
@@ -53,20 +53,34 @@ def make_pdf_black_scholes(
     return pdf
 
 
-def make_pdf_fprime_black_scholes_model(
+def make_pdf_fprime_black_scholes(
         underlying,
         rate,
         maturity,
         vol):
     """make_pdf_fprime_black_scholes_model
+    return first derivative of p.d.f. of black scholes.
+    See :py:func:`make_pdf_black_scholes`.
+
+    .. math::
+        \Phi_{S}^{\prime}(k)
+        := \\frac{\partial}{\partial K^{2}} c(0, S; T, K)
+
+    where
+    :math:`S` is underlying,
+    :math:`T` is maturity,
+    :math:`K` is strike,
+    :math:`\Phi_{S}(k)` is p.d.f. of :math:`S`,
+    :math:`c(0, S; T, K)` is value of call option
+    with strike :math:`K` and :math:`T` maturity at time 0.
 
     :param float underlying:
     :param float rate:
     :param float maturity: non-negative.
     :param float vol: volatility. non-negative.
-    :return: p.d.f. of call price under black scholes model
+    :return: first derivative of p.d.f. of call price under black scholes model
         as a function of strike.
-    :rtype: lambda
+    :rtype: function
     """
     assert(maturity >= 0.0)
     assert(vol >= 0.0)

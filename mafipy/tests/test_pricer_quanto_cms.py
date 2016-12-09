@@ -50,6 +50,29 @@ class TestPricerQuantoCms(object):
                 underlying, rate, maturity, vol)(strike)
             assert expect == approx(actual)
 
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, expect", [
+            # maturity < 0 raise AssertionError
+            (2.0, 1.0, 1.0, -1.0, 1.0, 1.0),
+            # vol < 0 raise AssertionError
+            (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
+            # otherwise
+            (2.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+        ])
+    def test_make_pdf_fprime_black_scholes(
+            self, underlying, strike, rate, maturity, vol, expect):
+        # raise AssertionError
+        if maturity < 0.0 or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.make_pdf_fprime_black_scholes(
+                    underlying, rate, maturity, vol)
+        else:
+            expect = analytic_formula.black_scholes_call_value_third_by_strike(
+                underlying, strike, rate, maturity, vol)
+            actual = target.make_pdf_fprime_black_scholes(
+                underlying, rate, maturity, vol)(strike)
+            assert expect == approx(actual)
+
 
 class TestSimpleQuantoCmsPricer(object):
 
