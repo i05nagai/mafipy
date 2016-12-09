@@ -12,17 +12,29 @@ from . import payoff
 from . import replication
 
 
-def make_pdf_black_scholes_model(
+def make_pdf_black_scholes(
         underlying,
         rate,
         maturity,
         vol):
-    """make_pdf_black_scholes_model
+    """make_pdf_black_scholes
+    return p.d.f. of black scholes model
 
-    :param underlying:
-    :param rate:
-    :param maturity: non-negative.
-    :param vol: volatility. non-negative.
+    .. math::
+        \Phi_{S}(k) := \\frac{\partial}{\partial K^{2}} c(0, S; T, K)
+
+    where
+    :math:`S` is underlying,
+    :math:`T` is maturity,
+    :math:`K` is strike,
+    :math:`\Phi_{S}(k)` is p.d.f. of :math:`S`,
+    :math:`c(0, S; T, K)` is value of call option 
+    with strike :math:`K` and :math:`T` maturity at time 0.
+
+    :param float underlying:
+    :param float rate:
+    :param float maturity: non-negative.
+    :param float vol: volatility. non-negative.
     :return: p.d.f. of call price under black scholes model
         as a function of strike.
     :rtype: function with strike.

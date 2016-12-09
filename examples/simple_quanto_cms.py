@@ -14,7 +14,7 @@ def main():
         rate=rate,
         maturity=maturity,
         vol=vol_swap_rate)
-    swap_rate_pdf = pricer_quanto_cms.make_pdf_black_scholes_model(
+    swap_rate_pdf = pricer_quanto_cms.make_pdf_black_scholes(
         underlying=init_swap_rate,
         rate=rate,
         maturity=maturity,
