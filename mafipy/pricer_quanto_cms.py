@@ -225,6 +225,7 @@ def _forward_fx_diffusion(
         swap_rate_pdf,
         swap_rate_pdf_fprime):
     """_forward_fx_diffusion
+    calculate following value:
 
     .. math::
 
@@ -233,21 +234,29 @@ def _forward_fx_diffusion(
             \left(
                 \\rho_{XS}\sigma_{X}\sqrt{T}\Phi^{-1}(\Psi^{A}(s))
                     + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
-            \\right).
+            \\right),
 
     where
-    :math:`s` is :param swap_rate:,
-    :math:`\\rho_{XS}` is :param corr:,
-    :math:`\sigma_{X}` is :param vol:,
+    :math:`s` is swap_rate,
+    :math:`\\rho_{XS}` is corr,
+    :math:`\sigma_{X}` is vol,
+    :math:`\Psi^{A}(\cdot)` is c.d.f. of swap_rate under annuity measure.
 
     :param float swap_rate:
     :param float time:
-    :param float vol:
-    :param float corr:
-    :param callable dist_func: distribution of foward swap rate
-        under annuity measure
+    :param float vol: must be positive. volatility.
+    :param float corr: must be within [-1, 1]. correlation.
+    :param callable swap_rate_cdf: c.d.f. of foward swap rate
+        under annuity measure.
+    :param callable swap_rate_pdf: not used. p.d.f. of foward swap rate
+        under annuity measure.
+    :param callable swap_rate_pdf_fprime: not used. derivative of p.d.f.
+        of foward swap rate under annuity measure.
     :return: value of forward fx diffusion.
+    :rtype: float
     """
+    assert(vol > 0.0)
+    assert(-1.0 <= corr <= 1.0)
     h = _calc_h(swap_rate_cdf, swap_rate)
     term1 = corr * vol * math.sqrt(time) * h
     term2 = vol * vol * time * (1.0 - corr * corr) * 0.5

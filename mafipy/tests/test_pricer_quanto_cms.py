@@ -3,12 +3,13 @@
 
 from __future__ import division
 
-import mafipy.pricer_quanto_cms as target
+from pytest import approx
 import mafipy.analytic_formula as analytic_formula
 import mafipy.math_formula as math_formula
-import scipy.stats
+import mafipy.pricer_quanto_cms as target
+import math
 import pytest
-from pytest import approx
+import scipy.stats
 
 
 class TestPricerQuantoCms(object):
@@ -160,6 +161,60 @@ class TestPricerQuantoCms(object):
         actual = target._calc_h_fhess(
             swap_rate_pdf_fprime, swap_rate_pdf, swap_rate, h, h_fprime)
         assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "swap_rate, time, vol, corr", [
+            # vol < 0.0 raise AssertionError
+            (2.0, 1.0, -1.0, 0.1),
+            # corr < -1.0 raise AssertionError
+            (2.0, 1.0, 1.0, -1.1),
+            # corr > -1.0 raise AssertionError
+            (2.0, 1.0, 1.0, 1.1),
+            # otherwise
+            (2.0, 1.0, 1.0, 0.1),
+        ])
+    def test_forward_fx_diffusion(self,
+                                  swap_rate,
+                                  time,
+                                  vol,
+                                  corr):
+        norm = scipy.stats.norm
+
+        def swap_rate_cdf(s):
+            return norm.cdf(s)
+
+        def swap_rate_pdf(s):
+            return norm.pdf(s)
+
+        def swap_rate_pdf_fprime(s):
+            return -s * norm.pdf(s)
+
+        h = target._calc_h(swap_rate_cdf, swap_rate)
+
+        # raise AssertionError
+        if -1.0 > corr or 1.0 < corr or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target._forward_fx_diffusion(swap_rate,
+                                                      time,
+                                                      vol,
+                                                      corr,
+                                                      swap_rate_cdf,
+                                                      swap_rate_pdf,
+                                                      swap_rate_pdf_fprime)
+        else:
+            # expect
+            term1 = corr * vol * h
+            term2 = (1 - corr * corr) * vol * vol * time * 0.5
+            expect = math.exp(term1 + term2)
+            # actual
+            actual = target._forward_fx_diffusion(swap_rate,
+                                                  time,
+                                                  vol,
+                                                  corr,
+                                                  swap_rate_cdf,
+                                                  swap_rate_pdf,
+                                                  swap_rate_pdf_fprime)
+            assert expect == approx(actual)
 
 
 class TestSimpleQuantoCmsPricer(object):
