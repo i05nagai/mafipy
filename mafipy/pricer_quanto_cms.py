@@ -281,15 +281,27 @@ def _forward_fx_diffusion_fprime(
             & = & \\rho_{XS}\sigma_{X}\sqrt{T}h'(s) \\tilde{\chi}(s)
 
     where
-    :math:`h(s) := \Phi^{-1}(\Psi^{A}(s))`
+    :math:`h(s) := \Phi^{-1}(\Psi^{A}(s))`,
+    :math:`\\rho_{XS}` is corr,
+    :math:`\sigma_{X}` is vol.
+
+    See :py:func:`_forward_fx_diffusion`.
 
     :param float swap_rate:
     :param float time:
-    :param float vol:
-    :param float corr:
-    :param function swap_rate_cdf: distribution of forward swap rate
-        under annuity measure
+    :param float vol: must be positive. volatility
+    :param float corr: must be within [-1, 1]. correlation.
+    :param callable swap_rate_cdf: c.d.f. of foward swap rate
+        under annuity measure.
+    :param callable swap_rate_pdf: not used. p.d.f. of foward swap rate
+        under annuity measure.
+    :param callable swap_rate_pdf_fprime: not used. derivative of p.d.f.
+        of foward swap rate under annuity measure.
+    :return: value of derivative of forward fx diffusion.
+    :rtype: float
     """
+    assert(vol > 0.0)
+    assert(-1.0 <= corr <= 1.0)
     forward_fx_diffusion = _forward_fx_diffusion(
         swap_rate,
         time,
