@@ -328,6 +328,15 @@ def _forward_fx_diffusion_fhess(
     See :py:func:`_forward_fx_diffusion`
     and :py:func:`_forward_fx_diffusion_fprime`.
 
+    .. math::
+        \\tilde{\chi}^{\prime\prime}(s)
+            & = & \\rho_{XS}\sigma_{X}\sqrt{T}
+            \left(
+               h^{\prime\prime}(s)\\tilde{\chi}(s)
+                + \\rho_{XS}\sigma_{X}\sqrt{T}
+                    h^{\prime}(s)^{2} \\tilde{\chi}(s)
+            \\right)
+
     :param float swap_rate:
     :param float time: non-negative.
     :param float vol: non-negative.
