@@ -120,6 +120,25 @@ def make_cdf_black_scholes(
 
 
 def _calc_h(swap_rate_cdf, swap_rate):
+    """_calc_h
+    calculates following value:
+
+    .. math::
+        h(s) := \Phi^{-1}(\Phi^{A}(s))
+
+    where
+    :math:`\Phi^{-1}(\cdot)` is inverse function of standard gaussian c.d.f,
+    :math:`\Phi^{A}(s)` is c.d.f. of swap rate under annuity measure.
+
+    There is no meaning of this value
+    because of simplification to calculate forward fx diffusion
+    See :py:func:`_forward_fx_diffusion`.
+
+    :param float swap_rate_cdf:
+    :param float swap_rate:
+    :return: :math:`\Phi^{-1}(\Phi^{A}(s))`.
+    :rtype: float
+    """
     norm = scipy.stats.norm
 
     return norm.ppf(swap_rate_cdf(swap_rate))

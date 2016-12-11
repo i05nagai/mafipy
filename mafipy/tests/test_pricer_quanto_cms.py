@@ -5,6 +5,7 @@ from __future__ import division
 
 import mafipy.pricer_quanto_cms as target
 import mafipy.analytic_formula as analytic_formula
+import scipy.stats
 import pytest
 from pytest import approx
 
@@ -96,6 +97,19 @@ class TestPricerQuantoCms(object):
             actual = target.make_cdf_black_scholes(
                 underlying, rate, maturity, vol)(strike)
             assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "swap_rate", [
+            (2.0),
+        ])
+    def test__calc_h(self, swap_rate):
+        def swap_rate_cdf(swap_rate):
+            return (swap_rate * 0.9) / swap_rate
+        norm = scipy.stats.norm
+        expect = norm.ppf(swap_rate_cdf(swap_rate))
+
+        actual = target._calc_h(swap_rate_cdf, swap_rate)
+        assert expect == approx(actual)
 
 
 class TestSimpleQuantoCmsPricer(object):
