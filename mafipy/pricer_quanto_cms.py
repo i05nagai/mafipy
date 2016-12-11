@@ -373,6 +373,12 @@ def _forward_fx_diffusion_fhess(
 
 
 class _ForwardFxDiffusionHelper(object):
+    """_ForwardFxDiffusionHelper
+    Generate forward FX diffusion under simple qunato cms model.
+    This helper class makes forward FX diffusion,
+    differential of the diffusion
+    and second derivative of the diffusion as a function of swap rate.
+    """
 
     def __init__(self,
                  time,
@@ -381,6 +387,18 @@ class _ForwardFxDiffusionHelper(object):
                  swap_rate_cdf,
                  swap_rate_pdf,
                  swap_rate_pdf_fprime):
+        """__init__
+
+        :param float time:
+        :param float vol: must be positive. volatility.
+        :param float corr: must be within [-1, 1]. correlation.
+        :param callable swap_rate_cdf:
+        :param callable swap_rate_pdf:
+        :param callable swap_rate_pdf_fprime:
+        """
+        assert(time >= 0.0)
+        assert(vol >= 0.0)
+        assert(-1.0 <= corr <= 1.0)
         self.time = time
         self.vol = vol
         self.corr = corr
@@ -389,6 +407,10 @@ class _ForwardFxDiffusionHelper(object):
         self.swap_rate_pdf_fprime = swap_rate_pdf_fprime
 
     def make_func(self):
+        """make_func
+        makes forward FX diffusion as a function of swap rate.
+        See :py:func:`_forward_fx_diffusion`.
+        """
         return lambda swap_rate: _forward_fx_diffusion(
             swap_rate=swap_rate,
             time=self.time,
@@ -399,6 +421,10 @@ class _ForwardFxDiffusionHelper(object):
             swap_rate_pdf_fprime=self.swap_rate_pdf_fprime)
 
     def make_fprime(self):
+        """make_fprime
+        makes derivative of forward FX diffusion as a function of swap rate.
+        See :py:func:`_forward_fx_diffusion_fprime`.
+        """
         return lambda swap_rate: _forward_fx_diffusion_fprime(
             swap_rate=swap_rate,
             time=self.time,
@@ -409,6 +435,11 @@ class _ForwardFxDiffusionHelper(object):
             swap_rate_pdf_fprime=self.swap_rate_pdf_fprime)
 
     def make_fhess(self):
+        """make_fhess
+        makes second derivative of forward FX diffusion
+        as a function of swap rate.
+        See :py:func:`_forward_fx_diffusion_fhess`.
+        """
         return lambda swap_rate: _forward_fx_diffusion_fhess(
             swap_rate=swap_rate,
             time=self.time,

@@ -7,6 +7,7 @@ from pytest import approx
 import mafipy.analytic_formula as analytic_formula
 import mafipy.math_formula as math_formula
 import mafipy.pricer_quanto_cms as target
+import mafipy.tests.util as util
 import math
 import pytest
 import scipy.stats
@@ -346,6 +347,91 @@ class TestPricerQuantoCms(object):
                                                         swap_rate_pdf,
                                                         swap_rate_pdf_fprime)
             assert expect == approx(actual)
+
+
+class Test_ForwardFxDiffusionHelper(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        data = util.get_real(3)
+        self.time = data[0]
+        self.vol = data[1]
+        self.corr = data[2]
+        self.target = target._ForwardFxDiffusionHelper(
+            self.time,
+            self.vol,
+            self.corr,
+            self._swap_rate_cdf,
+            self._swap_rate_pdf,
+            self._swap_rate_pdf_fprime)
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    def _swap_rate_cdf(self, s):
+        return scipy.stats.norm.cdf(s)
+
+    def _swap_rate_pdf(self, s):
+        return scipy.stats.norm.pdf(s)
+
+    def _swap_rate_pdf_fprime(self, s):
+        return -s * scipy.stats.norm.pdf(s)
+
+    @pytest.mark.parametrize("swap_rate", [
+        util.get_real_t(1)[0],
+    ])
+    def test_make_func(self, swap_rate):
+        expect = target._forward_fx_diffusion(
+            swap_rate,
+            self.time,
+            self.vol,
+            self.corr,
+            self._swap_rate_cdf,
+            self._swap_rate_pdf,
+            self._swap_rate_pdf_fprime)
+        actual = self.target.make_func()(swap_rate)
+        assert expect == approx(actual)
+
+    @pytest.mark.parametrize("swap_rate", [
+        util.get_real_t(1)[0],
+    ])
+    def test_make_fprime(self, swap_rate):
+        expect = target._forward_fx_diffusion_fprime(
+            swap_rate,
+            self.time,
+            self.vol,
+            self.corr,
+            self._swap_rate_cdf,
+            self._swap_rate_pdf,
+            self._swap_rate_pdf_fprime)
+        actual = self.target.make_fprime()(swap_rate)
+        assert expect == approx(actual)
+
+    @pytest.mark.parametrize("swap_rate", [
+        util.get_real_t(1)[0],
+    ])
+    def test_make_fhess(self, swap_rate):
+        expect = target._forward_fx_diffusion_fhess(
+            swap_rate,
+            self.time,
+            self.vol,
+            self.corr,
+            self._swap_rate_cdf,
+            self._swap_rate_pdf,
+            self._swap_rate_pdf_fprime)
+        actual = self.target.make_fhess()(swap_rate)
+        assert expect == approx(actual)
 
 
 class TestSimpleQuantoCmsPricer(object):
