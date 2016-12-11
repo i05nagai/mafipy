@@ -145,6 +145,28 @@ def _calc_h(swap_rate_cdf, swap_rate):
 
 
 def _calc_h_fprime(swap_rate_pdf, swap_rate, h):
+    """_calc_h_fprime
+    calculates derivative of :py:func:`_calc_h`.
+
+    .. math::
+        h^{\prime}(s)
+        = \\frac{1}{\phi(h(s))} \psi^{A}(s),
+
+    where
+    :math:`\phi^{-1}(\cdot)` is inverse function of standard gaussian p.d.f.,
+    :math:`\psi^{A}(s)` is p.d.f. of swap rate under annuity measure,
+    :math:`s` is swap_rate.
+
+    There is no meaning of this value
+    because of simplification to calculate forward fx diffusion
+    See :py:func:`_forward_fx_diffusion_fprime`.
+
+    :param float swap_rate_pdf:
+    :param float swap_rate:
+    :param float h: value of :math:`h(s)`.
+    :return: :math:`h^{\prime}(s)`.
+    :rtype: float
+    """
     norm = scipy.stats.norm
 
     try:

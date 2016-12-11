@@ -111,6 +111,25 @@ class TestPricerQuantoCms(object):
         actual = target._calc_h(swap_rate_cdf, swap_rate)
         assert expect == approx(actual)
 
+    @pytest.mark.parametrize(
+        "swap_rate", [
+            (2.0),
+        ])
+    def test__calc_h_fprime(self, swap_rate):
+        norm = scipy.stats.norm
+
+        def swap_rate_cdf(swap_rate):
+            return norm.cdf(swap_rate)
+
+        def swap_rate_pdf(swap_rate):
+            return norm.pdf(swap_rate)
+
+        h = target._calc_h(swap_rate_cdf, swap_rate)
+
+        expect = swap_rate_pdf(swap_rate) / norm.pdf(h)
+        actual = target._calc_h_fprime(swap_rate_pdf, swap_rate, h)
+        assert expect == approx(actual)
+
 
 class TestSimpleQuantoCmsPricer(object):
 
