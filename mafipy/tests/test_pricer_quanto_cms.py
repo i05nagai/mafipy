@@ -5,6 +5,7 @@ from __future__ import division
 
 import mafipy.pricer_quanto_cms as target
 import mafipy.analytic_formula as analytic_formula
+import mafipy.math_formula as math_formula
 import scipy.stats
 import pytest
 from pytest import approx
@@ -128,6 +129,36 @@ class TestPricerQuantoCms(object):
 
         expect = swap_rate_pdf(swap_rate) / norm.pdf(h)
         actual = target._calc_h_fprime(swap_rate_pdf, swap_rate, h)
+        assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "swap_rate", [
+            (2.0),
+        ])
+    def test__calc_h_fhess(self, swap_rate):
+        norm = scipy.stats.norm
+
+        def swap_rate_cdf(s):
+            return norm.cdf(s)
+
+        def swap_rate_pdf(s):
+            return norm.pdf(s)
+
+        def swap_rate_pdf_fprime(s):
+            return -s * norm.pdf(s)
+
+        h = target._calc_h(swap_rate_cdf, swap_rate)
+        h_fprime = target._calc_h_fprime(swap_rate_pdf, swap_rate, h)
+
+        # expect
+        term1 = swap_rate_pdf_fprime(swap_rate) * norm.pdf(h)
+        term2 = (swap_rate_pdf(swap_rate)
+                 * math_formula.norm_pdf_fprime(h) * h_fprime)
+        denominator = norm.pdf(h) ** 2
+        expect = (term1 - term2) / denominator
+        # actual
+        actual = target._calc_h_fhess(
+            swap_rate_pdf_fprime, swap_rate_pdf, swap_rate, h, h_fprime)
         assert expect == approx(actual)
 
 
