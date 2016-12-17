@@ -13,6 +13,10 @@
    :target: https://codeclimate.com/github/i05nagai/mafipy
    :alt: Issue Count
 
+.. image:: https://badges.gitter.im/mafipy/Lobby.svg
+   :alt: Join the chat at https://gitter.im/mafipy/Lobby
+   :target: https://gitter.im/mafipy/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 
 mafipy
 ======
