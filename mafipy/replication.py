@@ -135,8 +135,14 @@ class LinearAnnuityMappingFuncHelper(AnnuityMappingFuncHelper):
 
 
 class Replication(object):
+    """Replication
+    Interface class to the class which uses replication method.
+    """
 
     def eval(self):
+        """eval
+        evaluates value of derivative by replication methods.
+        """
         raise NotImplementedError
 
 
