@@ -358,6 +358,35 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today",
+        [
+            # maturity < 0 raise AssertionError
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            # otherwise
+            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+        ])
+    def test_black_scholes_call_gamma(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        # raise AssertionError
+        if maturity < 0.0 or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_gamma(
+                    underlying, strike, rate, maturity, vol)
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
+            denominator = (underlying ** 2) * vol * math.sqrt(maturity)
+            expect = -scipy.stats.norm.pdf(d1) / denominator
+
+            actual = target.black_scholes_call_gamma(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
+
     def test_calc_local_vol_model_implied_vol(self):
         underlying = 1.0
         strike = 0.0
