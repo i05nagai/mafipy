@@ -633,6 +633,50 @@ def black_scholes_call_theta(
     return - term1 - term2
 
 
+def black_scholes_call_rho(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol,
+        today):
+    """black_scholes_call_rho
+    calculates black scholes rho.
+
+    .. math::
+        \\frac{\partial}{\partial t} c(t, S, K, r, T, \sigma)
+            = (T - t)
+                e^{-r (T - t)}
+                K \Phi(d_{2})
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{2}` is defined in
+    :py:func:`func_d2`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of rho.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    norm = scipy.stats.norm
+    time = maturity - today
+    d2 = func_d2(underlying, strike, rate, time, vol)
+    return time * math.exp(-rate * time) * strike * norm.cdf(d2)
+
+
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,
