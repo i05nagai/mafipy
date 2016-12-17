@@ -9,17 +9,17 @@ def main():
     rate = 0.01
     maturity = 1.0
     vol_swap_rate = 0.05
-    swap_rate_cdf = pricer_quanto_cms.make_cdf_black_scholes_model(
+    swap_rate_cdf = pricer_quanto_cms.make_cdf_black_scholes(
         underlying=init_swap_rate,
         rate=rate,
         maturity=maturity,
         vol=vol_swap_rate)
-    swap_rate_pdf = pricer_quanto_cms.make_pdf_black_scholes_model(
+    swap_rate_pdf = pricer_quanto_cms.make_pdf_black_scholes(
         underlying=init_swap_rate,
         rate=rate,
         maturity=maturity,
         vol=vol_swap_rate)
-    swap_rate_pdf_fprime = pricer_quanto_cms.make_pdf_fprime_black_scholes_model(
+    swap_rate_pdf_fprime = pricer_quanto_cms.make_pdf_fprime_black_scholes(
         underlying=init_swap_rate,
         rate=rate,
         maturity=maturity,
@@ -58,16 +58,30 @@ def main():
         "today": 0.0,
     }
     put_pricer = bs_pricer.make_put_wrt_strike(**put_pricer_params)
+    """
     pricer = pricer_quanto_cms.SimpleQuantoCmsPricer(
         "linear", annuity_mapping_params,
         "call", payoff_params,
         forward_fx_diffusion_params,
         call_pricer,
         put_pricer)
-    discount_factor = 0.9
     price = pricer.eval(discount_factor, init_swap_rate,
                         min_put_range=0.0 + 0.000000001,
                         max_call_range=0.06)
+    """
+    discount_factor = 0.9
+    price = pricer_quanto_cms.replicate(
+        init_swap_rate,
+        discount_factor,
+        call_pricer,
+        put_pricer,
+        "call",
+        payoff_params,
+        forward_fx_diffusion_params,
+        "linear",
+        annuity_mapping_params,
+        min_put_range=0.0 + 0.000000001,
+        max_call_range=0.060)
     print("price:", price)
 
 

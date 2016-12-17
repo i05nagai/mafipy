@@ -170,12 +170,11 @@ class AnalyticReplication(Replication):
                                         init_swap_rate, max_call_range)
                     for f in self.call_integrands])
 
-    def eval(self,
-             init_swap_rate,
-             min_put_range=-np.inf,
-             max_call_range=np.inf):
+    def eval(self, init_swap_rate, min_put_range, max_call_range):
         analytic_term = self._calc_analytic_term(init_swap_rate)
-        put_integral_term = self._calc_put_integral(init_swap_rate, min_put_range)
-        call_integral_term = self._calc_call_integral(init_swap_rate, max_call_range)
+        put_integral_term = self._calc_put_integral(
+            init_swap_rate, min_put_range)
+        call_integral_term = self._calc_call_integral(
+            init_swap_rate, max_call_range)
 
         return analytic_term + put_integral_term + call_integral_term

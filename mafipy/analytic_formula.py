@@ -386,6 +386,87 @@ def black_scholes_call_value_fhess_by_strike(
     return term1 + term2 - term3 - term4 - term5
 
 
+def black_scholes_call_value_third_by_strike(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_value_third_by_strike
+    Third derivative of value of call option with respect to strike
+    under black scholes model.
+    See :py:func:`calc_black_scholes_call_formula`
+    and :py:func:`black_scholes_call_value_fprime_by_strike`,
+    and :py:func:`black_scholes_call_value_fhess_by_strike`.
+
+    .. math::
+        \\begin{array}{ccl}
+            \\frac{\partial^{3}}{\partial K^{3}} c(0, S; T, K)
+            & = &
+            \left(
+                S\phi^{\prime\prime}(d_{1}(K))
+                - K\phi^{\prime\prime}(d_{2}(K))
+            \\right)
+            (d^{\prime}(K))^{3}
+            \\\\
+            & &
+            +
+            \left(
+                S\phi^{\prime}(d_{1}(K))
+                - K\phi^{\prime}(d_{2}(K))
+            \\right)
+            3d^{\prime}(K)d^{\prime\prime}
+            \\\\
+            & &
+            - 3\phi(d_{2}(K))d^{\prime\prime}
+            - 3\phi^{\prime}(d_{2}(K))(d^{\prime}(K))^{2}
+        \end{array}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is vol,
+    :math:`d_{1}, d_{2}` is defined
+    in :py:func:`calc_black_scholes_call_formula`,
+    :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
+    :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: non-negative.
+    :param float vol: volatility. non-negative.
+    :return: value of third derivative.
+    :rtype: float.
+    """
+    norm = scipy.stats.norm
+    assert(maturity > 0.0)
+    assert(vol > 0.0)
+
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    d2 = func_d2(underlying, strike, rate, maturity, vol)
+    d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
+    d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
+    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+    d1_density_fhess = mafipy.math_formula.norm_pdf_fhess(d1)
+    d2_density = norm.pdf(d2)
+    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
+    d2_density_fhess = mafipy.math_formula.norm_pdf_fhess(d2)
+
+    # term1
+    factor11 = (underlying * d1_density_fhess - strike * d2_density_fhess)
+    term1 = factor11 * (d_fprime ** 3)
+    # term2
+    factor21 = (underlying * d1_density_fprime - strike * d2_density_fprime)
+    term2 = factor21 * 3 * d_fprime * d_fhess
+    # term3, term4
+    term3 = 3 * d2_density * d_fhess
+    term4 = 3 * d2_density_fprime * (d_fprime ** 2)
+    return term1 + term2 - term3 - term4
+
+
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,
