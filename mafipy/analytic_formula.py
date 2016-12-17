@@ -467,6 +467,216 @@ def black_scholes_call_value_third_by_strike(
     return term1 + term2 - term3 - term4
 
 
+def black_scholes_call_delta(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_delta
+    calculates black scholes delta.
+
+    .. math::
+        \\frac{\partial}{\partial S} c(S, K, r, T, \sigma)
+            = \Phi(d_{1}(S))
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\Phi` is standard normal c.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of delta.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    return scipy.stats.norm.cdf(d1)
+
+
+def black_scholes_call_gamma(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_gamma
+    calculates black scholes gamma.
+
+    .. math::
+        \\frac{\partial^{2}}{\partial S^{2}} c(S, K, r, T, \sigma)
+            = -\phi(d_{1}(S, K, r, T, \sigma))
+                \\frac{1}{S^{2}\sigma\sqrt{T}}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\Phi` is standard normal c.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of gamma.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    denominator = (underlying ** 2) * vol * math.sqrt(maturity)
+    return -scipy.stats.norm.pdf(d1) / denominator
+
+
+def black_scholes_call_vega(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_vega
+    calculates black scholes vega.
+
+    .. math::
+        \\frac{\partial}{\partial \sigma} c(S, K, r, T, \sigma)
+            = -\sqrt{T}S\phi(d_{1}(S, K, r, T, \sigma))
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of vega.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    return - underlying * scipy.stats.norm.pdf(d1)
+
+
+def black_scholes_call_theta(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol,
+        today):
+    """black_scholes_call_theta
+    calculates black scholes theta.
+
+    .. math::
+        \\frac{\partial}{\partial t} c(t, S, K, r, T, \sigma)
+            = - S * \phi(d_{1})
+                \left(
+                    \\frac{\sigma}{2\sqrt{T - t}}
+                \\right)
+                - r e^{-r(T - t)} K \Phi(d_{2})
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of theta.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    norm = scipy.stats.norm
+    time = maturity - today
+    d1 = func_d1(underlying, strike, rate, time, vol)
+    d2 = func_d2(underlying, strike, rate, time, vol)
+    term1 = underlying * norm.pdf(d1) * (vol / (2.0 * math.sqrt(time)))
+    term2 = rate * math.exp(-rate * time) * strike * norm.cdf(d2)
+    return - term1 - term2
+
+
+def black_scholes_call_rho(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol,
+        today):
+    """black_scholes_call_rho
+    calculates black scholes rho.
+
+    .. math::
+        \\frac{\partial}{\partial t} c(t, S, K, r, T, \sigma)
+            = (T - t)
+                e^{-r (T - t)}
+                K \Phi(d_{2})
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{2}` is defined in
+    :py:func:`func_d2`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of rho.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    norm = scipy.stats.norm
+    time = maturity - today
+    d2 = func_d2(underlying, strike, rate, time, vol)
+    return time * math.exp(-rate * time) * strike * norm.cdf(d2)
+
+
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,
