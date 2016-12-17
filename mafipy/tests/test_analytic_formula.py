@@ -416,6 +416,39 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today",
+        [
+            # maturity < 0 raise AssertionError
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            # otherwise
+            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+        ])
+    def test_black_scholes_call_theta(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        # raise AssertionError
+        if maturity < 0.0 or vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_theta(
+                    underlying, strike, rate, maturity, vol, today)
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            norm = scipy.stats.norm
+            time = maturity - today
+            d1 = target.func_d1(underlying, strike, rate, time, vol)
+            term1 = underlying * norm.pdf(d1) * vol / (2.0 * math.sqrt(time))
+            d2 = target.func_d2(underlying, strike, rate, time, vol)
+            term2 = rate * math.exp(-rate * time) * strike * norm.cdf(d2)
+            expect = -term1 - term2
+
+            actual = target.black_scholes_call_theta(
+                underlying, strike, rate, maturity, vol, today)
+            assert expect == approx(actual)
+
     def test_calc_local_vol_model_implied_vol(self):
         underlying = 1.0
         strike = 0.0
