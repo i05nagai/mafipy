@@ -2,28 +2,30 @@ language: python
 sudo: false
 cache:
   directories:
-    - $HOME/.cache/pip
-
+  - "$HOME/.cache/pip"
 env:
   global:
-    - secure: "o0oF6E/QqqkgPq5/k5Akcb/yh2F1XC9wzmueV2NJc7BhPGwjPmiIMRyJAZHQZmBL1TzRHdpBp5APCgXOCbY8B2N7ksoAtbGIpLydmvujFMDoRMpyn+IVkajgDVRp1G9k3hqXmJoLH6WvIL/LE4ydHvPM4zI1jQY+0vPIqbjNJbAHYKpPV/NkXIz5udhaeJIFBW5dwizsLg/q+pkS7XsICy0ktp+nn2gU9haVjGXbGW+flItZWkl4HMJgqCKpiipQJUlG4neh/QKTV1aH7DDyQ4rtXixk3cUK6CzWnw9NsUPAefmao8GM4StmHcrgWTkriO9l8AifLukQMWOjNsOzRa+N99oVMETMbu5m5jjKsevUqwvCEOxyJhystSZkzZWShKjNNKqY12towpZmGYSWHGdZFdqMnYE6hlg2W+6iikJNcg8eb0luiD1h4MAOgFPSX+5TesTMC+s0Yl2AL6g7ElIVg5qh4xXOJFewrSK51cd3uufcO/YQt397m5XYaC0zniAPWmgV/jN7b8tPakHjTyFAWUYCPuccR9CenUS/N4oebMo9wQvT7Xy/MojP30XtVmpmtj1zDLhXZwBtdJjnW73TDH3VMvcME6tz5fB8lhjQ/SLaJisY2SWxmDK/k42AJlNVz7b0+lvtRuKnciW0l1xh8oeLmZdQsT+k8Rm/ouM="
+  - secure: o0oF6E/QqqkgPq5/k5Akcb/yh2F1XC9wzmueV2NJc7BhPGwjPmiIMRyJAZHQZmBL1TzRHdpBp5APCgXOCbY8B2N7ksoAtbGIpLydmvujFMDoRMpyn+IVkajgDVRp1G9k3hqXmJoLH6WvIL/LE4ydHvPM4zI1jQY+0vPIqbjNJbAHYKpPV/NkXIz5udhaeJIFBW5dwizsLg/q+pkS7XsICy0ktp+nn2gU9haVjGXbGW+flItZWkl4HMJgqCKpiipQJUlG4neh/QKTV1aH7DDyQ4rtXixk3cUK6CzWnw9NsUPAefmao8GM4StmHcrgWTkriO9l8AifLukQMWOjNsOzRa+N99oVMETMbu5m5jjKsevUqwvCEOxyJhystSZkzZWShKjNNKqY12towpZmGYSWHGdZFdqMnYE6hlg2W+6iikJNcg8eb0luiD1h4MAOgFPSX+5TesTMC+s0Yl2AL6g7ElIVg5qh4xXOJFewrSK51cd3uufcO/YQt397m5XYaC0zniAPWmgV/jN7b8tPakHjTyFAWUYCPuccR9CenUS/N4oebMo9wQvT7Xy/MojP30XtVmpmtj1zDLhXZwBtdJjnW73TDH3VMvcME6tz5fB8lhjQ/SLaJisY2SWxmDK/k42AJlNVz7b0+lvtRuKnciW0l1xh8oeLmZdQsT+k8Rm/ouM=
 matrix:
   include:
-    - python: "2.7"
-      env:
-        - COVERAGE="true"
-        - SKIP_TESTS="false"
-        - CODECLIMATE_COVERAGE_REPORT="false"
-    - python: "3.5"
-      env:
-        - COVERAGE="true"
-        - SKIP_TESTS="false"
-        - CODECLIMATE_COVERAGE_REPORT="true"
+  - python: '2.7'
+    env:
+    - COVERAGE="true"
+    - SKIP_TESTS="false"
+    - CODECLIMATE_COVERAGE_REPORT="false"
+  - python: '3.5'
+    env:
+    - COVERAGE="true"
+    - SKIP_TESTS="false"
+    - CODECLIMATE_COVERAGE_REPORT="true"
 before_install:
-  - pwd
-  - ls -la
-  - echo ${PATH}
-  - python --version
+- pwd
+- ls -la
+- echo ${PATH}
+- python --version
 install: bash ci/travis/install.sh
 script: python setup.py test
 after_success: bash ci/travis/after_success.sh
+notifications:
+  slack:
+    secure: i9zIk/OgAtjR9Vlnr0qJT93lfSH3uGTH47gUrYkCaD4PGWExSgPomWAsl2UYBBvcn3spQb7zENWPLaNU+0h71+OcnDUWdjoQx8wpEx7aRo8XWibkKjK0axMfxco0KoTDcV84y4QDLysY/P4M1YvLuVRCd64yUlYxv+V4aHC5CzjiXbtKa1IqP4RZqYi0gCG5QFHK776O3Btt1V4PyLOocHvy5cUY8TzWO40vDExuYSpfB0hWwuXuCxgpezifh4Ed5yjVZ8A2SpCYjYjj1ZWxnwJ9uWSQpe77rYuPAs2M0f652lcK7IVh9cIKNMsjgPcqY0F2VuDF5lpwqAYv7Mw1rhj76UVXgaUXvqcPUulUvMraUJYYXUPUNegKufocZfdKm2AZlMknQzYUblHz4G3rf6XDv8Mm5KdQJdapYouCLVbrEPsR/IIJAeNRb/gSJwlWRGc98xdoviqLUW+lsoJrI5P4Xvp039B8UqyecossNazaP/fv3JnVYgpX6vws1d79PmHtILwOwRdb5LI//zaiieu8sTLfRJxR1FQixQ7rUIittHFtckw14W3jUKLVFeuL+9vAidOEVd4ok0trKAcFqEVvXLU5xXytBVlkX3txyh2Bi/0pazEeGGhDYDLabEq2LhX9uL367KB41Up7UF+Qo3tqaGQqtzICdelXdUSz5H0=
