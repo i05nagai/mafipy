@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-def raise_key_erorr(keys, dictionary, dictionary_name):
+def raise_key_error(keys, dictionary, dictionary_name):
     """raise_key_error
 
     :param keys:

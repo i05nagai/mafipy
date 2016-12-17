@@ -451,28 +451,172 @@ class _ForwardFxDiffusionHelper(object):
 
 
 class SimpleQuantoCmsHelper(object):
+    """SimpleQuantoCmsHelper
+    Interface of helper class to generate integrands of replication method
+    to expectation of numerator and denominator.
+    See :py:func:`SimpleQuantoCmsPricer`.
+    The integrands are part of terms of stochastic weight.
+    Stochastic weight of numerator are
+
+    .. math::
+        \\begin{eqnarray*}
+            w(s)
+                & := &
+                    \\frac{d^{2} }{d s^{2}} (g(s) \\alpha(s) \\tilde{\chi}(s))
+                \\\\
+                & = &
+                g^{\prime\prime}(s)\\alpha(s)\\tilde{\chi}(s)
+                    + g(s)\\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+                    + g(s)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                \\\\
+                & &
+                    + 2g^{\prime}(s)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                    + 2g^{\prime}(s)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                    + 2g(s)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s).
+        \end{eqnarray*}
+
+    where
+    :math:`g` is payoff function,
+    :math:`\\alpha` is annuity mapping function,
+    :math:`\\tilde{\chi}(s)` is forward fx diffusion,
+    see :py:func:`_forward_fx_diffusion`.
+
+    The stochastic weight of denominator is
+
+    .. math::
+        \\begin{eqnarray*}
+            w(s)
+                & := &
+                    \\frac{d^{2} }{d s^{2}} (\\alpha(s) \\tilde{\chi}(s))
+                \\\\
+                & = &
+                    \\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+                    + \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                    + 2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s).
+        \end{eqnarray*}
+
+    """
 
     def make_numerator_call_integrands(self, **kwargs):
+        """make_numerator_call_integrands
+        Interface of integrands which are integrated with call pricer
+        in replication method in the numerator.
+        """
         raise NotImplementedError
 
     def make_numerator_put_integrands(self, **kwargs):
+        """make_numerator_put_integrands
+        Interface of integrands which are integrated with put pricer
+        in replication method in the numerator.
+        """
         raise NotImplementedError
 
     def make_numerator_analytic_funcs(self, **kwargs):
+        """make_numerator_analytic_funcs
+        Interface of analytically computable terms in replication method.
+        The terms depedend on the model of forward FX rate
+        and forward swap rate.
+        """
         raise NotImplementedError
 
     def make_denominator_call_integrands(self, **kwargs):
+        """make_denominator_call_integrands
+        Interface of integrands which are integrated with call pricer
+        in replication method in the denominator.
+        """
         raise NotImplementedError
 
     def make_denominator_put_integrands(self, **kwargs):
+        """make_denominator_put_integrands
+        Interface of integrands which are integrated with put pricer
+        in replication method in the denominator.
+        """
         raise NotImplementedError
 
     def make_denominator_analytic_funcs(self, **kwargs):
+        """make_denominator_analytic_funcs
+        Interface of analytically computable terms in replication method.
+        The terms depedend on the model of forward FX rate
+        and forward swap rate.
+        """
         raise NotImplementedError
 
 
-class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
-    """SimpleQuantoCmsLinearCallHelper"""
+class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
+    """_SimpleQuantoCmsLinearCallHelper
+    In linear TSR model with call payoff,
+    stochastic weight in the numerator is
+
+        .. math::
+            \\begin{eqnarray}
+                g_{\mathrm{call}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
+                    & = &
+                    \delta(s - K)\\alpha(s)\\tilde{\chi}(s),
+                \\\\
+                g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                    & = &
+                    (s - K)^{+}
+                    (\\alpha_{1}s + \\alpha_{2})
+                    \\rho_{XS}\sigma_{X}\sqrt{T}
+                    \left(
+                       h^{\prime\prime}(s)\\tilde{\chi}(s)
+                        + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                    \\right),
+                \\\\
+                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                    & = & 2 1_{[K, \infty)}(s) \\alpha_{1}
+                        \exp
+                        \left(
+                            \\rho_{XS}\sigma_{X}\sqrt{T}\Phi^{-1}(\Psi^{A}(s))
+                                + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
+                        \\right),
+                \\\\
+                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                    & = & 2 1_{[K, \infty)}(s)
+                        (\\alpha_{1}s + \\alpha_{2})
+                        \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                \\\\
+                2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                    & = &
+                        2(s - K)^{+} \\alpha_{1}
+                            \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+            \end{eqnarray}
+
+    where
+    :math:`g_{\mathrm{callplet}}` is payoff function,
+    :math:`\\alpha` is annuity mapping function,
+    :math:`\\tilde{\chi}(s)` is forward fx diffusion,
+    see :py:func:`_forward_fx_diffusion`.
+
+    Stochastic weight in the denominator is
+
+    .. math::
+        \\begin{eqnarray}
+            \\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+                & = & 0
+                \\\\
+            \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                & = &
+                (\\alpha_{1}s + \\alpha_{2})
+                \\rho_{XS}\sigma_{X}\sqrt{T}
+                \left(
+                       h^{\prime\prime}(s)\\tilde{\chi}(s)
+                    + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                \\right),
+                \\\\
+            2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                & = &
+                    2\\alpha_{1}
+                    \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+        \end{eqnarray}
+
+    :param AnnuityMappingFuncHelper annuity_mapping_helper:
+    :param PayoffHelper call_payoff_helper:
+    :param _ForwardFxDiffusionHelper forward_fx_diffusion_helper:
+    :param call_pricer: call option pricer.
+    :param put_pricer: put option pricer.
+    :param float payoff_strike: strike of call option payoff function.
+    """
 
     def __init__(self,
                  annuity_mapping_helper,
@@ -480,7 +624,13 @@ class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
                  forward_fx_diffusion_helper,
                  call_pricer,
                  put_pricer,
-                 payoff_strike):
+                 payoff_strike,
+                 min_put_range=-np.inf,
+                 max_put_range=np.inf,
+                 min_call_range=-np.inf,
+                 max_call_range=np.inf):
+        """__init__
+        """
         # annutiy mapping funciton
         self.annuity_mapping_func = annuity_mapping_helper.make_func()
         self.annuity_mapping_fprime = annuity_mapping_helper.make_fprime()
@@ -491,15 +641,38 @@ class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         self.payoff_fhess = call_payoff_helper.make_fhess()
         self.payoff_strike = payoff_strike
         # forawad fx diffusion
-        self.forward_fx_diffusion = forward_fx_diffusion_helper.make_func()
-        self.forward_fx_diffusion_fprime = forward_fx_diffusion_helper.make_fprime()
-        self.forward_fx_diffusion_fhess = forward_fx_diffusion_helper.make_fhess()
+        fwd_fx_helper = forward_fx_diffusion_helper
+        self.forward_fx_diffusion = fwd_fx_helper.make_func()
+        self.forward_fx_diffusion_fprime = fwd_fx_helper.make_fprime()
+        self.forward_fx_diffusion_fhess = fwd_fx_helper.make_fhess()
         # pricer
         self.call_pricer = call_pricer
         self.put_pricer = put_pricer
+        # range
+        self.min_put_range = min_put_range
+        self.max_put_range = max_put_range
+        self.min_call_range = min_call_range
+        self.max_call_range = max_call_range
 
     def _make_numerator_integrands(self):
+        """_make_numerator_integrands
+        Returns following functions:
+
+        .. math::
+            g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+            \\\\
+            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+            \\\\
+            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+            \\\\
+            2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+
+        :return: array of function.
+        :rtype: array.
+        """
         def func1(swap_rate):
+            """func1
+            """
             return (self.payoff_func(swap_rate)
                     * self.annuity_mapping_func(swap_rate)
                     * self.forward_fx_diffusion_fhess(swap_rate))
@@ -525,12 +698,57 @@ class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         return [func1, func2, func3, func4]
 
     def make_numerator_call_integrands(self, **kwargs):
+        """make_numerator_call_integrands
+        See :py:func:`_make_numerator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
         return self._make_numerator_integrands()
 
     def make_numerator_put_integrands(self, **kwargs):
+        """make_numerator_put_integrands
+        See :py:func:`_make_numerator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
         return self._make_numerator_integrands()
 
     def make_numerator_analytic_funcs(self, **kwargs):
+        """make_numerator_analytic_funcs
+        There are 3 functions which is calculated analytically.
+        First is constant term in replication method.
+        Second and third is the term
+        which contains dirac delta function as integrands.
+        Specifically, the second and third term are
+
+        .. math::
+            p(K) \\alpha(K)\\tilde{\chi}(K)
+            1_{(L_{\min}^{\mathrm{put}},L_{\max}^{\mathrm{put}})}(K)
+            \\\\
+            c(K) \\alpha(K)\\tilde{\chi}(K)1_{(L_{\min},L_{\max})}(K)
+            1_{(L_{\min}^{\mathrm{call}},L_{\max}^{\mathrm{call}})}(K)
+
+        where
+        :math:`p(K) := p(0, S(0); K, T)`,
+        :math:`c(K) := c(0, S(0); K, T)`,
+        :math:`L_{\min}^{\mathrm{put}}`
+        is lower bound of integral range for put,
+        :math:`L_{\max}^{\mathrm{put}}`
+        is upper bound of integral range for put.
+        :math:`L_{\min}^{\mathrm{call}}`
+        is lower bound of integral range for call,
+        :math:`L_{\max}^{\mathrm{call}}`
+        is upper bound of integral range for call.
+
+        This term contains dirac delta function
+        (second derivative of payoff function)
+        so that can be calculated analytically.
+
+        :return: array of function.
+        :rtype: array.
+        """
         def func1(init_swap_rate):
             return (self.payoff_func(init_swap_rate)
                     * self.annuity_mapping_func(init_swap_rate)
@@ -539,15 +757,34 @@ class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         def func2(init_swap_rate):
             return (self.put_pricer(self.payoff_strike)
                     * self.annuity_mapping_func(self.payoff_strike)
-                    * self.annuity_mapping_func(self.payoff_strike))
+                    * self.forward_fx_diffusion(self.payoff_strike))
 
         def func3(init_swap_rate):
             return (self.call_pricer(self.payoff_strike)
                     * self.annuity_mapping_func(self.payoff_strike)
-                    * self.annuity_mapping_func(self.payoff_strike))
-        return [func1, func2, func3]
+                    * self.forward_fx_diffusion(self.payoff_strike))
+
+        terms = [func1]
+        if self.min_put_range < self.payoff_strike < self.max_put_range:
+            terms.append(func2)
+        if self.min_call_range < self.payoff_strike < self.max_call_range:
+            terms.append(func3)
+        return terms
 
     def _make_denominator_integrands(self):
+        """`_make_denominator_integrands`
+        Returns following functions:
+
+        .. math::
+            \\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+            \\\\
+            \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+            \\\\
+            2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+
+        :return: array of function.
+        :rtype: array.
+        """
         def func1(swap_rate):
             return (self.annuity_mapping_fhess(swap_rate)
                     * self.forward_fx_diffusion(swap_rate))
@@ -563,133 +800,176 @@ class SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         return [func1, func2, func3]
 
     def make_denominator_call_integrands(self, **kwargs):
+        """make_denominator_call_integrands
+        See :py:func:`_make_denominator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
         return self._make_denominator_integrands()
 
     def make_denominator_put_integrands(self, **kwargs):
+        """make_denominator_put_integrands
+        See :py:func:`_make_denominator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
         return self._make_denominator_integrands()
 
     def make_denominator_analytic_funcs(self, **kwargs):
+        """make_denominator_analytic_funcs
+        Return constant term in replication method.
+
+        :return: array of function.
+        :rtype: array.
+        """
         def func1(init_swap_rate):
             return (self.annuity_mapping_func(init_swap_rate)
                     * self.forward_fx_diffusion(init_swap_rate))
         return [func1]
 
 
-class SimpleQuantoCmsPricer(object):
-    """SimpleQuantoCmsPricer"""
+def _make_numerator_replication(quanto_cms_helper, call_pricer, put_pricer):
+    """_make_numerator_replication
 
+    :param SimpleQuantoCmsHelper quanto_cms_helper:
+    :param call_pricer:
+    :param put_pricer:
+    :return: generated replication object
+    :rtype: :py:class:`AnalyticReplication`
+    """
+    put_integrands = quanto_cms_helper.make_numerator_put_integrands()
+    call_integrands = quanto_cms_helper.make_numerator_call_integrands()
+    analytic_funcs = quanto_cms_helper.make_numerator_analytic_funcs()
+    return replication.AnalyticReplication(
+        call_pricer,
+        put_pricer,
+        analytic_funcs,
+        put_integrands,
+        call_integrands)
+
+
+def _make_denominator_replication(quanto_cms_helper, call_pricer, put_pricer):
+    """_make_denominator_replication
+
+    :param qunato_cms_helper:
+    :param call_pricer:
+    :param put_pricer:
+    :return: generated replication object
+    :rtype: :py:class:`AnalyticReplication`
+    """
+    put_integrands = quanto_cms_helper.make_denominator_put_integrands()
+    call_integrands = quanto_cms_helper.make_denominator_call_integrands()
+    analytic_funcs = quanto_cms_helper.make_denominator_analytic_funcs()
+    return replication.AnalyticReplication(
+        call_pricer,
+        put_pricer,
+        analytic_funcs,
+        put_integrands,
+        call_integrands)
+
+
+def replicate(init_swap_rate,
+              discount_factor,
+              call_pricer,
+              put_pricer,
+              payoff_type,
+              payoff_params,
+              forward_fx_diffusion_params,
+              annuity_mapping_type,
+              annuity_mapping_params,
+              min_put_range=-np.inf,
+              max_call_range=np.inf):
+    """replicate
+    Simple qunato cms pricer.
+
+    .. math::
+        V_{\mathrm{QuantoCMS}}(0)
+        \\approx
+            P_{f}(0, T_{p})
+            \\frac{\mathrm{E}^{A,d}
+            \left[
+                g(S(T)) \\alpha(S(T)) \\tilde{\chi}(S(T))
+            \\right]
+            }{\mathrm{E}^{A,d}
+            \left[
+                \\alpha(S(T)) \\tilde{\chi}(S(T))
+            \\right]
+            }
+
+    where
+    :math:`T_{p}` is payment date of Quanto CMS,
+    :math:`P_{f}(0, T)` is value of foreign currency zero coupon bond
+    with maturity :math:`T` at time 0.
+    :math:`\mathrm{E}^{A,d}` is expectation under domestic annuity measure.
+    :math:`g` is payoff function,
+    :math:`\\alpha(\cdot)` is annuity mapping function,
+    :math:`\\tilde{\chi}(\cdot)` is forward fx diffusion,
+    :math:`S(T)` is time :math:`T` forward swap rate.
+
+    See
+    `Interest Rate Modeling. Volume 3: Products and Risk Management, Chap16`.
+
+    :param float init_swap_rate:
+    :param float discount_factor:
+    :param callable call_pricer:
+    :param callable put_pricer:
+    :param str payoff_type:
+        Specify type of payoff function as a string
+        ("call", "put", "bull_spread").
+    :param dict payoff_params:
+    :param dict forward_fx_diffusion_params:
+    :param str annuity_mapping_type:
+        Specify type of annuity mapping function as a string ("linear").
+    :param dict annuity_mapping_params:
+    :param float min_put_range:
+    :param float max_call_range:
+    """
     payoff_dict = {
         "call": 1,
         "put": 2,
         "bull_spread": 3,
     }
-
     annuity_mapping_dict = {
         "linear": 1,
     }
 
-    def __init__(self,
-                 annuity_mapping_type,
-                 annuity_mapping_params,
-                 payoff_type,
-                 payoff_params,
-                 forward_fx_diffusion_params,
-                 call_pricer,
-                 put_pricer):
-        """__init__
-
-        :param annuity_mapping_type:
-        :param annuity_mapping_params:
-        :param payoff_type:
-        :param payoff_params:
-        :param forward_fx_diffusion_params:
-        :param call_pricer:
-        :param put_pricer:
-        """
-        self.annuity_mapping_type = \
-            self.annuity_mapping_dict[annuity_mapping_type]
-        self.payoff_type = self.payoff_dict[payoff_type]
-        # forward fx diffusion
-        self.forward_fx_diffusion_helper = _ForwardFxDiffusionHelper(
-            **forward_fx_diffusion_params)
-        # annuity mapping func
-        if self.annuity_mapping_type == 1:
-            self.annuity_mapping_helper = (
-                replication.LinearAnnuityMappingFuncHelper(
-                    **annuity_mapping_params))
-        # payoff
-        if self.payoff_type == 1:
-            self.payoff_helper = payoff.CallUnderlyingPayoffHelper(
-                **payoff_params)
-        payoff_strike = payoff_params["strike"]
-        # pricer
-        self.call_pricer = call_pricer
-        self.put_pricer = put_pricer
-        # quanto cms
-        if self.payoff_type == 1 and self.annuity_mapping_type == 1:
-            quanto_cms_helper = SimpleQuantoCmsLinearCallHelper(
-                self.annuity_mapping_helper,
-                self.payoff_helper,
-                self.forward_fx_diffusion_helper,
-                call_pricer,
-                put_pricer,
-                payoff_strike)
-        # replication
-        self.numerator_replication = self._make_numerator_replication(
-            quanto_cms_helper)
-        self.denominator_replication = self._make_denominator_replication(
-            quanto_cms_helper)
-
-    def _make_numerator_replication(self, quanto_cms_helper):
-        put_integrands = quanto_cms_helper.make_numerator_put_integrands()
-        call_integrands = quanto_cms_helper.make_numerator_call_integrands()
-        analytic_funcs = quanto_cms_helper.make_numerator_analytic_funcs()
-        return replication.AnalyticReplication(
-            self.call_pricer,
-            self.put_pricer,
-            analytic_funcs,
-            put_integrands,
-            call_integrands)
-
-    def _make_denominator_replication(self, quanto_cms_helper):
-        """_make_denominator_replication
-
-        :param qunato_cms_helper:
-        :return: generated replication object
-        :rtype: :py:class:`AnalyticReplication`
-        """
-        put_integrands = quanto_cms_helper.make_denominator_put_integrands()
-        call_integrands = quanto_cms_helper.make_denominator_call_integrands()
-        analytic_funcs = quanto_cms_helper.make_denominator_analytic_funcs()
-        return replication.AnalyticReplication(
-            self.call_pricer,
-            self.put_pricer,
-            analytic_funcs,
-            put_integrands,
-            call_integrands)
-
-    def eval(self,
-             discount_factor,
-             init_swap_rate,
-             min_put_range=-np.inf,
-             max_call_range=np.inf):
-        """eval
-
-        :param float discount_factor: discount factor at payment date.
-        :param float init_swap_rate: initial swap rate.
-        :param float min_put_range:
-        :param float max_call_range:
-        :return: value of quanto cms.
-        :rtype: float
-        """
-        numerator = self.numerator_replication.eval(
-            init_swap_rate,
-            min_put_range=min_put_range,
-            max_call_range=max_call_range)
-        print("numerator", numerator)
-        denominator = self.denominator_replication.eval(
-            init_swap_rate,
-            min_put_range=min_put_range,
-            max_call_range=max_call_range)
-        print("denominator", denominator)
-        return discount_factor * numerator / denominator
+    annuity_mapping_type = annuity_mapping_dict[annuity_mapping_type]
+    payoff_type = payoff_dict[payoff_type]
+    # forward fx diffusion
+    forward_fx_diffusion_helper = _ForwardFxDiffusionHelper(
+        **forward_fx_diffusion_params)
+    # annuity mapping func
+    if annuity_mapping_type == 1:
+        annuity_mapping_helper = replication.LinearAnnuityMappingFuncHelper(
+            **annuity_mapping_params)
+    # payoff
+    if payoff_type == 1:
+        payoff_helper = payoff.CallUnderlyingPayoffHelper(**payoff_params)
+    payoff_strike = payoff_params["strike"]
+    # pricer
+    # quanto cms helper
+    if payoff_type == 1 and annuity_mapping_type == 1:
+        quanto_cms_helper = _SimpleQuantoCmsLinearCallHelper(
+            annuity_mapping_helper,
+            payoff_helper,
+            forward_fx_diffusion_helper,
+            call_pricer,
+            put_pricer,
+            payoff_strike,
+            min_put_range,
+            max_call_range)
+    # replication
+    numerator_replication = _make_numerator_replication(
+        quanto_cms_helper, call_pricer, put_pricer)
+    denominator_replication = _make_denominator_replication(
+        quanto_cms_helper, call_pricer, put_pricer)
+    # calculate
+    numerator = numerator_replication.eval(
+        init_swap_rate, min_put_range, max_call_range)
+    print("numerator", numerator)
+    denominator = denominator_replication.eval(
+        init_swap_rate, min_put_range, max_call_range)
+    print("denominator", denominator)
+    return discount_factor * numerator / denominator

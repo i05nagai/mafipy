@@ -216,10 +216,12 @@ class CallStrikePayoffHelper(PayoffHelper):
         self.params = util.check_keys(keys, params, locals())
 
     def make_func(self):
-        return functools.partial(payoff_call, **self.params)
+        return lambda strike: payoff_call(
+            self.params["underlying"], strike, self.params["gearing"])
 
     def make_fprime(self):
-        return functools.partial(payoff_call_fprime, **self.params)
+        return lambda strike: payoff_call_fprime(
+            self.params["underlying"], strike, self.params["gearing"])
 
     def make_fhess(self):
         return ValueError("dirac delta function")
