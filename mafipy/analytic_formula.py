@@ -467,6 +467,43 @@ def black_scholes_call_value_third_by_strike(
     return term1 + term2 - term3 - term4
 
 
+def black_scholes_call_delta(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_delta
+    calculates black scholes delta.
+
+    .. math::
+        \\frac{\partial}{\partial S} c(S, K, r, T, \sigma)
+            = \Phi(d_{1}(S))
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\Phi` is standard normal c.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of delta.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    return scipy.stats.norm.cdf(d1)
+
+
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,
