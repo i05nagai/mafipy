@@ -596,7 +596,7 @@ def black_scholes_call_theta(
 
     .. math::
         \\frac{\partial}{\partial t} c(t, S, K, r, T, \sigma)
-            = - underlying * \phi(d_{1})
+            = - S * \phi(d_{1})
                 \left(
                     \\frac{\sigma}{2\sqrt{T - t}}
                 \\right)
