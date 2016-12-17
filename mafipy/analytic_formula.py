@@ -516,7 +516,7 @@ def black_scholes_call_gamma(
     .. math::
         \\frac{\partial^{2}}{\partial S^{2}} c(S, K, r, T, \sigma)
             = -\phi(d_{1}(S, K, r, T, \sigma))
-                \\frac{}{S^{2}\sigma\sqrt{T}}
+                \\frac{1}{S^{2}\sigma\sqrt{T}}
 
     where
     :math:`S` is underlying,
@@ -543,6 +543,45 @@ def black_scholes_call_gamma(
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     denominator = (underlying ** 2) * vol * math.sqrt(maturity)
     return -scipy.stats.norm.pdf(d1) / denominator
+
+
+def black_scholes_call_vega(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol):
+    """black_scholes_call_vega
+    calculates black scholes vega.
+
+    .. math::
+        \\frac{\partial}{\partial \sigma} c(S, K, r, T, \sigma)
+            = -\sqrt{T}S\phi(d_{1}(S, K, r, T, \sigma))
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`calc_black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+    :return: value of vega.
+    :rtype: float.
+    """
+    assert(maturity >= 0.0)
+    assert(vol >= 0.0)
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    return - underlying * scipy.stats.norm.pdf(d1)
 
 
 def calc_local_vol_model_implied_vol(
