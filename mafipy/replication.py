@@ -73,30 +73,64 @@ def linear_annuity_mapping_fhess(underlying, alpha0, alpha1):
 
 
 class AnnuityMappingFuncHelper(object):
+    """AnnuityMappingFuncHelper
+    Interface to generate annuity mapping function
+    and it's first and second derivative.
+    """
 
-    def make_func(self, payoff_params):
+    def make_func(self):
         raise NotImplementedError
 
-    def make_fprime(self, payoff_params):
+    def make_fprime(self):
         raise NotImplementedError
 
-    def make_fhess(self, payoff_params):
+    def make_fhess(self):
         raise NotImplementedError
 
 
 class LinearAnnuityMappingFuncHelper(AnnuityMappingFuncHelper):
+    """LinearAnnuityMappingFuncHelper
+    Helper class to generate linear annuity mappiing function
+    and it's first and second derivative as a function of swap rate.
+
+    :param float alpha0: required.
+    :param float alpha1: required.
+    """
 
     def __init__(self, **params):
         keys = ["alpha0", "alpha1"]
         self.params = util.check_keys(keys, params, locals())
 
     def make_func(self):
+        """make_func
+        returns linear annuity mapping function.
+        See :py:func:`linear_annuity_mapping_func`.
+
+        :return: linear annuity mapping function as a function of swap rate.
+        :rtype: FuncionType
+        """
         return functools.partial(linear_annuity_mapping_func, **self.params)
 
     def make_fprime(self):
+        """make_fpirme
+        returns first derivative of linear annuity mapping function.
+        See :py:func:`linear_annuity_mapping_fprime`.
+
+        :return: first derivative of linear annuity mapping function
+            as a function of swap rate.
+        :rtype: FuncionType
+        """
         return functools.partial(linear_annuity_mapping_fprime, **self.params)
 
     def make_fhess(self):
+        """make_fhess
+        returns first derivative of linear annuity mapping function.
+        See :py:func:`linear_annuity_mapping_fprime`.
+
+        :return: first derivative of linear annuity mapping function
+            as a function of swap rate.
+        :rtype: FuncionType
+        """
         return functools.partial(linear_annuity_mapping_fhess, **self.params)
 
 
