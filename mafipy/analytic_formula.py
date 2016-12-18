@@ -276,6 +276,9 @@ def calc_black_scholes_put_value(
         vol,
         today=0.0):
     """calc_black_scholes_put_value
+    evaluates value of put option using put-call parity so that
+    this function calls :py:func:`calc_black_scholes_call_value`.
+    See :py:func:`calc_black_scholes_put_formula`.
 
     :param float underlying:
     :param float strike:
@@ -286,8 +289,10 @@ def calc_black_scholes_put_value(
     :return: put value.
     :rtype: float
     """
-    return calc_black_scholes_put_formula(
-        underlying, strike, rate, maturity - today, vol)
+    call_value = calc_black_scholes_call_value(
+        underlying, strike, rate, maturity, vol, today)
+    discount = math.exp(-rate * (maturity - today))
+    return call_value - (underlying - strike * discount)
 
 
 def black_scholes_call_value_fprime_by_strike(

@@ -190,11 +190,13 @@ class TestAnalytic(object):
         ])
     def test_calc_black_scholes_put_value(
             self, underlying, strike, rate, maturity, vol, today):
-        expect = target.calc_black_scholes_put_formula(
-            underlying, strike, rate, maturity - today, vol)
+        call_value = target.calc_black_scholes_call_value(
+            underlying, strike, rate, maturity, vol, today)
+        discount = math.exp(-rate * (maturity - today))
+        expect = call_value - (underlying - discount * strike)
         actual = target.calc_black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
-        assert actual == approx(expect)
+        assert expect == approx(actual)
 
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
