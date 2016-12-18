@@ -638,7 +638,6 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         # payoff
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
-        self.payoff_fhess = call_payoff_helper.make_fhess()
         self.payoff_strike = payoff_strike
         # forawad fx diffusion
         fwd_fx_helper = forward_fx_diffusion_helper
@@ -831,17 +830,17 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
 
 
 class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
-    """_SimpleQuantoCmsLinearCallHelper
-    In linear TSR model with call payoff,
+    """_SimpleQuantoCmsLinearBullSpreadHelper
+    In linear TSR model with bull-spread payoff,
     stochastic weight in the numerator is
 
         .. math::
             \\begin{eqnarray}
-                g_{\mathrm{call}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
+                g_{\mathrm{bullspread}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
                     & = &
                     \delta(s - K)\\alpha(s)\\tilde{\chi}(s),
                 \\\\
-                g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                g_{\mathrm{bullspread}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
                     & = &
                     (s - K)^{+}
                     (\\alpha_{1}s + \\alpha_{2})
@@ -851,7 +850,7 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                         + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
                     \\right),
                 \\\\
-                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                2g_{\mathrm{bullspread}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
                     & = & 2 1_{[K, \infty)}(s) \\alpha_{1}
                         \exp
                         \left(
@@ -859,19 +858,19 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                                 + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
                         \\right),
                 \\\\
-                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{bullspread}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
                     & = & 2 1_{[K, \infty)}(s)
                         (\\alpha_{1}s + \\alpha_{2})
                         \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
                 \\\\
-                2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{bullspread}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
                     & = &
                         2(s - K)^{+} \\alpha_{1}
                             \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
             \end{eqnarray}
 
     where
-    :math:`g_{\mathrm{callplet}}` is payoff function,
+    :math:`g_{\mathrm{bullspread}}` is payoff function,
     :math:`\\alpha` is annuity mapping function,
     :math:`\\tilde{\chi}(s)` is forward fx diffusion,
     see :py:func:`_forward_fx_diffusion`.
@@ -899,20 +898,24 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         \end{eqnarray}
 
     :param AnnuityMappingFuncHelper annuity_mapping_helper:
-    :param PayoffHelper call_payoff_helper:
+    :param PayoffHelper bull_spread_payoff_helper:
     :param _ForwardFxDiffusionHelper forward_fx_diffusion_helper:
     :param call_pricer: call option pricer.
     :param put_pricer: put option pricer.
-    :param float payoff_strike: strike of call option payoff function.
+    :param float payoff_lower_strike: lower strike of
+        bull spread option payoff function.
+    :param float payoff_upper_strike: upper strike of
+        bull spread option payoff function.
     """
 
     def __init__(self,
                  annuity_mapping_helper,
-                 call_payoff_helper,
+                 bull_spread_payoff_helper,
                  forward_fx_diffusion_helper,
                  call_pricer,
                  put_pricer,
-                 payoff_strike,
+                 payoff_lower_strike,
+                 payoff_upper_strike,
                  min_put_range=-np.inf,
                  max_put_range=np.inf,
                  min_call_range=-np.inf,
@@ -924,10 +927,10 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         self.annuity_mapping_fprime = annuity_mapping_helper.make_fprime()
         self.annuity_mapping_fhess = annuity_mapping_helper.make_fhess()
         # payoff
-        self.payoff_func = call_payoff_helper.make_func()
-        self.payoff_fprime = call_payoff_helper.make_fprime()
-        self.payoff_fhess = call_payoff_helper.make_fhess()
-        self.payoff_strike = payoff_strike
+        self.payoff_func = bull_spread_payoff_helper.make_func()
+        self.payoff_fprime = bull_spread_payoff_helper.make_fprime()
+        self.payoff_lower_strike = payoff_lower_strike
+        self.payoff_upper_strike = payoff_upper_strike
         # forawad fx diffusion
         fwd_fx_helper = forward_fx_diffusion_helper
         self.forward_fx_diffusion = fwd_fx_helper.make_func()
@@ -947,13 +950,17 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         Returns following functions:
 
         .. math::
-            g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+            g_{\mathrm{bullspread}}(s; K_{l}, K_{u})
+                \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
             \\\\
-            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+            2g_{\mathrm{bullspread}}^{\prime}(s; K_{l}, K_{u})
+                \\alpha^{\prime}(s)\\tilde{\chi}(s)
             \\\\
-            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+            2g_{\mathrm{bullspread}}^{\prime}(s; K_{l}, K_{u})
+                \\alpha(s)\\tilde{\chi}^{\prime}(s)
             \\\\
-            2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+            2g_{\mathrm{bullspread}}(s; K_{l}, K_{u})
+                \\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
 
         :return: array of function.
         :rtype: array.
@@ -1012,11 +1019,17 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         Specifically, the second and third term are
 
         .. math::
-            p(K) \\alpha(K)\\tilde{\chi}(K)
-            1_{(L_{\min}^{\mathrm{put}},L_{\max}^{\mathrm{put}})}(K)
+            p(K_{f}) \\alpha(K_{f})\\tilde{\chi}(K_{f})
+            1_{(L_{\min}^{\mathrm{put}},L_{\max}^{\mathrm{put}})}(K_{f})
             \\\\
-            c(K) \\alpha(K)\\tilde{\chi}(K)1_{(L_{\min},L_{\max})}(K)
-            1_{(L_{\min}^{\mathrm{call}},L_{\max}^{\mathrm{call}})}(K)
+            p(K_{c}) \\alpha(K_{c})\\tilde{\chi}(K_{c})
+            1_{(L_{\min}^{\mathrm{put}},L_{\max}^{\mathrm{put}})}(K_{c})
+            \\\\
+            c(K_{f}) \\alpha(K_{f})\\tilde{\chi}(K_{f})
+            1_{(L_{\min}^{\mathrm{call}},L_{\max}^{\mathrm{call}})}(K_{f})
+            \\\\
+            c(K_{c}) \\alpha(K_{c})\\tilde{\chi}(K_{c})
+            1_{(L_{\min}^{\mathrm{call}},L_{\max}^{\mathrm{call}})}(K_{c})
 
         where
         :math:`p(K) := p(0, S(0); K, T)`,
@@ -1042,21 +1055,39 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                     * self.annuity_mapping_func(init_swap_rate)
                     * self.forward_fx_diffusion(init_swap_rate))
 
-        def func2(init_swap_rate):
-            return (self.put_pricer(self.payoff_strike)
-                    * self.annuity_mapping_func(self.payoff_strike)
-                    * self.forward_fx_diffusion(self.payoff_strike))
+        # put term1
+        def func21(init_swap_rate):
+            return (self.put_pricer(self.payoff_lower_strike)
+                    * self.annuity_mapping_func(self.payoff_lower_strike)
+                    * self.forward_fx_diffusion(self.payoff_lower_strike))
 
-        def func3(init_swap_rate):
-            return (self.call_pricer(self.payoff_strike)
-                    * self.annuity_mapping_func(self.payoff_strike)
-                    * self.forward_fx_diffusion(self.payoff_strike))
+        # put term2
+        def func22(init_swap_rate):
+            return (self.put_pricer(self.payoff_upper_strike)
+                    * self.annuity_mapping_func(self.payoff_upper_strike)
+                    * self.forward_fx_diffusion(self.payoff_upper_strike))
+
+        # call term1
+        def func31(init_swap_rate):
+            return (self.call_pricer(self.payoff_lower_strike)
+                    * self.annuity_mapping_func(self.payoff_lower_strike)
+                    * self.forward_fx_diffusion(self.payoff_lower_strike))
+
+        # call term2
+        def func32(init_swap_rate):
+            return (self.call_pricer(self.payoff_upper_strike)
+                    * self.annuity_mapping_func(self.payoff_upper_strike)
+                    * self.forward_fx_diffusion(self.payoff_upper_strike))
 
         terms = [func1]
-        if self.min_put_range < self.payoff_strike < self.max_put_range:
-            terms.append(func2)
-        if self.min_call_range < self.payoff_strike < self.max_call_range:
-            terms.append(func3)
+        if self.min_put_range < self.payoff_lower_strike < self.max_put_range:
+            terms.append(func21)
+        if self.min_put_range < self.payoff_upper_strike < self.max_put_range:
+            terms.append(func22)
+        if self.min_call_range < self.payoff_lower_strike < self.max_call_range:
+            terms.append(func31)
+        if self.min_call_range < self.payoff_upper_strike < self.max_call_range:
+            terms.append(func32)
         return terms
 
     def _make_denominator_integrands(self):
