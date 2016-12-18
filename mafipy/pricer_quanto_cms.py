@@ -836,21 +836,25 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
 
         .. math::
             \\begin{eqnarray}
-                g_{\mathrm{bullspread}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
+                g_{\mathrm{bullspread}}^{\prime\prime}(s; K)
+                \\alpha(s)\\tilde{\chi}(s)
                     & = &
                     \delta(s - K)\\alpha(s)\\tilde{\chi}(s),
                 \\\\
-                g_{\mathrm{bullspread}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                g_{\mathrm{bullspread}}(s; K)
+                \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
                     & = &
                     (s - K)^{+}
                     (\\alpha_{1}s + \\alpha_{2})
                     \\rho_{XS}\sigma_{X}\sqrt{T}
                     \left(
                        h^{\prime\prime}(s)\\tilde{\chi}(s)
-                        + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                        + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2}
+                            \\tilde{\chi}(s)
                     \\right),
                 \\\\
-                2g_{\mathrm{bullspread}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                2g_{\mathrm{bullspread}}^{\prime}(s; K)
+                \\alpha^{\prime}(s)\\tilde{\chi}(s)
                     & = & 2 1_{[K, \infty)}(s) \\alpha_{1}
                         \exp
                         \left(
@@ -858,15 +862,19 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                                 + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
                         \\right),
                 \\\\
-                2g_{\mathrm{bullspread}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{bullspread}}^{\prime}(s; K)
+                \\alpha(s)\\tilde{\chi}^{\prime}(s)
                     & = & 2 1_{[K, \infty)}(s)
                         (\\alpha_{1}s + \\alpha_{2})
-                        \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                        \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)
+                        \\tilde{\chi}(s),
                 \\\\
-                2g_{\mathrm{bullspread}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{bullspread}}(s; K)
+                \\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
                     & = &
                         2(s - K)^{+} \\alpha_{1}
-                            \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                            \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)
+                            \\tilde{\chi}(s),
             \end{eqnarray}
 
     where
@@ -1266,7 +1274,9 @@ def replicate(init_swap_rate,
     # payoff
     if payoff_type == 1:
         payoff_helper = payoff.CallUnderlyingPayoffHelper(**payoff_params)
-    payoff_strike = payoff_params["strike"]
+    elif payoff_type == 3:
+        payoff_helper = payoff.BullSpreadUnderlyingPayoffHelper(
+            **payoff_params)
     # pricer
     # quanto cms helper
     if payoff_type == 1 and annuity_mapping_type == 1:
@@ -1276,9 +1286,21 @@ def replicate(init_swap_rate,
             forward_fx_diffusion_helper,
             call_pricer,
             put_pricer,
-            payoff_strike,
+            payoff_params["strike"],
             min_put_range,
             max_call_range)
+    elif payoff_type == 3 and annuity_mapping_type == 1:
+        quanto_cms_helper = _SimpleQuantoCmsLinearBullSpreadHelper(
+            annuity_mapping_helper,
+            payoff_helper,
+            forward_fx_diffusion_helper,
+            call_pricer,
+            put_pricer,
+            payoff_params["lower_strike"],
+            payoff_params["upper_strike"],
+            min_put_range,
+            max_call_range)
+
     # replication
     numerator_replication = _make_numerator_replication(
         quanto_cms_helper, call_pricer, put_pricer)
