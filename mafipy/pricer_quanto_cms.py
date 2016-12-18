@@ -830,6 +830,294 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         return [func1]
 
 
+class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
+    """_SimpleQuantoCmsLinearCallHelper
+    In linear TSR model with call payoff,
+    stochastic weight in the numerator is
+
+        .. math::
+            \\begin{eqnarray}
+                g_{\mathrm{call}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
+                    & = &
+                    \delta(s - K)\\alpha(s)\\tilde{\chi}(s),
+                \\\\
+                g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                    & = &
+                    (s - K)^{+}
+                    (\\alpha_{1}s + \\alpha_{2})
+                    \\rho_{XS}\sigma_{X}\sqrt{T}
+                    \left(
+                       h^{\prime\prime}(s)\\tilde{\chi}(s)
+                        + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                    \\right),
+                \\\\
+                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                    & = & 2 1_{[K, \infty)}(s) \\alpha_{1}
+                        \exp
+                        \left(
+                            \\rho_{XS}\sigma_{X}\sqrt{T}\Phi^{-1}(\Psi^{A}(s))
+                                + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
+                        \\right),
+                \\\\
+                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                    & = & 2 1_{[K, \infty)}(s)
+                        (\\alpha_{1}s + \\alpha_{2})
+                        \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                \\\\
+                2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                    & = &
+                        2(s - K)^{+} \\alpha_{1}
+                            \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+            \end{eqnarray}
+
+    where
+    :math:`g_{\mathrm{callplet}}` is payoff function,
+    :math:`\\alpha` is annuity mapping function,
+    :math:`\\tilde{\chi}(s)` is forward fx diffusion,
+    see :py:func:`_forward_fx_diffusion`.
+
+    Stochastic weight in the denominator is
+
+    .. math::
+        \\begin{eqnarray}
+            \\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+                & = & 0
+                \\\\
+            \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                & = &
+                (\\alpha_{1}s + \\alpha_{2})
+                \\rho_{XS}\sigma_{X}\sqrt{T}
+                \left(
+                       h^{\prime\prime}(s)\\tilde{\chi}(s)
+                    + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                \\right),
+                \\\\
+            2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                & = &
+                    2\\alpha_{1}
+                    \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+        \end{eqnarray}
+
+    :param AnnuityMappingFuncHelper annuity_mapping_helper:
+    :param PayoffHelper call_payoff_helper:
+    :param _ForwardFxDiffusionHelper forward_fx_diffusion_helper:
+    :param call_pricer: call option pricer.
+    :param put_pricer: put option pricer.
+    :param float payoff_strike: strike of call option payoff function.
+    """
+
+    def __init__(self,
+                 annuity_mapping_helper,
+                 call_payoff_helper,
+                 forward_fx_diffusion_helper,
+                 call_pricer,
+                 put_pricer,
+                 payoff_strike,
+                 min_put_range=-np.inf,
+                 max_put_range=np.inf,
+                 min_call_range=-np.inf,
+                 max_call_range=np.inf):
+        """__init__
+        """
+        # annutiy mapping funciton
+        self.annuity_mapping_func = annuity_mapping_helper.make_func()
+        self.annuity_mapping_fprime = annuity_mapping_helper.make_fprime()
+        self.annuity_mapping_fhess = annuity_mapping_helper.make_fhess()
+        # payoff
+        self.payoff_func = call_payoff_helper.make_func()
+        self.payoff_fprime = call_payoff_helper.make_fprime()
+        self.payoff_fhess = call_payoff_helper.make_fhess()
+        self.payoff_strike = payoff_strike
+        # forawad fx diffusion
+        fwd_fx_helper = forward_fx_diffusion_helper
+        self.forward_fx_diffusion = fwd_fx_helper.make_func()
+        self.forward_fx_diffusion_fprime = fwd_fx_helper.make_fprime()
+        self.forward_fx_diffusion_fhess = fwd_fx_helper.make_fhess()
+        # pricer
+        self.call_pricer = call_pricer
+        self.put_pricer = put_pricer
+        # range
+        self.min_put_range = min_put_range
+        self.max_put_range = max_put_range
+        self.min_call_range = min_call_range
+        self.max_call_range = max_call_range
+
+    def _make_numerator_integrands(self):
+        """_make_numerator_integrands
+        Returns following functions:
+
+        .. math::
+            g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+            \\\\
+            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+            \\\\
+            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+            \\\\
+            2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+
+        :return: array of function.
+        :rtype: array.
+        """
+        def func1(swap_rate):
+            """func1
+            """
+            return (self.payoff_func(swap_rate)
+                    * self.annuity_mapping_func(swap_rate)
+                    * self.forward_fx_diffusion_fhess(swap_rate))
+
+        def func2(swap_rate):
+            return (2.0
+                    * self.payoff_fprime(swap_rate)
+                    * self.annuity_mapping_fprime(swap_rate)
+                    * self.forward_fx_diffusion(swap_rate))
+
+        def func3(swap_rate):
+            return (2.0
+                    * self.payoff_fprime(swap_rate)
+                    * self.annuity_mapping_func(swap_rate)
+                    * self.forward_fx_diffusion_fprime(swap_rate))
+
+        def func4(swap_rate):
+            return (2.0
+                    * self.payoff_func(swap_rate)
+                    * self.annuity_mapping_fprime(swap_rate)
+                    * self.forward_fx_diffusion_fprime(swap_rate))
+
+        return [func1, func2, func3, func4]
+
+    def make_numerator_call_integrands(self, **kwargs):
+        """make_numerator_call_integrands
+        See :py:func:`_make_numerator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        return self._make_numerator_integrands()
+
+    def make_numerator_put_integrands(self, **kwargs):
+        """make_numerator_put_integrands
+        See :py:func:`_make_numerator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        return self._make_numerator_integrands()
+
+    def make_numerator_analytic_funcs(self, **kwargs):
+        """make_numerator_analytic_funcs
+        There are 3 functions which is calculated analytically.
+        First is constant term in replication method.
+        Second and third is the term
+        which contains dirac delta function as integrands.
+        Specifically, the second and third term are
+
+        .. math::
+            p(K) \\alpha(K)\\tilde{\chi}(K)
+            1_{(L_{\min}^{\mathrm{put}},L_{\max}^{\mathrm{put}})}(K)
+            \\\\
+            c(K) \\alpha(K)\\tilde{\chi}(K)1_{(L_{\min},L_{\max})}(K)
+            1_{(L_{\min}^{\mathrm{call}},L_{\max}^{\mathrm{call}})}(K)
+
+        where
+        :math:`p(K) := p(0, S(0); K, T)`,
+        :math:`c(K) := c(0, S(0); K, T)`,
+        :math:`L_{\min}^{\mathrm{put}}`
+        is lower bound of integral range for put,
+        :math:`L_{\max}^{\mathrm{put}}`
+        is upper bound of integral range for put.
+        :math:`L_{\min}^{\mathrm{call}}`
+        is lower bound of integral range for call,
+        :math:`L_{\max}^{\mathrm{call}}`
+        is upper bound of integral range for call.
+
+        This term contains dirac delta function
+        (second derivative of payoff function)
+        so that can be calculated analytically.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        def func1(init_swap_rate):
+            return (self.payoff_func(init_swap_rate)
+                    * self.annuity_mapping_func(init_swap_rate)
+                    * self.forward_fx_diffusion(init_swap_rate))
+
+        def func2(init_swap_rate):
+            return (self.put_pricer(self.payoff_strike)
+                    * self.annuity_mapping_func(self.payoff_strike)
+                    * self.forward_fx_diffusion(self.payoff_strike))
+
+        def func3(init_swap_rate):
+            return (self.call_pricer(self.payoff_strike)
+                    * self.annuity_mapping_func(self.payoff_strike)
+                    * self.forward_fx_diffusion(self.payoff_strike))
+
+        terms = [func1]
+        if self.min_put_range < self.payoff_strike < self.max_put_range:
+            terms.append(func2)
+        if self.min_call_range < self.payoff_strike < self.max_call_range:
+            terms.append(func3)
+        return terms
+
+    def _make_denominator_integrands(self):
+        """`_make_denominator_integrands`
+        Returns following functions:
+
+        .. math::
+            \\alpha^{\prime\prime}(s)\\tilde{\chi}(s)
+            \\\\
+            \\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+            \\\\
+            2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+
+        :return: array of function.
+        :rtype: array.
+        """
+        def func1(swap_rate):
+            return (self.annuity_mapping_fhess(swap_rate)
+                    * self.forward_fx_diffusion(swap_rate))
+
+        def func2(swap_rate):
+            return (self.annuity_mapping_func(swap_rate)
+                    * self.forward_fx_diffusion_fhess(swap_rate))
+
+        def func3(swap_rate):
+            return (2.0
+                    * self.annuity_mapping_fprime(swap_rate)
+                    * self.forward_fx_diffusion_fprime(swap_rate))
+        return [func1, func2, func3]
+
+    def make_denominator_call_integrands(self, **kwargs):
+        """make_denominator_call_integrands
+        See :py:func:`_make_denominator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        return self._make_denominator_integrands()
+
+    def make_denominator_put_integrands(self, **kwargs):
+        """make_denominator_put_integrands
+        See :py:func:`_make_denominator_integrands`.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        return self._make_denominator_integrands()
+
+    def make_denominator_analytic_funcs(self, **kwargs):
+        """make_denominator_analytic_funcs
+        Return constant term in replication method.
+
+        :return: array of function.
+        :rtype: array.
+        """
+        def func1(init_swap_rate):
+            return (self.annuity_mapping_func(init_swap_rate)
+                    * self.forward_fx_diffusion(init_swap_rate))
+        return [func1]
+
+
 def _make_numerator_replication(quanto_cms_helper, call_pricer, put_pricer):
     """_make_numerator_replication
 
