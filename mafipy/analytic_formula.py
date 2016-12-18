@@ -164,18 +164,6 @@ def calc_black_scholes_call_formula(underlying, strike, rate, maturity, vol):
     :return: call value.
     :rtype: float
     """
-    # option is expired
-    if maturity < 0.0:
-        return 0.0
-    if underlying < 0.0:
-        # max(S - K, 0) = (S - K) + max(-(S - K), 0)
-        value = calc_black_scholes_call_formula(
-            -underlying, -strike, rate, maturity, vol)
-        return (underlying - strike) + value
-    # underlying is positive
-    if _is_d1_or_d2_infinity(underlying, strike, vol):
-        return max(underlying - strike, 0)
-
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
     return (underlying * scipy.special.ndtr(d1)
@@ -235,15 +223,47 @@ def calc_black_scholes_call_value(
     (`maturity` - `today`) is treated as time to expiry.
     See :py:func:`calc_black_scholes_call_formula`.
 
+    * case :math:`S > 0, K < 0`
+
+        * return :math:`S - e^{-rT} K`
+
+    * case :math:`S < 0, K > 0`
+
+        * return 0
+
+    * case :math:`S < 0, K < 0`
+
+        * return :math:`S - e^{-rT}K + E[(-(S - K))^{+}]`
+
+    * case :math:`T \le 0`
+
+        * return 0
+
     :param float underlying:
     :param float strike:
     :param float rate:
     :param float maturity:
-    :param float vol:
+    :param float vol: volatility. This must be positive.
     :param float today:
     :return: call value.
     :rtype: float
     """
+    assert(vol >= 0.0)
+    # option is expired
+    if maturity < 0.0 or np.isclose(maturity, 0.0):
+        return 0.0
+    # never below strike
+    elif strike < 0.0 and underlying > 0.0:
+        return underlying - math.exp(-rate * maturity) * strike
+    # never beyond strike
+    elif strike > 0.0 and underlying < 0.0:
+        return 0.0
+    elif underlying < 0.0:
+        # max(S - K, 0) = (S - K) + max(-(S - K), 0)
+        value = calc_black_scholes_call_formula(
+            -underlying, -strike, rate, maturity - today, vol)
+        return (underlying - strike) + value
+
     return calc_black_scholes_call_formula(
         underlying, strike, rate, maturity - today, vol)
 

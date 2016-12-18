@@ -4,6 +4,7 @@
 
 from __future__ import division
 from pytest import approx
+import numpy as np
 import mafipy.analytic_formula as target
 import mafipy.math_formula
 import math
@@ -110,18 +111,8 @@ class TestAnalytic(object):
             (1.0, 1.0, 1.0, 1.0, 1.0, 0.678817974887),
             # underlying > strike
             (2.0, 1.0, 1.0, 1.0, 1.0, 1.646647107929),
-            # underlying < maturity
+            # underlying < strike
             (1.0, 2.0, 1.0, 1.0, 1.0, 0.478587969669),
-            # maturity < 0
-            (1.0, 1.0, 1.0, -1.0, 1.0, 0.0),
-            # underlying < 0
-            (-1.0, -2.0, 1.0, 1.0, 1.0, (-1.0 + 2.0) + 0.478587969669),
-            # underlying = 0
-            (0.0, 2.0, 1.0, 1.0, 1.0, 0.0),
-            # strike < 0
-            (1.0, -2.0, 1.0, 1.0, 1.0, 3.0),
-            # vol < 0
-            (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
         ])
     def test_calc_black_scholes_call_formula(
             self, underlying, strike, rate, maturity, vol, expect):
@@ -132,22 +123,8 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol",
         [
-            # underlying = strike
-            (1.0, 1.0, 1.0, 1.0, 1.0),
             # underlying > strike
             (2.0, 1.0, 1.0, 1.0, 1.0),
-            # underlying < maturity
-            (1.0, 2.0, 1.0, 1.0, 1.0),
-            # maturity < 0
-            (1.0, 1.0, 1.0, -1.0, 1.0),
-            # underlying < 0
-            (-1.0, -2.0, 1.0, 1.0, 1.0),
-            # underlying = 0
-            (0.0, 2.0, 1.0, 1.0, 1.0),
-            # strike < 0
-            (1.0, -2.0, 1.0, 1.0, 1.0),
-            # vol < 0
-            (2.0, 1.0, 1.0, 1.0, -1.0),
         ])
     def test_calc_black_scholes_put_formula(
             self, underlying, strike, rate, maturity, vol):
@@ -162,20 +139,54 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
+            # maturity < 0
+            (1.0, 1.0, 1.0, -1.0, 1.0, 0.0),
+            # maturity = 0
+            (1.0, 1.0, 1.0, 0.0, 1.0, 0.0),
+            # underlying > 0, strike < 0
+            (1.0, -1.0, 1.0, 1.0, 1.0, 0.0),
+            # underlying < 0, strike > 0
+            (-1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
+            # underlying < 0, stirke < 0
+            (-1.0, -2.0, 1.0, 1.0, 1.0, 0.0),
+            # vol < 0
+            (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
+            # today > 0
             (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
         ])
     def test_calc_black_scholes_call_value(
             self, underlying, strike, rate, maturity, vol, today):
-        expect = target.calc_black_scholes_call_formula(
-            underlying, strike, rate, maturity - today, vol)
-        actual = target.calc_black_scholes_call_value(
-            underlying, strike, rate, maturity, vol, today)
-        assert actual == approx(expect)
+        if vol <= 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.calc_black_scholes_call_value(
+                    underlying, strike, rate, maturity, vol, today)
+        else:
+            actual = target.calc_black_scholes_call_value(
+                underlying, strike, rate, maturity, vol, today)
+            if maturity < 0 or np.isclose(maturity, 0.0):
+                expect = 0.0
+                assert expect == approx(actual)
+            # never below strike
+            elif underlying > 0.0 and strike < 0.0:
+                expect = underlying - math.exp(-rate * maturity) * strike
+                assert expect == approx(actual)
+            # never beyond strike
+            elif underlying < 0.0 and strike > 0.0:
+                expect = 0.0
+                assert expect == approx(actual)
+            # underlying and strike are negative
+            elif underlying < 0.0:
+                expect = (-1.0 + 2.0) + 0.478587969669
+                assert expect == approx(actual)
+            else:
+                expect = target.calc_black_scholes_call_formula(
+                    underlying, strike, rate, maturity - today, vol)
+                assert expect == approx(actual)
 
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
+            (2.0, 1.0, 1.0, 1.0, 1.0, 0.5),
         ])
     def test_calc_black_scholes_put_value(
             self, underlying, strike, rate, maturity, vol, today):
