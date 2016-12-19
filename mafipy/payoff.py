@@ -241,10 +241,49 @@ class CallUnderlyingPayoffHelper(PayoffHelper):
         self.params = util.check_keys(keys, params, locals())
 
     def make_func(self):
+        """make_func
+        """
         return functools.partial(payoff_call, **self.params)
 
     def make_fprime(self):
+        """make_fprime
+        """
         return functools.partial(payoff_call_fprime, **self.params)
 
     def make_fhess(self):
-        return ValueError("dirac delta function")
+        """make_fhess
+        """
+        raise ValueError("dirac delta function")
+
+
+class BullSpreadUnderlyingPayoffHelper(PayoffHelper):
+    """BullSpreadUnderlyingPayoffHelper
+    generate bull-spread option payoff as a funciton of underlying.
+
+    :param float lower_strike: required.
+    :param float upper_strike: required.
+    :param float gearing: required.
+    """
+
+    def __init__(self, **params):
+        """__init__
+        """
+        keys = ["lower_strike", "upper_strike", "gearing"]
+        self.params = util.check_keys(keys, params, locals())
+        if self.params["lower_strike"] > self.params["upper_strike"]:
+            raise ValueError("lower strike must be greater than upper strike")
+
+    def make_func(self):
+        """make_func
+        """
+        return functools.partial(payoff_bull_spread, **self.params)
+
+    def make_fprime(self):
+        """make_fprime
+        """
+        return functools.partial(payoff_bull_spread_fprime, **self.params)
+
+    def make_fhess(self):
+        """make_fhess
+        """
+        raise ValueError("dirac delta function")

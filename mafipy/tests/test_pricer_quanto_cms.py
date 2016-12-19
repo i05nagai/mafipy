@@ -451,10 +451,10 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
     # before each test start
     def setup(self):
         # data
-        data = util.get_real(14)
+        data = util.get_real(13)
         self.alpha0 = data[0]
         self.alpha1 = data[1]
-        self.payoff_underlying = data[3]
+        self.payoff_strike = data[3]
         self.gearing = data[4]
         self.maturity = data[5]
         self.forward_fx_vol = data[6]
@@ -465,7 +465,6 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
         self.today = 0.0
         self.init_swap_rate = data[11]
         self.rate = data[12]
-        self.payoff_strike = data[13]
         # ordered data
         data = sorted(util.get_real(2))
         min_put_range = data[0]
@@ -505,14 +504,13 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
         self.annuity_mapping_fhess = annuity_mapping_helper.make_fhess()
         # payoff helper
         self.payoff_params = {
-            "underlying": self.payoff_underlying,
+            "strike": self.payoff_strike,
             "gearing": self.gearing,
         }
-        call_payoff_helper = payoff.CallStrikePayoffHelper(
+        call_payoff_helper = payoff.CallUnderlyingPayoffHelper(
             **self.payoff_params)
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
-        self.payoff_fhess = call_payoff_helper.make_fhess()
         # foward fx diffusion
         forward_fx_diffusion_params = {
             "time": self.maturity,
@@ -739,6 +737,371 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
                       * self.forward_fx_diffusion(init_swap_rate))
             assert expect == approx(actual)
         case4()
+
+    def test__make_denominator_integrands(self):
+        data = util.get_real(1)
+        swap_rate = data[0]
+        funcs = self.target._make_denominator_integrands()
+        # size
+        assert 3 == len(funcs)
+        # func1
+        actual = funcs[0](swap_rate)
+        expect = (self.annuity_mapping_fhess(swap_rate)
+                  * self.forward_fx_diffusion(swap_rate))
+        assert expect == approx(actual)
+        # func2
+        actual = funcs[1](swap_rate)
+        expect = (self.annuity_mapping_func(swap_rate)
+                  * self.forward_fx_diffusion_fhess(swap_rate))
+        assert expect == approx(actual)
+        # func3
+        actual = funcs[2](swap_rate)
+        expect = (2.0
+                  * self.annuity_mapping_fprime(swap_rate)
+                  * self.forward_fx_diffusion_fprime(swap_rate))
+        assert expect == approx(actual)
+
+    def test_make_denominator_call_integrands(self):
+        # just call _make_denominator_call_integrands()
+        # so that no needs to test
+        pass
+
+    def test_make_denominator_put_integrands(self):
+        # just call _make_denominator_call_integrands()
+        # so that no needs to test
+        pass
+
+    def test_make_denominator_analytic_func(self):
+        data = util.get_real(1)
+        init_swap_rate = data[0]
+        funcs = self.target.make_denominator_analytic_funcs()
+        # size
+        assert 1 == len(funcs)
+        # func1
+        actual = funcs[0](init_swap_rate)
+        expect = (self.annuity_mapping_func(init_swap_rate)
+                  * self.forward_fx_diffusion(init_swap_rate))
+        assert expect == approx(actual)
+
+
+class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        # data
+        data = util.get_real(11)
+        self.alpha0 = data[0]
+        self.alpha1 = data[1]
+        self.gearing = data[2]
+        self.maturity = data[3]
+        self.forward_fx_vol = data[4]
+        self.forward_fx_corr = data[5]
+        self.init_swap_rate = data[6]
+        self.rate = data[7]
+        self.swap_rate_vol = data[8]
+        self.today = 0.0
+        self.init_swap_rate = data[9]
+        self.rate = data[10]
+        # ordered data
+        data = sorted(util.get_real(2))
+        self.payoff_lower_strike = data[0]
+        self.payoff_upper_strike = data[1]
+        data = sorted(util.get_real(2))
+        min_put_range = data[0]
+        max_put_range = data[1]
+        data = sorted(util.get_real(2))
+        min_call_range = data[0]
+        max_call_range = data[1]
+        # set
+        self._set_target(min_put_range,
+                         max_put_range,
+                         min_call_range,
+                         max_call_range)
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    def _set_target(self,
+                    min_put_range,
+                    max_put_range,
+                    min_call_range,
+                    max_call_range):
+        # range
+        self.min_put_range = min_put_range
+        self.max_put_range = max_put_range
+        self.min_call_range = min_call_range
+        self.max_call_range = max_call_range
+        # annuity mapping params
+        annuity_mapping_params = {
+            "alpha0": self.alpha0,
+            "alpha1": self.alpha1
+        }
+        annuity_mapping_helper = replication.LinearAnnuityMappingFuncHelper(
+            **annuity_mapping_params)
+        self.annuity_mapping_func = annuity_mapping_helper.make_func()
+        self.annuity_mapping_fprime = annuity_mapping_helper.make_fprime()
+        self.annuity_mapping_fhess = annuity_mapping_helper.make_fhess()
+        # payoff helper
+        self.payoff_params = {
+            "lower_strike": self.payoff_lower_strike,
+            "upper_strike": self.payoff_upper_strike,
+            "gearing": self.gearing,
+        }
+        call_payoff_helper = payoff.BullSpreadUnderlyingPayoffHelper(
+            **self.payoff_params)
+        self.payoff_func = call_payoff_helper.make_func()
+        self.payoff_fprime = call_payoff_helper.make_fprime()
+        # foward fx diffusion
+        forward_fx_diffusion_params = {
+            "time": self.maturity,
+            "vol": self.forward_fx_vol,
+            "corr": self.forward_fx_corr,
+            "swap_rate_cdf": self._swap_rate_cdf,
+            "swap_rate_pdf": self._swap_rate_pdf,
+            "swap_rate_pdf_fprime": self._swap_rate_pdf_fprime
+        }
+        forward_fx_diffusion_helper = target._ForwardFxDiffusionHelper(
+            **forward_fx_diffusion_params)
+        self.forward_fx_diffusion = forward_fx_diffusion_helper.make_func()
+        self.forward_fx_diffusion_fprime = (
+            forward_fx_diffusion_helper.make_fprime())
+        self.forward_fx_diffusion_fhess = (
+            forward_fx_diffusion_helper.make_fhess())
+        # pricer
+        bs_pricer = analytic_formula.BlackScholesPricerHelper()
+        call_pricer_params = {
+            "underlying": self.init_swap_rate,
+            "rate": self.rate,
+            "maturity": self.maturity,
+            "vol": self.swap_rate_vol,
+            "today": self.today,
+        }
+        self.call_pricer = bs_pricer.make_call_wrt_strike(**call_pricer_params)
+        put_pricer_params = {
+            "underlying": self.init_swap_rate,
+            "rate": self.rate,
+            "maturity": self.maturity,
+            "vol": self.swap_rate_vol,
+            "today": 0.0,
+        }
+        self.put_pricer = bs_pricer.make_put_wrt_strike(**put_pricer_params)
+        # target
+        self.target = target._SimpleQuantoCmsLinearBullSpreadHelper(
+            annuity_mapping_helper,
+            call_payoff_helper,
+            forward_fx_diffusion_helper,
+            self.call_pricer,
+            self.put_pricer,
+            self.payoff_lower_strike,
+            self.payoff_upper_strike,
+            min_put_range,
+            max_put_range,
+            min_call_range,
+            max_call_range)
+
+    def _swap_rate_cdf(self, swap_rate):
+        return scipy.stats.norm.cdf(swap_rate)
+
+    def _swap_rate_pdf(self, swap_rate):
+        return scipy.stats.norm.pdf(swap_rate)
+
+    def _swap_rate_pdf_fprime(self, swap_rate):
+        return math_formula.norm_pdf_fprime(swap_rate)
+
+    def _calc_func1(self, swap_rate):
+        return (self.payoff_func(swap_rate)
+                * self.annuity_mapping_func(swap_rate)
+                * self.forward_fx_diffusion_fhess(swap_rate))
+
+    def _calc_func2(self, swap_rate):
+        return (2.0
+                * self.payoff_fprime(swap_rate)
+                * self.annuity_mapping_fprime(swap_rate)
+                * self.forward_fx_diffusion(swap_rate))
+
+    def _calc_func3(self, swap_rate):
+        return (2.0
+                * self.payoff_fprime(swap_rate)
+                * self.annuity_mapping_func(swap_rate)
+                * self.forward_fx_diffusion_fprime(swap_rate))
+
+    def _calc_func4(self, swap_rate):
+        return (2.0
+                * self.payoff_func(swap_rate)
+                * self.annuity_mapping_fprime(swap_rate)
+                * self.forward_fx_diffusion_fprime(swap_rate))
+
+    def test__make_numerator_call_integrands(self):
+        data = util.get_real(1)
+        swap_rate = data[0]
+        funcs = self.target._make_numerator_integrands()
+        # size
+        assert 4 == len(funcs)
+        # func1
+        actual = funcs[0](swap_rate)
+        expect = self._calc_func1(swap_rate)
+        assert expect == approx(actual)
+        # func2
+        actual = funcs[1](swap_rate)
+        expect = self._calc_func2(swap_rate)
+        assert expect == approx(actual)
+        # func3
+        actual = funcs[2](swap_rate)
+        expect = self._calc_func3(swap_rate)
+        assert expect == approx(actual)
+        # func4
+        actual = funcs[3](swap_rate)
+        expect = self._calc_func4(swap_rate)
+        assert expect == approx(actual)
+
+    def test_make_numerator_call_integrands(self):
+        # just call _make_numerator_call_integrands()
+        # so that no needs to test
+        pass
+
+    def test_make_numerator_put_integrands(self):
+        # just call _make_numerator_call_integrands()
+        # so that no needs to test
+        pass
+
+    def _analytic_func1(self, init_swap_rate):
+        return (self.payoff_func(init_swap_rate)
+                * self.annuity_mapping_func(init_swap_rate)
+                * self.forward_fx_diffusion(init_swap_rate))
+
+    # put term1
+    def _analytic_func21(self, init_swap_rate):
+        return (self.put_pricer(self.payoff_lower_strike)
+                * self.annuity_mapping_func(self.payoff_lower_strike)
+                * self.forward_fx_diffusion(self.payoff_lower_strike))
+
+    # put term2
+    def _analytic_func22(self, init_swap_rate):
+        return (self.put_pricer(self.payoff_upper_strike)
+                * self.annuity_mapping_func(self.payoff_upper_strike)
+                * self.forward_fx_diffusion(self.payoff_upper_strike))
+
+    # call term1
+    def _analytic_func31(self, init_swap_rate):
+        return (self.call_pricer(self.payoff_lower_strike)
+                * self.annuity_mapping_func(self.payoff_lower_strike)
+                * self.forward_fx_diffusion(self.payoff_lower_strike))
+
+    # call term2
+    def _analytic_func32(self, init_swap_rate):
+        return (self.call_pricer(self.payoff_upper_strike)
+                * self.annuity_mapping_func(self.payoff_upper_strike)
+                * self.forward_fx_diffusion(self.payoff_upper_strike))
+
+    def test_make_numerator_analytic_funcs(self):
+        data = util.get_real(1)
+        init_swap_rate = data[0]
+
+        def check(expect_list, actual_list, init_swap_rate):
+            # size
+            assert len(expect_list) == len(actual_list)
+            # funcs
+            for expect, actual in zip(expect_list, actual_list):
+                assert expect(init_swap_rate) == approx(actual(init_swap_rate))
+
+        def case1():
+            min_put_range = self.payoff_lower_strike / 2.0
+            max_put_range = self.payoff_upper_strike * 1.01
+            min_call_range = self.payoff_lower_strike / 2.0
+            max_call_range = self.payoff_upper_strike * 1.01
+            self._set_target(min_put_range, max_put_range,
+                             min_call_range, max_call_range)
+            funcs = self.target.make_numerator_analytic_funcs()
+
+            expect_list = [self._analytic_func1,
+                           self._analytic_func21, self._analytic_func22,
+                           self._analytic_func31, self._analytic_func32]
+            check(expect_list, funcs, init_swap_rate)
+        case1()
+
+        # min_put_range < lower_strike < max_put_range
+        # min_put_range < upper_strike < max_put_range
+        # min_call_range < lower_strike < max_call_range
+        # man_call_range < upper_strike
+        def case2():
+            min_put_range = self.payoff_lower_strike / 2.0
+            max_put_range = self.payoff_upper_strike * 1.01
+            min_call_range = self.payoff_lower_strike * 0.5
+            max_call_range = (self.payoff_upper_strike
+                              + self.payoff_lower_strike) * 0.5
+            self._set_target(min_put_range, max_put_range,
+                             min_call_range, max_call_range)
+            funcs = self.target.make_numerator_analytic_funcs()
+            expect_list = [self._analytic_func1,
+                           self._analytic_func21, self._analytic_func22,
+                           self._analytic_func31]
+            check(expect_list, funcs, init_swap_rate)
+        case2()
+
+        # min_put_range < lower_strike < max_put_range
+        # min_put_range < upper_strike < max_put_range
+        # max_call_range < lower_strike
+        # max_call_range < upper_strike
+        def case3():
+            min_put_range = self.payoff_lower_strike * 0.5
+            max_put_range = self.payoff_upper_strike * 1.01
+            min_call_range = self.payoff_lower_strike * 0.5
+            max_call_range = self.payoff_lower_strike * 0.55
+            self._set_target(min_put_range,
+                             max_put_range,
+                             min_call_range,
+                             max_call_range)
+            funcs = self.target.make_numerator_analytic_funcs()
+            expect_list = [self._analytic_func1,
+                           self._analytic_func21, self._analytic_func22]
+            check(expect_list, funcs, init_swap_rate)
+        case3()
+
+        # min_put_range < lower_strike < max_put_range
+        # max_put_range < upper_strike
+        # max_call_range < lower_strike
+        # max_call_range < upper_strike
+        def case4():
+            min_put_range = self.payoff_lower_strike * 0.5
+            max_put_range = (self.payoff_upper_strike
+                             + self.payoff_lower_strike) * 0.5
+            min_call_range = self.payoff_lower_strike * 0.5
+            max_call_range = self.payoff_lower_strike * 0.55
+            self._set_target(min_put_range,
+                             max_put_range,
+                             min_call_range,
+                             max_call_range)
+            funcs = self.target.make_numerator_analytic_funcs()
+            expect_list = [self._analytic_func1, self._analytic_func21]
+            check(expect_list, funcs, init_swap_rate)
+        case4()
+
+        # max_put_range < lower_strike
+        # max_put_range < upper_strike
+        # max_call_range < lower_strike
+        # max_call_range < upper_strike
+        def case5():
+            min_put_range = self.payoff_lower_strike * 0.5
+            max_put_range = self.payoff_lower_strike * 0.55
+            min_call_range = self.payoff_lower_strike * 0.5
+            max_call_range = self.payoff_lower_strike * 0.55
+            self._set_target(min_put_range, max_put_range,
+                             min_call_range, max_call_range)
+            funcs = self.target.make_numerator_analytic_funcs()
+            expect_list = [self._analytic_func1]
+            check(expect_list, funcs, init_swap_rate)
+        case5()
 
     def test__make_denominator_integrands(self):
         data = util.get_real(1)

@@ -4,6 +4,7 @@
 from __future__ import division
 
 import mafipy.payoff as target
+import mafipy.tests.util as util
 import pytest
 from pytest import approx
 
@@ -256,3 +257,64 @@ class TestPayoff(object):
         actual = target.payoff_risk_reversal(
             underlying, lower_strike, upper_strike, gearing)
         assert(expect == approx(actual))
+
+
+class TestBullSpreadUnderlyingPayoffHelper(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        data = sorted(util.get_real(2))
+        self.lower_strike = data[0]
+        self.upper_strike = data[1]
+        data = util.get_real()
+        self.gearing = data[0]
+        params = {
+            "lower_strike": self.lower_strike,
+            "upper_strike": self.upper_strike,
+            "gearing": self.gearing
+        }
+        self.target = target.BullSpreadUnderlyingPayoffHelper(**params)
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    def test_make_func(self):
+
+        def case1():
+            swap_rate = self.lower_strike
+            actual = self.target.make_func()(swap_rate)
+            assert 0.0 == approx(actual)
+        case1()
+
+        def case2():
+            swap_rate = self.upper_strike
+            actual = self.target.make_func()(swap_rate)
+            expect = (self.upper_strike - self.lower_strike) * self.gearing
+            assert expect == approx(actual)
+        case2()
+
+        def case3():
+            swap_rate = util.get_real()[0]
+            actual = self.target.make_func()(swap_rate)
+            expect = target.payoff_bull_spread(
+                swap_rate, self.lower_strike, self.upper_strike, self.gearing)
+            assert expect == approx(actual)
+        case3()
+
+    def test_make_fprime(self):
+        swap_rate = util.get_real()[0]
+        actual = self.target.make_func()(swap_rate)
+        expect = target.payoff_bull_spread(
+            swap_rate, self.lower_strike, self.upper_strike, self.gearing)
+        assert expect == approx(actual)
