@@ -306,9 +306,7 @@ def black_scholes_call_value_fprime_by_strike(
 
     .. math::
         \\frac{\partial }{\partial K} c(K; S, r, T, \sigma)
-        = S \phi(d_{1}(K)) d^{\prime}(K)
-        - e^{-rT} \Phi(d_{1}(K))
-        - K e^{-rT} \phi(d_{1}(K)) d^{\prime}(K)
+        = - e^{-rT} \Phi(d_{1}(K))
 
     where
     :math:`S` is underlying,
@@ -331,17 +329,11 @@ def black_scholes_call_value_fprime_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    d_fprime = d_fprime_by_strike(
-        underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
 
-    term1 = underlying * norm.pdf(d1) * d_fprime
-    term2 = math.exp(-rate * maturity) * norm.cdf(d2)
-    term3 = math.exp(-rate * maturity) * strike * norm.pdf(d2) * d_fprime
-    return term1 - term2 - term3
+    return -discount * norm.cdf(d2)
 
 
 def black_scholes_call_value_fhess_by_strike(
