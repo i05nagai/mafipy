@@ -87,7 +87,7 @@ class TestAnalytic(object):
         rate = 1.0
         vol = 0.0001
         maturity = 1.0 / 365.0
-        expect = strike / (math.sqrt(maturity) * vol * underlying)
+        expect = -1.0 / (math.sqrt(maturity) * vol * strike)
         actual = target.d_fprime_by_strike(
             underlying, strike, rate, maturity, vol)
         assert expect == approx(actual)
@@ -99,8 +99,8 @@ class TestAnalytic(object):
         ])
     def test_d_fhess_by_strike(
             self, underlying, strike, rate, maturity, vol):
-        expect = 1.0 / (math.sqrt(maturity) * vol * underlying)
-        actual = target.d_fprime_by_strike(
+        expect = 1.0 / (math.sqrt(maturity) * vol * strike * strike)
+        actual = target.d_fhess_by_strike(
             underlying, strike, rate, maturity, vol)
         assert expect == approx(actual)
 

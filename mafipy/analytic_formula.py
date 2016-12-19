@@ -95,8 +95,7 @@ def d_fprime_by_strike(underlying, strike, rate, maturity, vol):
     :rtype: float
     """
     assert(maturity > 0.0)
-    assert(vol > 0.0)
-    return strike / (math.sqrt(maturity) * vol * underlying)
+    return - 1.0 / (math.sqrt(maturity) * vol * strike)
 
 
 def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
@@ -122,8 +121,7 @@ def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
     :rtype: float
     """
     assert(maturity > 0.0)
-    assert(vol > 0.0)
-    return 1.0 / (math.sqrt(maturity) * vol * underlying)
+    return 1.0 / (math.sqrt(maturity) * vol * strike * strike)
 
 
 def calc_black_scholes_call_formula(underlying, strike, rate, maturity, vol):
