@@ -352,13 +352,8 @@ def black_scholes_call_value_fhess_by_strike(
         \\begin{array}{ccl}
             \\frac{\partial^{2}}{\partial K^{2}} c(0, S; T, K)
                 & = &
-                S\phi^{\prime}(d_{1}(K))(d_{1}^{\prime}(K))^{2}
-                + S\phi(d_{1}(K))d_{1}^{\prime\prime}(K)
-                - 2\phi(d_{2}(K))d_{2}^{\prime}(K)
-                \\\\
-                & &
-                - K\phi^{\prime}(d_{2}(K))(d_{2}^{\prime}(K))^{2}
-                - K\phi(d_{2}(K))d_{2}^{\prime\prime}(K))
+                    -e^{-rT}
+                    \phi(d_{2}(K)) d^{\prime}(K)
         \end{array}
 
     where
@@ -408,23 +403,11 @@ def black_scholes_call_value_third_by_strike(
         \\begin{array}{ccl}
             \\frac{\partial^{3}}{\partial K^{3}} c(0, S; T, K)
             & = &
-            \left(
-                S\phi^{\prime\prime}(d_{1}(K))
-                - K\phi^{\prime\prime}(d_{2}(K))
-            \\right)
-            (d^{\prime}(K))^{3}
-            \\\\
-            & &
-            +
-            \left(
-                S\phi^{\prime}(d_{1}(K))
-                - K\phi^{\prime}(d_{2}(K))
-            \\right)
-            3d^{\prime}(K)d^{\prime\prime}
-            \\\\
-            & &
-            - 3\phi(d_{2}(K))d^{\prime\prime}
-            - 3\phi^{\prime}(d_{2}(K))(d^{\prime}(K))^{2}
+                -e^{-rT}
+                \left(
+                    \phi^{\prime}(d_{2}(K))(d^{\prime}(K))^{2}
+                        + \phi(d_{2}(K))d^{\prime\prime}(K)
+                \\right)
         \end{array}
 
     where
