@@ -382,23 +382,13 @@ def black_scholes_call_value_fhess_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
     d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
-    d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
-    d1_density = norm.pdf(d1)
-    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
     d2_density = norm.pdf(d2)
-    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
 
-    term1 = underlying * d1_density_fprime * d_fprime * d_fprime
-    term2 = underlying * d1_density * d_fhess
-    term3 = 2.0 * d2_density * d_fprime
-    term4 = strike * d2_density_fprime * d_fprime * d_fprime
-    term5 = strike * d2_density * d_fhess
-    return term1 + term2 - term3 - term4 - term5
+    return -discount * d2_density * d_fprime
 
 
 def black_scholes_call_value_third_by_strike(
@@ -458,28 +448,17 @@ def black_scholes_call_value_third_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
     d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
     d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
-    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
-    d1_density_fhess = mafipy.math_formula.norm_pdf_fhess(d1)
     d2_density = norm.pdf(d2)
     d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
-    d2_density_fhess = mafipy.math_formula.norm_pdf_fhess(d2)
 
-    # term1
-    factor11 = (underlying * d1_density_fhess - strike * d2_density_fhess)
-    term1 = factor11 * (d_fprime ** 3)
-    # term2
-    factor21 = (underlying * d1_density_fprime - strike * d2_density_fprime)
-    term2 = factor21 * 3 * d_fprime * d_fhess
-    # term3, term4
-    term3 = 3 * d2_density * d_fhess
-    term4 = 3 * d2_density_fprime * (d_fprime ** 2)
-    return term1 + term2 - term3 - term4
+    term1 = d2_density_fprime * d_fprime * d_fprime
+    term2 = d2_density * d_fhess
+    return -discount * (term1 + term2)
 
 
 def black_scholes_call_delta(
