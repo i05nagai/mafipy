@@ -87,7 +87,7 @@ class TestAnalytic(object):
         rate = 1.0
         vol = 0.0001
         maturity = 1.0 / 365.0
-        expect = strike / (math.sqrt(maturity) * vol * underlying)
+        expect = -1.0 / (math.sqrt(maturity) * vol * strike)
         actual = target.d_fprime_by_strike(
             underlying, strike, rate, maturity, vol)
         assert expect == approx(actual)
@@ -99,8 +99,8 @@ class TestAnalytic(object):
         ])
     def test_d_fhess_by_strike(
             self, underlying, strike, rate, maturity, vol):
-        expect = 1.0 / (math.sqrt(maturity) * vol * underlying)
-        actual = target.d_fprime_by_strike(
+        expect = 1.0 / (math.sqrt(maturity) * vol * strike * strike)
+        actual = target.d_fhess_by_strike(
             underlying, strike, rate, maturity, vol)
         assert expect == approx(actual)
 
@@ -249,8 +249,6 @@ class TestAnalytic(object):
             (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
             # maturity < 0 raise AssertionError
             (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
-            # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
         ])
     def test_black_scholes_call_value_fhess_by_strike(
             self, underlying, strike, rate, maturity, vol, today):
@@ -264,24 +262,12 @@ class TestAnalytic(object):
             norm = scipy.stats.norm
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
+            discount = math.exp(-rate * maturity)
             d2 = target.func_d2(underlying, strike, rate, maturity, vol)
-            d1_density = norm.pdf(d1)
-            d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+            d2_fprime = target.d_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
             d2_density = norm.pdf(d2)
-            d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
-            d_fprime = target.d_fprime_by_strike(
-                underlying, strike, rate, maturity, vol)
-            d_fhess = target.d_fhess_by_strike(
-                underlying, strike, rate, maturity, vol)
-
-            term1 = (underlying * d1_density_fprime * d_fprime * d_fprime)
-            term2 = underlying * d1_density * d_fhess
-            term3 = 2.0 * d2_density * d_fprime
-            term4 = strike * d2_density_fprime * d_fprime * d_fprime
-            term5 = strike * d2_density * d_fhess
-
-            expect = term1 + term2 - term3 - term4 - term5
+            expect = -discount * d2_density * d2_fprime
 
             actual = target.black_scholes_call_value_fhess_by_strike(
                 underlying, strike, rate, maturity, vol)
@@ -298,8 +284,6 @@ class TestAnalytic(object):
             (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
             # maturity < 0 raise AssertionError
             (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
-            # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
         ])
     def test_black_scholes_call_value_third_by_strike(
             self, underlying, strike, rate, maturity, vol, today):
@@ -313,31 +297,18 @@ class TestAnalytic(object):
             norm = scipy.stats.norm
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
             d2 = target.func_d2(underlying, strike, rate, maturity, vol)
-            d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
-            d1_density_fhess = mafipy.math_formula.norm_pdf_fhess(d1)
             d2_density = norm.pdf(d2)
             d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
-            d2_density_fhess = mafipy.math_formula.norm_pdf_fhess(d2)
             d_fprime = target.d_fprime_by_strike(
                 underlying, strike, rate, maturity, vol)
             d_fhess = target.d_fhess_by_strike(
                 underlying, strike, rate, maturity, vol)
 
-            # term1
-            factor1 = (underlying * d1_density_fhess
-                       - strike * d2_density_fhess)
-            term1 = factor1 * (d_fprime ** 3)
-            # term2
-            factor2 = (underlying * d1_density_fprime
-                       - strike * d2_density_fprime)
-            term2 = factor2 * 3 * d_fprime * d_fhess
-            # term3, term4
-            term3 = 3.0 * d2_density * d_fhess
-            term4 = 3.0 * d2_density_fprime * (d_fprime ** 2)
-
-            expect = term1 + term2 - term3 - term4
+            term1 = d2_density_fprime * d_fprime * d_fprime
+            term2 = d2_density * d_fhess
+            discount = math.exp(-rate * maturity)
+            expect = -discount * (term1 + term2)
 
             actual = target.black_scholes_call_value_third_by_strike(
                 underlying, strike, rate, maturity, vol)

@@ -95,8 +95,7 @@ def d_fprime_by_strike(underlying, strike, rate, maturity, vol):
     :rtype: float
     """
     assert(maturity > 0.0)
-    assert(vol > 0.0)
-    return strike / (math.sqrt(maturity) * vol * underlying)
+    return - 1.0 / (math.sqrt(maturity) * vol * strike)
 
 
 def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
@@ -122,8 +121,7 @@ def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
     :rtype: float
     """
     assert(maturity > 0.0)
-    assert(vol > 0.0)
-    return 1.0 / (math.sqrt(maturity) * vol * underlying)
+    return 1.0 / (math.sqrt(maturity) * vol * strike * strike)
 
 
 def calc_black_scholes_call_formula(underlying, strike, rate, maturity, vol):
@@ -308,9 +306,7 @@ def black_scholes_call_value_fprime_by_strike(
 
     .. math::
         \\frac{\partial }{\partial K} c(K; S, r, T, \sigma)
-        = S \phi(d_{1}(K)) d^{\prime}(K)
-        - e^{-rT} \Phi(d_{1}(K))
-        - K e^{-rT} \phi(d_{1}(K)) d^{\prime}(K)
+        = - e^{-rT} \Phi(d_{1}(K))
 
     where
     :math:`S` is underlying,
@@ -333,17 +329,11 @@ def black_scholes_call_value_fprime_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
-    d_fprime = d_fprime_by_strike(
-        underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
 
-    term1 = underlying * norm.pdf(d1) * d_fprime
-    term2 = math.exp(-rate * maturity) * norm.cdf(d2)
-    term3 = math.exp(-rate * maturity) * strike * norm.pdf(d2) * d_fprime
-    return term1 - term2 - term3
+    return -discount * norm.cdf(d2)
 
 
 def black_scholes_call_value_fhess_by_strike(
@@ -362,13 +352,8 @@ def black_scholes_call_value_fhess_by_strike(
         \\begin{array}{ccl}
             \\frac{\partial^{2}}{\partial K^{2}} c(0, S; T, K)
                 & = &
-                S\phi^{\prime}(d_{1}(K))(d_{1}^{\prime}(K))^{2}
-                + S\phi(d_{1}(K))d_{1}^{\prime\prime}(K)
-                - 2\phi(d_{2}(K))d_{2}^{\prime}(K)
-                \\\\
-                & &
-                - K\phi^{\prime}(d_{2}(K))(d_{2}^{\prime}(K))^{2}
-                - K\phi(d_{2}(K))d_{2}^{\prime\prime}(K))
+                    -e^{-rT}
+                    \phi(d_{2}(K)) d^{\prime}(K)
         \end{array}
 
     where
@@ -392,23 +377,13 @@ def black_scholes_call_value_fhess_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
     d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
-    d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
-    d1_density = norm.pdf(d1)
-    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
     d2_density = norm.pdf(d2)
-    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
 
-    term1 = underlying * d1_density_fprime * d_fprime * d_fprime
-    term2 = underlying * d1_density * d_fhess
-    term3 = 2.0 * d2_density * d_fprime
-    term4 = strike * d2_density_fprime * d_fprime * d_fprime
-    term5 = strike * d2_density * d_fhess
-    return term1 + term2 - term3 - term4 - term5
+    return -discount * d2_density * d_fprime
 
 
 def black_scholes_call_value_third_by_strike(
@@ -428,23 +403,11 @@ def black_scholes_call_value_third_by_strike(
         \\begin{array}{ccl}
             \\frac{\partial^{3}}{\partial K^{3}} c(0, S; T, K)
             & = &
-            \left(
-                S\phi^{\prime\prime}(d_{1}(K))
-                - K\phi^{\prime\prime}(d_{2}(K))
-            \\right)
-            (d^{\prime}(K))^{3}
-            \\\\
-            & &
-            +
-            \left(
-                S\phi^{\prime}(d_{1}(K))
-                - K\phi^{\prime}(d_{2}(K))
-            \\right)
-            3d^{\prime}(K)d^{\prime\prime}
-            \\\\
-            & &
-            - 3\phi(d_{2}(K))d^{\prime\prime}
-            - 3\phi^{\prime}(d_{2}(K))(d^{\prime}(K))^{2}
+                -e^{-rT}
+                \left(
+                    \phi^{\prime}(d_{2}(K))(d^{\prime}(K))^{2}
+                        + \phi(d_{2}(K))d^{\prime\prime}(K)
+                \\right)
         \end{array}
 
     where
@@ -468,28 +431,17 @@ def black_scholes_call_value_third_by_strike(
     """
     norm = scipy.stats.norm
     assert(maturity > 0.0)
-    assert(vol > 0.0)
 
-    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
     d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
     d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
-    d1_density_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
-    d1_density_fhess = mafipy.math_formula.norm_pdf_fhess(d1)
     d2_density = norm.pdf(d2)
     d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
-    d2_density_fhess = mafipy.math_formula.norm_pdf_fhess(d2)
 
-    # term1
-    factor11 = (underlying * d1_density_fhess - strike * d2_density_fhess)
-    term1 = factor11 * (d_fprime ** 3)
-    # term2
-    factor21 = (underlying * d1_density_fprime - strike * d2_density_fprime)
-    term2 = factor21 * 3 * d_fprime * d_fhess
-    # term3, term4
-    term3 = 3 * d2_density * d_fhess
-    term4 = 3 * d2_density_fprime * (d_fprime ** 2)
-    return term1 + term2 - term3 - term4
+    term1 = d2_density_fprime * d_fprime * d_fprime
+    term2 = d2_density * d_fhess
+    return -discount * (term1 + term2)
 
 
 def black_scholes_call_delta(
