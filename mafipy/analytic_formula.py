@@ -247,23 +247,24 @@ def calc_black_scholes_call_value(
     :rtype: float
     """
     assert(vol >= 0.0)
+    time = maturity - today
     # option is expired
-    if maturity < 0.0 or np.isclose(maturity, 0.0):
+    if time < 0.0 or np.isclose(time, 0.0):
         return 0.0
     # never below strike
     elif strike < 0.0 and underlying > 0.0:
-        return underlying - math.exp(-rate * maturity) * strike
+        return underlying - math.exp(-rate * time) * strike
     # never beyond strike
     elif strike > 0.0 and underlying < 0.0:
         return 0.0
     elif underlying < 0.0:
         # max(S - K, 0) = (S - K) + max(-(S - K), 0)
         value = calc_black_scholes_call_formula(
-            -underlying, -strike, rate, maturity - today, vol)
+            -underlying, -strike, rate, time, vol)
         return (underlying - strike) + value
 
     return calc_black_scholes_call_formula(
-        underlying, strike, rate, maturity - today, vol)
+        underlying, strike, rate, time, vol)
 
 
 def calc_black_scholes_put_value(
@@ -287,9 +288,14 @@ def calc_black_scholes_put_value(
     :return: put value.
     :rtype: float
     """
+    time = maturity - today
+    # option is expired
+    if time < 0.0 or np.isclose(time, 0.0):
+        return 0.0
+
     call_value = calc_black_scholes_call_value(
         underlying, strike, rate, maturity, vol, today)
-    discount = math.exp(-rate * (maturity - today))
+    discount = math.exp(-rate * time)
     return call_value - (underlying - strike * discount)
 
 
