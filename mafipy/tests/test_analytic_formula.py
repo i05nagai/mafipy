@@ -7,6 +7,7 @@ from pytest import approx
 import numpy as np
 import mafipy.analytic_formula as target
 import mafipy.math_formula
+import mafipy.tests.util as util
 import math
 import pytest
 import scipy.stats
@@ -632,3 +633,45 @@ class TestBlackScholesPricerHelper:
         actual_func = self.target_class.make_put_wrt_strike(
             underlying, rate, maturity, vol, today)
         assert type(expect_func) == type(actual_func)
+
+
+class TestModelAnalyticFormula(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        pass
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today", [
+            util.get_real(6)
+        ])
+    def test_put_call_parity_black_scholes(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        call_value = target.calc_black_scholes_call_value(
+            underlying, strike, rate, maturity, vol, today)
+        put_value = target.calc_black_scholes_put_value(
+            underlying, strike, rate, maturity, vol, today)
+        # forward
+        time = maturity - today
+        if time < 0.0:
+            forward_value = 0.0
+        else:
+            discount = math.exp(-rate * time)
+            forward_value = underlying - discount * strike
+
+        assert forward_value == approx(call_value - put_value)
