@@ -1,6 +1,10 @@
 engines:
   pep8:
     enabled: true	
+    checks:
+      # Line break before binary operator
+      W503:
+        enabled: false
   radon: 
     enabled: true
 ratings:
