@@ -10,6 +10,9 @@ import scipy.special
 import mafipy.math_formula
 
 
+# ----------------------------------------------------------------------------
+# Black scholes european call/put
+# ----------------------------------------------------------------------------
 def _is_d1_or_d2_infinity(underlying, strike, vol):
     """is_d1_or_d2_infinity
 
@@ -450,6 +453,70 @@ def black_scholes_call_value_third_by_strike(
     return -discount * (term1 + term2)
 
 
+# ----------------------------------------------------------------------------
+# Black payers/recievers swaption
+# ----------------------------------------------------------------------------
+def black_payers_swaption_value(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_value
+    calculates value of payer's swaptions under black model.
+
+    .. math::
+        \\begin{eqnarray}
+            V_{\mathrm{payersswap}}(t)
+            & = &
+                A(t)
+                \mathrm{E}_{t}^{A}
+                \left[
+                    (S(T) - K)^{+}
+                \\right]
+            \\\\
+            & = &
+                A(t)(S(t)N(d_{1}) - KN(d_{2})),
+            \\\\
+            d_{1}
+                & = &
+                    \\frac{
+                        \ln\left(\\frac{S(t)}{K} \\right)
+                            + \\frac{1}{2}\sigma^{2}(T - t)
+                    }{
+                        \sigma \sqrt{T - t}
+                    },
+            \\\\
+            d_{2}
+                & = &
+                    \\frac{
+                        \ln\left(\\frac{S(t)}{K} \\right)
+                            - \\frac{1}{2}\sigma^{2}(T - t)
+                    }{
+                        \sigma \sqrt{T - t}
+                    }
+        \end{eqnarray}
+
+    where
+    :math:`A(t)` is `swap_annuity`,
+    :math:`S(t)` is `init_swap_rate`,
+    :math:`K` is `option_strike`,
+    :math:`\sigma` is `vol`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+    """
+    assert(vol >= 0.0)
+    # option is expired
+    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+        return 0.0
+    option_value = calc_black_scholes_call_formula(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * option_value
+
+
+# ----------------------------------------------------------------------------
+# Black scholes greeks
+# ----------------------------------------------------------------------------
 def black_scholes_call_delta(
         underlying,
         strike,
@@ -660,6 +727,9 @@ def black_scholes_call_rho(
     return time * math.exp(-rate * time) * strike * norm.cdf(d2)
 
 
+# ----------------------------------------------------------------------------
+# Local volatility model
+# ----------------------------------------------------------------------------
 def calc_local_vol_model_implied_vol(
         underlying,
         strike,

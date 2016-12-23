@@ -315,6 +315,54 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
+    # ----------------------------------------------------------------------------
+    # Black payers/recievers swaption
+    # ----------------------------------------------------------------------------
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1),
+            # maturity < 0 
+            (1.0, 2.0, 1.0, -1.0, 0.1),
+            # otherwise
+            (1.0, 2.0, 1.0, 1.0, 0.1),
+        ])
+    def test_black_payers_swaption_value(self,
+                                         init_swap_rate,
+                                         option_strike,
+                                         swap_annuity,
+                                         option_maturity,
+                                         vol):
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_payers_swaption_value(
+                    init_swap_rate,
+                    option_strike,
+                    swap_annuity,
+                    option_maturity,
+                    vol)
+        elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+            return 0.0
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            value = target.calc_black_scholes_call_formula(
+                init_swap_rate, option_strike, 0.0, option_maturity, vol)
+            expect = swap_annuity * value
+
+            actual = target.black_payers_swaption_value(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol)
+            assert expect == approx(actual)
+
+    # ----------------------------------------------------------------------------
+    # Black scholes greeks
+    # ----------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
