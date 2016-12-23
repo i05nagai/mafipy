@@ -11,6 +11,7 @@ import mafipy.pricer_quanto_cms as target
 import mafipy.replication as replication
 import mafipy.tests.util as util
 import math
+import numpy as np
 import pytest
 import scipy.stats
 
@@ -1149,7 +1150,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         assert expect == approx(actual)
 
 
-class TestSimpleQuantoCmsPricer(object):
+class TestModelPricerQuantoCMS(object):
 
     # before all tests starts
     @classmethod
@@ -1169,5 +1170,109 @@ class TestSimpleQuantoCmsPricer(object):
     def teardown(self):
         pass
 
-    def test_eval(self):
-        pass
+    @pytest.mark.parametrize(
+        "underlying, rate, maturity, vol", [
+            util.get_real(4)
+        ])
+    def test_black_scholes_pdf_atm(
+            self, underlying, rate, maturity, vol):
+        integrate = scipy.integrate
+        # atm
+        payoff_strike = underlying
+        pdf = target.make_pdf_black_scholes(underlying, rate, maturity, vol)
+
+        # call value
+        def call_integrand(strike):
+            return max(strike - payoff_strike, 0.0) * pdf(strike)
+        call_value_integral = integrate.quad(
+            call_integrand, payoff_strike, np.inf)[0]
+        call_value_analytic = analytic_formula.calc_black_scholes_call_value(
+            underlying, payoff_strike, rate, maturity, vol)
+        assert call_value_integral == approx(call_value_analytic)
+
+        # put value
+        def put_integrand(strike):
+            return max(payoff_strike - strike, 0.0) * pdf(strike)
+        put_value_integral = integrate.quad(
+            put_integrand, 0.0, payoff_strike)[0]
+        put_value_analytic = analytic_formula.calc_black_scholes_put_value(
+            underlying, payoff_strike, rate, maturity, vol)
+        assert put_value_integral == approx(put_value_analytic)
+
+    @pytest.mark.parametrize(
+        "underlying, rate, maturity, vol", [
+            util.get_real(4)
+        ])
+    def test_black_scholes_pdf_otm(
+            self, underlying, rate, maturity, vol):
+        integrate = scipy.integrate
+
+        def case_call():
+            # strike
+            payoff_strike = underlying * 0.5
+            pdf = target.make_pdf_black_scholes(
+                underlying, rate, maturity, vol)
+
+            def integrand(strike):
+                return max(strike - payoff_strike, 0.0) * pdf(strike)
+            value_integral = integrate.quad(
+                integrand, payoff_strike, np.inf)[0]
+            value_analytic = analytic_formula.calc_black_scholes_call_value(
+                underlying, payoff_strike, rate, maturity, vol)
+            assert value_integral == approx(value_analytic)
+        case_call()
+
+        # put value
+        def case_put():
+            # strike
+            payoff_strike = underlying + (1.0 - underlying) * 0.5
+            pdf = target.make_pdf_black_scholes(
+                underlying, rate, maturity, vol)
+
+            def integrand(strike):
+                return max(payoff_strike - strike, 0.0) * pdf(strike)
+            value_integral = integrate.quad(
+                integrand, 0.0, payoff_strike)[0]
+            value_analytic = analytic_formula.calc_black_scholes_put_value(
+                underlying, payoff_strike, rate, maturity, vol)
+            assert value_integral == approx(value_analytic)
+        case_put()
+
+    @pytest.mark.parametrize(
+        "underlying, rate, maturity, vol", [
+            util.get_real(4)
+        ])
+    def test_black_scholes_pdf_itm(
+            self, underlying, rate, maturity, vol):
+        integrate = scipy.integrate
+
+        def case_call():
+            # strike
+            payoff_strike = underlying + (1.0 - underlying) * 0.5
+            pdf = target.make_pdf_black_scholes(
+                underlying, rate, maturity, vol)
+
+            def integrand(strike):
+                return max(strike - payoff_strike, 0.0) * pdf(strike)
+            value_integral = integrate.quad(
+                integrand, payoff_strike, np.inf)[0]
+            value_analytic = analytic_formula.calc_black_scholes_call_value(
+                underlying, payoff_strike, rate, maturity, vol)
+            assert value_integral == approx(value_analytic)
+        case_call()
+
+        # put value
+        def case_put():
+            # strike
+            payoff_strike = underlying * 0.5
+            pdf = target.make_pdf_black_scholes(
+                underlying, rate, maturity, vol)
+
+            def integrand(strike):
+                return max(payoff_strike - strike, 0.0) * pdf(strike)
+            value_integral = integrate.quad(
+                integrand, 0.0, payoff_strike)[0]
+            value_analytic = analytic_formula.calc_black_scholes_put_value(
+                underlying, payoff_strike, rate, maturity, vol)
+            assert value_integral == approx(value_analytic)
+        case_put()
