@@ -514,6 +514,64 @@ def black_payers_swaption_value(
     return swap_annuity * option_value
 
 
+def black_receivers_swaption_value(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_receivers_swaption_value
+    calculates value of receiver's swaptions under black model.
+
+    .. math::
+        \\begin{eqnarray}
+            V_{\mathrm{payersswap}}(t)
+            & = &
+                A(t)
+                \mathrm{E}_{t}^{A}
+                \left[
+                    (K - S(T))^{+}
+                \\right]
+            \\\\
+            & = &
+                A(t)(KN(-d_{2}) - S(t)N(-d_{1})),
+            \\\\
+            d_{1}
+                & = &
+                    \\frac{
+                        \ln\left(\\frac{S(t)}{K} \\right)
+                            + \\frac{1}{2}\sigma^{2}(T - t)
+                    }{
+                        \sigma \sqrt{T - t}
+                    },
+            \\\\
+            d_{2}
+                & = &
+                    \\frac{
+                        \ln\left(\\frac{S(t)}{K} \\right)
+                            - \\frac{1}{2}\sigma^{2}(T - t)
+                    }{
+                        \sigma \sqrt{T - t}
+                    }
+        \end{eqnarray}
+
+    where
+    :math:`A(t)` is `swap_annuity`,
+    :math:`S(t)` is `init_swap_rate`,
+    :math:`K` is `option_strike`,
+    :math:`\sigma` is `vol`.
+
+    :param init_swap_rate:
+    :param option_strike:
+    :param swap_annuity:
+    :param option_maturity:
+    :param vol:
+    """
+    assert(vol >= 0.0)
+    # option is expired
+    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+        return 0.0
+    option_value = calc_black_scholes_put_formula(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * option_value
+
+
 # ----------------------------------------------------------------------------
 # Black scholes greeks
 # ----------------------------------------------------------------------------
