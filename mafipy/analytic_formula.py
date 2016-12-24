@@ -572,6 +572,52 @@ def black_receivers_swaption_value(
     return swap_annuity * option_value
 
 
+def black_payers_swaption_value_fprime_by_strike(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        vol):
+    """black_payers_swaption_value_fprime_by_strike
+    First derivative of value of payer's swaption with respect to strike
+    under black model.
+    See :py:func:`calc_black_scholes_call_formula`.
+
+    .. math::
+        \\frac{\partial }{\partial K}
+        V_{\matrhm{payersswaption}(K; S, A, T, \sigma)
+            = - A\Phi(d_{2}(K))
+
+    where
+    :math:`S` is `init_swap_rate`,
+    :math:`K` is `option_strike`,
+    :math:`A` is `swap_annuity`,
+    :math:`T` is `option_maturity`,
+    :math:`\sigma` is `vol`,
+    :math:`d_{1}, d_{2}` is defined
+    in :py:func:`calc_black_payers_swaption_value`,
+    :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
+    :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
+
+    :param float init_swap_rate:
+    :param float option_strike:
+    :param float swap_annuity:
+    :param float option_maturity:
+    :param float vol: volatility. must be non-negative.
+    :return: value of derivative.
+    :rtype: float
+    """
+    assert(vol > 0.0)
+    # option is expired
+    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+        return 0.0
+
+    value = black_scholes_call_value_fprime_by_strike(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+
+    return -swap_annuity * value
+
+
 # ----------------------------------------------------------------------------
 # Black scholes greeks
 # ----------------------------------------------------------------------------
