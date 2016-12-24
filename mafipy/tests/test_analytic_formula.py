@@ -490,6 +490,49 @@ class TestAnalytic(object):
             vol)
         assert expect == approx(actual)
 
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1),
+            # maturity < 0
+            (1.0, 2.0, 1.0, -1.0, 0.1),
+            # otherwise
+            (1.0, 2.0, 1.0, 1.0, 0.1),
+        ])
+    def test_black_payers_swaption_value_third_by_strike(self,
+                                                         init_swap_rate,
+                                                         option_strike,
+                                                         swap_annuity,
+                                                         option_maturity,
+                                                         vol):
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_payers_swaption_value_third_by_strike(
+                    init_swap_rate,
+                    option_strike,
+                    swap_annuity,
+                    option_maturity,
+                    vol)
+            return
+        elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+            expect = 0.0
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            value = target.black_scholes_call_value_third_by_strike(
+                init_swap_rate, option_strike, 0.0, option_maturity, vol)
+            expect = -swap_annuity * value
+
+        actual = target.black_payers_swaption_value_third_by_strike(
+            init_swap_rate,
+            option_strike,
+            swap_annuity,
+            option_maturity,
+            vol)
+        assert expect == approx(actual)
+
     # ----------------------------------------------------------------------------
     # Black scholes greeks
     # ----------------------------------------------------------------------------
