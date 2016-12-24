@@ -343,8 +343,9 @@ class TestAnalytic(object):
                     swap_annuity,
                     option_maturity,
                     vol)
+            return
         elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
-            return 0.0
+            expect = 0.0
         else:
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
@@ -352,13 +353,13 @@ class TestAnalytic(object):
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * value
 
-            actual = target.black_payers_swaption_value(
-                init_swap_rate,
-                option_strike,
-                swap_annuity,
-                option_maturity,
-                vol)
-            assert expect == approx(actual)
+        actual = target.black_payers_swaption_value(
+            init_swap_rate,
+            option_strike,
+            swap_annuity,
+            option_maturity,
+            vol)
+        assert expect == approx(actual)
 
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
@@ -385,8 +386,9 @@ class TestAnalytic(object):
                     swap_annuity,
                     option_maturity,
                     vol)
+            return
         elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
-            return 0.0
+            expect = 0.0
         else:
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
@@ -394,13 +396,13 @@ class TestAnalytic(object):
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * value
 
-            actual = target.black_receivers_swaption_value(
-                init_swap_rate,
-                option_strike,
-                swap_annuity,
-                option_maturity,
-                vol)
-            assert expect == approx(actual)
+        actual = target.black_receivers_swaption_value(
+            init_swap_rate,
+            option_strike,
+            swap_annuity,
+            option_maturity,
+            vol)
+        assert expect == approx(actual)
 
     # ----------------------------------------------------------------------------
     # Black scholes greeks
