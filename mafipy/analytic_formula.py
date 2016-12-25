@@ -614,8 +614,7 @@ def black_payers_swaption_value_fprime_by_strike(
 
     value = black_scholes_call_value_fprime_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
-
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 def black_payers_swaption_value_fhess_by_strike(
@@ -661,7 +660,7 @@ def black_payers_swaption_value_fhess_by_strike(
     value = black_scholes_call_value_fhess_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
 
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 def black_payers_swaption_value_third_by_strike(
@@ -711,7 +710,7 @@ def black_payers_swaption_value_third_by_strike(
     value = black_scholes_call_value_third_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
 
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 # ----------------------------------------------------------------------------
@@ -1237,3 +1236,73 @@ class BlackScholesPricerHelper(object):
             maturity=maturity,
             vol=vol,
             today=today)
+
+
+class BlackSwaptionPricerHelper(object):
+    """BlackSwaptionPricerHelper
+    Helper functions to generate a function with respect to a sigle variable.
+    For instance, black formula as a function of volatility is needed to
+    evaluate market smile by implied volatility.
+    """
+
+    def make_payers_swaption_wrt_strike(
+            self,
+            init_swap_rate,
+            swap_annuity,
+            option_maturity,
+            vol):
+        """make_payers_swaption_wrt_strike
+        make function of black payer's swaption formula
+        with respect to function.
+        This function return :py:func:`black_receivers_swaption_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            V_{\mathrm{payers}}(K; S, A, T, \sigma)
+                := V_{\mathrm{payers}}(S, K, A, T, \sigma)
+
+        :param float init_swap_rate:
+        :param float swap_annuity:
+        :param float option_maturity:
+        :param float vol: volatility.
+        :return: payer's swaption pricer as a function of strike.
+        :rtype: LambdaType
+        """
+        return lambda option_strike: black_payers_swaption_value(
+            init_swap_rate=init_swap_rate,
+            option_strike=option_strike,
+            swap_annuity=swap_annuity,
+            option_maturity=option_maturity,
+            vol=vol)
+
+    def make_receivers_swaption_wrt_strike(
+            self,
+            init_swap_rate,
+            swap_annuity,
+            option_maturity,
+            vol):
+        """make_put_wrt_strike
+        make function of black receiver's swaption formula
+        with respect to strike.
+        This function return :py:func:`black_receivers_swaption_value`
+        as funciton of a single variable.
+
+        .. math::
+
+            V_{\mathrm{receivers}}(K; S, A, T, \sigma)
+                := V_{\mathrm{receiver}}(S, K, A, T, \sigma)
+
+        :param float init_swap_rate:
+        :param float swap_annuity:
+        :param float option_maturity:
+        :param float vol: volatility
+        :return: receiver's swaption pricer as a function of strike.
+        :rtype: LambdaType.
+        """
+        return lambda option_strike: black_receivers_swaption_value(
+            init_swap_rate=init_swap_rate,
+            option_strike=option_strike,
+            swap_annuity=swap_annuity,
+            option_maturity=option_maturity,
+            vol=vol)

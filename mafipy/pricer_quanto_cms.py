@@ -12,6 +12,111 @@ from . import payoff
 from . import replication
 
 
+def make_pdf_black_swaption(
+        init_swap_rate,
+        swap_annuity,
+        option_maturity,
+        vol):
+    """make_pdf_black_swaption
+    return p.d.f. of black scholes model
+
+    .. math::
+        \Phi_{S}(k) := \\frac{\partial^{2}}{\partial K^{2}} c(0, S; T, K, \sigma)
+
+    where
+    :math:`S` is `init_swap_rate`,
+    :math:`T` is `option_maturity`,
+    :math:`K` is `option_strike`,
+    :math:`\Phi_{S}(k)` is p.d.f. of :math:`S`,
+    :math:`c(0, S; T, K)` is value of call option
+    with strike :math:`K` and :math:`T` maturity at time 0.
+
+    :param float init_swap_rate:
+    :param float rate:
+    :param float maturity: non-negative.
+    :param float vol: volatility. non-negative.
+    :return: p.d.f. of call price under black scholes model
+        as a function of strike.
+    :rtype: function with strike.
+    """
+    assert(vol >= 0.0)
+
+    def pdf(option_strike):
+        return analytic_formula.black_payers_swaption_value_fhess_by_strike(
+            init_swap_rate=init_swap_rate,
+            option_strike=option_strike,
+            swap_annuity=swap_annuity,
+            option_maturity=option_maturity,
+            vol=vol)
+
+    return pdf
+
+
+def make_pdf_fprime_black_swaption(
+        init_swap_rate,
+        swap_annuity,
+        option_maturity,
+        vol):
+    """make_pdf_fprime_black_swaption
+    return first derivative of p.d.f. of black swaption.
+    See :py:func:`make_pdf_black_swaption`.
+
+    .. math::
+        \Phi_{S}^{\prime}(k)
+        := \\frac{\partial}{\partial K^{2}} c(0, S; T, K)
+
+    where
+    :math:`S` is `init_swap_rate`,
+    :math:`T` is `option_maturity`,
+    :math:`K` is `option_strike`,
+    :math:`\Phi_{S}(k)` is p.d.f. of :math:`S`,
+    :math:`c(0, S; T, K)` is value of call option
+    with strike :math:`K` and :math:`T` maturity at time 0.
+
+    :param float init_swap_rate:
+    :param float swap_annuity:
+    :param float option_maturity: non-negative.
+    :param float vol: volatility. non-negative.
+    :return: first derivative of p.d.f. of call price under black scholes model
+        as a function of strike.
+    :rtype: function
+    """
+    assert(vol >= 0.0)
+
+    def pdf_fprime(option_strike):
+        return analytic_formula.black_payers_swaption_value_third_by_strike(
+            init_swap_rate=init_swap_rate,
+            option_strike=option_strike,
+            swap_annuity=swap_annuity,
+            option_maturity=option_maturity,
+            vol=vol)
+
+    return pdf_fprime
+
+
+def make_cdf_black_swaption(
+        init_swap_rate,
+        swap_annuity,
+        option_maturity,
+        vol):
+    """make_cdf_black_swaption
+    returns c.d.f. of black swaption.
+
+    :param init_swap_rate:
+    :param swap_annuity:
+    :param option_maturity:
+    :param vol:
+    :return: distribution of call price under black scholes model
+        as a funciton of strike.
+    :rtype: function
+    """
+    assert(vol >= 0.0)
+
+    return lambda option_strike: (
+        1.0 + analytic_formula.black_payers_swaption_value_fprime_by_strike(
+            init_swap_rate, option_strike, swap_annuity, option_maturity, vol))
+
+
 def make_pdf_black_scholes(
         underlying,
         rate,

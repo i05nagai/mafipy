@@ -315,9 +315,9 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Black payers/recievers swaption
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
         [
@@ -437,7 +437,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_fprime_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_fprime_by_strike(
             init_swap_rate,
@@ -480,7 +480,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_fhess_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_fhess_by_strike(
             init_swap_rate,
@@ -523,7 +523,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_third_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_third_by_strike(
             init_swap_rate,
@@ -533,9 +533,9 @@ class TestAnalytic(object):
             vol)
         assert expect == approx(actual)
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Black scholes greeks
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
@@ -853,6 +853,62 @@ class TestBlackScholesPricerHelper:
             today=today)
         actual_func = self.target_class.make_put_wrt_strike(
             underlying, rate, maturity, vol, today)
+        assert type(expect_func) == type(actual_func)
+
+
+class TestBlackSwaptionPricerHelper(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        self.target = target.BlackSwaptionPricerHelper()
+        pass
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, swap_annuity, option_maturity, vol", [
+            (1.0, 1.0, 0.1, 1.0)
+        ])
+    def test_make_payers_swaption_strike(
+            self, init_swap_rate, swap_annuity, option_maturity, vol):
+        def expect_func(option_strike):
+            return target.black_payers_swaption_value(
+                init_swap_rate=init_swap_rate,
+                option_strike=option_strike,
+                swap_annuity=swap_annuity,
+                option_maturity=option_maturity,
+                vol=vol)
+        actual_func = self.target.make_payers_swaption_wrt_strike(
+            init_swap_rate, swap_annuity, option_maturity, vol)
+        assert type(expect_func) == type(actual_func)
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, swap_annuity, option_maturity, vol", [
+            (1.0, 1.0, 0.1, 1.0)
+        ])
+    def test_make_receivers_swaption_wrt_strike(
+            self, init_swap_rate, swap_annuity, option_maturity, vol):
+        def expect_func(option_strike):
+            return target.black_receivers_swaption_value(
+                init_swap_rate=init_swap_rate,
+                option_strike=option_strike,
+                swap_annuity=swap_annuity,
+                option_maturity=option_maturity,
+                vol=vol)
+        actual_func = self.target.make_receivers_swaption_wrt_strike(
+            init_swap_rate, swap_annuity, option_maturity, vol)
         assert type(expect_func) == type(actual_func)
 
 
