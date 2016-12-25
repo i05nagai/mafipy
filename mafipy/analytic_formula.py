@@ -665,7 +665,7 @@ def black_payers_swaption_value_third_by_strike(
 
     .. math::
         \\frac{\partial^{3} }{\partial K^{3}}
-        V_{\mathrm{payer}(K; S, A, T, \sigma)
+        V_{\mathrm{payer}}(K; S, A, T, \sigma)
             = - A
             \left(
                 \phi^{\prime}(d_{2}(K)) (d_{2}^{\prime}(K))^{2}
