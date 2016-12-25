@@ -614,8 +614,7 @@ def black_payers_swaption_value_fprime_by_strike(
 
     value = black_scholes_call_value_fprime_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
-
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 def black_payers_swaption_value_fhess_by_strike(
@@ -661,7 +660,7 @@ def black_payers_swaption_value_fhess_by_strike(
     value = black_scholes_call_value_fhess_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
 
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 def black_payers_swaption_value_third_by_strike(
@@ -711,7 +710,7 @@ def black_payers_swaption_value_third_by_strike(
     value = black_scholes_call_value_third_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
 
-    return -swap_annuity * value
+    return swap_annuity * value
 
 
 # ----------------------------------------------------------------------------

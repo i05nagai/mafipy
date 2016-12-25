@@ -315,9 +315,9 @@ class TestAnalytic(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Black payers/recievers swaption
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
         [
@@ -437,7 +437,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_fprime_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_fprime_by_strike(
             init_swap_rate,
@@ -480,7 +480,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_fhess_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_fhess_by_strike(
             init_swap_rate,
@@ -523,7 +523,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             value = target.black_scholes_call_value_third_by_strike(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
-            expect = -swap_annuity * value
+            expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_third_by_strike(
             init_swap_rate,
@@ -533,9 +533,9 @@ class TestAnalytic(object):
             vol)
         assert expect == approx(actual)
 
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # Black scholes greeks
-    # ----------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
