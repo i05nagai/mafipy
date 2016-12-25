@@ -856,6 +856,62 @@ class TestBlackScholesPricerHelper:
         assert type(expect_func) == type(actual_func)
 
 
+class TestBlackSwaptionPricerHelper(object):
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        self.target = target.BlackSwaptionPricerHelper()
+        pass
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, swap_annuity, option_maturity, vol", [
+            (1.0, 1.0, 0.1, 1.0)
+        ])
+    def test_make_payers_swaption_strike(
+            self, init_swap_rate, swap_annuity, option_maturity, vol):
+        def expect_func(option_strike):
+            return target.black_payers_swaption_value(
+                init_swap_rate=init_swap_rate,
+                option_strike=option_strike,
+                swap_annuity=swap_annuity,
+                option_maturity=option_maturity,
+                vol=vol)
+        actual_func = self.target.make_payers_swaption_wrt_strike(
+            init_swap_rate, swap_annuity, option_maturity, vol)
+        assert type(expect_func) == type(actual_func)
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, swap_annuity, option_maturity, vol", [
+            (1.0, 1.0, 0.1, 1.0)
+        ])
+    def test_make_receivers_swaption_wrt_strike(
+            self, init_swap_rate, swap_annuity, option_maturity, vol):
+        def expect_func(option_strike):
+            return target.black_receivers_swaption_value(
+                init_swap_rate=init_swap_rate,
+                option_strike=option_strike,
+                swap_annuity=swap_annuity,
+                option_maturity=option_maturity,
+                vol=vol)
+        actual_func = self.target.make_receivers_swaption_wrt_strike(
+            init_swap_rate, swap_annuity, option_maturity, vol)
+        assert type(expect_func) == type(actual_func)
+
+
 class TestModelAnalyticFormula(object):
 
     # before all tests starts
