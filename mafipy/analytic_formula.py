@@ -454,7 +454,7 @@ def black_scholes_call_value_third_by_strike(
 
 
 # ----------------------------------------------------------------------------
-# Black payers/recievers swaption
+# Black payers/receivers swaption
 # ----------------------------------------------------------------------------
 def black_payers_swaption_value(
         init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
@@ -504,8 +504,10 @@ def black_payers_swaption_value(
     :param float swap_annuity: annuity of referencing swap
     :param float option_maturity: swaption maturity.
     :param float vol: volatilty. this must be positive.
+
+    :raises AssertionError: if volatility is not positive.
     """
-    assert(vol >= 0.0)
+    assert(vol > 0.0)
     # option is expired
     if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
         return 0.0
@@ -521,49 +523,32 @@ def black_receivers_swaption_value(
 
     .. math::
         \\begin{eqnarray}
-            V_{\mathrm{payersswap}}(t)
+            V_{\mathrm{receiver}}(t; S(t), K, A(t), T, \sigma)
             & = &
                 A(t)
                 \mathrm{E}_{t}^{A}
                 \left[
                     (K - S(T))^{+}
                 \\right]
-            \\\\
-            & = &
-                A(t)(KN(-d_{2}) - S(t)N(-d_{1})),
-            \\\\
-            d_{1}
-                & = &
-                    \\frac{
-                        \ln\left(\\frac{S(t)}{K} \\right)
-                            + \\frac{1}{2}\sigma^{2}(T - t)
-                    }{
-                        \sigma \sqrt{T - t}
-                    },
-            \\\\
-            d_{2}
-                & = &
-                    \\frac{
-                        \ln\left(\\frac{S(t)}{K} \\right)
-                            - \\frac{1}{2}\sigma^{2}(T - t)
-                    }{
-                        \sigma \sqrt{T - t}
-                    }
         \end{eqnarray}
 
     where
-    :math:`A(t)` is `swap_annuity`,
     :math:`S(t)` is `init_swap_rate`,
+    :math:`A(t)` is `swap_annuity`,
     :math:`K` is `option_strike`,
+    :math:`T` is `option_maturity`,
     :math:`\sigma` is `vol`.
+    :math:`d_{1}, d_{2}` are defined in :py:func:`black_payers_swaption_value`.
 
-    :param init_swap_rate:
-    :param option_strike:
-    :param swap_annuity:
-    :param option_maturity:
-    :param vol:
+    :param init_swap_rate: initial swap rate.
+    :param option_strike: strike of swaption.
+    :param swap_annuity: annuity of referencing swap.
+    :param option_maturity: maturity of swaption.
+    :param vol: volatility. This must be non-negative.
+
+    :raises AssertionError: if volatility is not positive.
     """
-    assert(vol >= 0.0)
+    assert(vol > 0.0)
     # option is expired
     if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
         return 0.0
@@ -581,11 +566,11 @@ def black_payers_swaption_value_fprime_by_strike(
     """black_payers_swaption_value_fprime_by_strike
     First derivative of value of payer's swaption with respect to strike
     under black model.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_payers_swaption_value`.
 
     .. math::
         \\frac{\partial }{\partial K}
-        V_{\matrhm{payersswaption}(K; S, A, T, \sigma)
+            V_{\matrhm{payer}}(K; S, A, T, \sigma)
             = - A\Phi(d_{2}(K))
 
     where
@@ -595,7 +580,7 @@ def black_payers_swaption_value_fprime_by_strike(
     :math:`T` is `option_maturity`,
     :math:`\sigma` is `vol`,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_payers_swaption_value`,
+    in :py:func:`black_payers_swaption_value`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
@@ -606,6 +591,8 @@ def black_payers_swaption_value_fprime_by_strike(
     :param float vol: volatility. must be non-negative.
     :return: value of derivative.
     :rtype: float
+
+    :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
     # option is expired
@@ -626,12 +613,12 @@ def black_payers_swaption_value_fhess_by_strike(
     """black_payers_swaption_value_fhess_by_strike
     Second derivative of value of payer's swaption with respect to strike
     under black model.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_payers_swaption_value`.
 
     .. math::
         \\frac{\partial^{2} }{\partial K^{2}}
-        V_{\matrhm{payersswaption}(K; S, A, T, \sigma)
-            = - A\phi(d_{2}(K)) d_{2}^{\prime}(K)
+            V_{\mathrm{payer}}(K; S, A, T, \sigma)
+                = - A\phi(d_{2}(K)) d_{2}^{\prime}(K)
 
     where
     :math:`S` is `init_swap_rate`,
@@ -640,7 +627,7 @@ def black_payers_swaption_value_fhess_by_strike(
     :math:`T` is `option_maturity`,
     :math:`\sigma` is `vol`,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_payers_swaption_value`,
+    in :py:func:`black_payers_swaption_value`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
@@ -651,6 +638,8 @@ def black_payers_swaption_value_fhess_by_strike(
     :param float vol: volatility. must be non-negative.
     :return: value of derivative.
     :rtype: float
+
+    :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
     # option is expired
@@ -672,11 +661,11 @@ def black_payers_swaption_value_third_by_strike(
     """black_payers_swaption_value_third_by_strike
     Third derivative of value of payer's swaption with respect to strike
     under black model.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_payers_swaption_value`.
 
     .. math::
         \\frac{\partial^{3} }{\partial K^{3}}
-        V_{\matrhm{payersswaption}(K; S, A, T, \sigma)
+        V_{\matrhm{payer}(K; S, A, T, \sigma)
             = - A
             \left(
                 \phi^{\prime}(d_{2}(K)) (d_{2}^{\prime}(K))^{2}
@@ -690,17 +679,19 @@ def black_payers_swaption_value_third_by_strike(
     :math:`T` is `option_maturity`,
     :math:`\sigma` is `vol`,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_payers_swaption_value`,
+    in :py:func:`black_payers_swaption_value`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
     :param float init_swap_rate: initial swap rate.
-    :param float option_strike:
-    :param float swap_annuity:
-    :param float option_maturity:
+    :param float option_strike: strike of swaption.
+    :param float swap_annuity: annuity of referencing swap.
+    :param float option_maturity: maturity of swaption.
     :param float vol: volatility. must be non-negative.
     :return: value of derivative.
     :rtype: float
+
+    :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
     # option is expired
