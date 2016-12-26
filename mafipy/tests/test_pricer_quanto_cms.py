@@ -42,9 +42,9 @@ class TestPricerQuantoCms(object):
     @pytest.mark.parametrize(
         "init_swap_rate, strike, swap_annuity, option_maturity, vol", [
             # vol < 0 raise AssertionError
-            (2.0, 1.0, 1.0, 1.0, -1.0),
+            (2.0, 1.0, 3.0, 1.0, -1.0),
             # otherwise
-            (2.0, 1.0, 1.0, 1.0, 1.0),
+            (2.0, 1.0, 3.0, 1.0, 1.0),
         ])
     def test_make_pdf_black_swaption(self,
                                      init_swap_rate,
@@ -60,7 +60,7 @@ class TestPricerQuantoCms(object):
         else:
             af = analytic_formula
             expect = af.black_payers_swaption_value_fhess_by_strike(
-                init_swap_rate, strike, swap_annuity, option_maturity, vol)
+                init_swap_rate, strike, 1.0, option_maturity, vol)
             actual = target.make_pdf_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
             assert expect == approx(actual)
@@ -68,9 +68,9 @@ class TestPricerQuantoCms(object):
     @pytest.mark.parametrize(
         "init_swap_rate, strike, swap_annuity, option_maturity, vol", [
             # vol < 0 raise AssertionError
-            (2.0, 1.0, 1.0, 1.0, -1.0),
+            (2.0, 1.0, 3.0, 1.0, -1.0),
             # otherwise
-            (2.0, 1.0, 1.0, 1.0, 1.0),
+            (2.0, 1.0, 3.0, 1.0, 1.0),
         ])
     def test_make_pdf_fprime_black_swaption(self,
                                             init_swap_rate,
@@ -86,7 +86,7 @@ class TestPricerQuantoCms(object):
         else:
             af = analytic_formula
             expect = af.black_payers_swaption_value_third_by_strike(
-                init_swap_rate, strike, swap_annuity, option_maturity, vol)
+                init_swap_rate, strike, 1.0, option_maturity, vol)
             actual = target.make_pdf_fprime_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
             assert expect == approx(actual)
@@ -94,9 +94,9 @@ class TestPricerQuantoCms(object):
     @pytest.mark.parametrize(
         "init_swap_rate, strike, swap_annuity, option_maturity, vol", [
             # vol < 0 raise AssertionError
-            (2.0, 1.0, 1.0, 1.0, -1.0),
+            (2.0, 1.0, 3.0, 1.0, -1.0),
             # otherwise
-            (2.0, 1.0, 1.0, 1.0, 1.0),
+            (2.0, 1.0, 3.0, 1.0, 1.0),
         ])
     def test_make_cdf_black_swaption(self,
                                      init_swap_rate,
@@ -112,7 +112,7 @@ class TestPricerQuantoCms(object):
         else:
             af = analytic_formula
             expect = (1.0 + af.black_payers_swaption_value_fprime_by_strike(
-                init_swap_rate, strike, swap_annuity, option_maturity, vol))
+                init_swap_rate, strike, 1.0, option_maturity, vol))
             actual = target.make_cdf_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
             assert expect == approx(actual)
