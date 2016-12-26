@@ -11,7 +11,7 @@ def linear_annuity(payoff_type):
         gen_payoff_params = gen_bull_spread_params
 
     init_swap_rate = 0.018654
-    swap_annuity = 0.99
+    swap_annuity = 2.004720
     maturity = 2.0
     vol_swap_rate = 0.39
     vol_put = 0.39
@@ -33,7 +33,7 @@ def linear_annuity(payoff_type):
         option_maturity=maturity,
         vol=vol_swap_rate)
     annuity_mapping_params = {
-        "alpha0": init_swap_rate,
+        "alpha0": (0.97990869 / swap_annuity - 0.5) / swap_annuity - 0.5,
         "alpha1": 1.0 / 2.0
     }
     payoff_params = gen_payoff_params()
@@ -73,14 +73,14 @@ def linear_annuity(payoff_type):
         forward_fx_diffusion_params,
         "linear",
         annuity_mapping_params,
-        min_put_range=0.0 + 0.00001,
-        max_call_range=0.030)
+        min_put_range=0.0002,
+        max_call_range=0.050)
     print("price:", price)
 
 
 def gen_call_params():
     return {
-        "strike": 0.00001,
+        "strike": 0.0001,
         "gearing": 1.0,
     }
 

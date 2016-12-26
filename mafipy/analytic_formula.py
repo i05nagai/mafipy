@@ -593,6 +593,13 @@ def black_payers_swaption_value_fprime_by_strike(
     :rtype: float
 
     :raises AssertionError: if volatility is not positive.
+
+    .. note::
+        Roughly speaking, this function calculates :math:`A(t) \Phi(d)`.
+        Percentile of probability 1 is infinity so that
+        assumption that annuity is equal to 1 is not good assumption
+        beacuse of :math:`\Phi(d)` returns 1 in some cases.
+
     """
     assert(vol > 0.0)
     # option is expired

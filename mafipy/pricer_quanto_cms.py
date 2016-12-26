@@ -52,7 +52,7 @@ def make_pdf_black_swaption(
         return analytic_formula.black_payers_swaption_value_fhess_by_strike(
             init_swap_rate=init_swap_rate,
             option_strike=option_strike,
-            swap_annuity=swap_annuity,
+            swap_annuity=1.0,
             option_maturity=option_maturity,
             vol=vol)
 
@@ -98,7 +98,7 @@ def make_pdf_fprime_black_swaption(
         return analytic_formula.black_payers_swaption_value_third_by_strike(
             init_swap_rate=init_swap_rate,
             option_strike=option_strike,
-            swap_annuity=swap_annuity,
+            swap_annuity=1.0,
             option_maturity=option_maturity,
             vol=vol)
 
@@ -127,7 +127,7 @@ def make_cdf_black_swaption(
 
     return lambda option_strike: (
         1.0 + analytic_formula.black_payers_swaption_value_fprime_by_strike(
-            init_swap_rate, option_strike, swap_annuity, option_maturity, vol))
+            init_swap_rate, option_strike, 1.0, option_maturity, vol))
 
 
 # -----------------------------------------------------------------------------
