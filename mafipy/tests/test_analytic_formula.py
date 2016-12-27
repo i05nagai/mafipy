@@ -384,7 +384,15 @@ class TestAnalytic(object):
             # vol < 0 raise AssertionError
             (1.0, 2.0, 1.0, 1.0, -0.1),
             # maturity < 0
-            (1.0, 2.0, 1.0, -1.0, 0.1),
+            (1.1, 2.2, 1.3, -1.4, 0.1),
+            # maturity = 0
+            (1.1, 1.2, 1.3, 0.0, 1.5),
+            # underlying > 0, strike < 0
+            (1.1, -1.3, 1.2, 1.1, 1.5),
+            # underlying < 0, strike > 0
+            (-1.1, 1.3, 1.2, 1.1, 1.5),
+            # underlying < 0, stirke < 0
+            (-1.1, -2.3, 1.2, 1.1, 1.5),
             # otherwise
             (1.0, 2.0, 1.0, 1.0, 0.1),
         ])
@@ -406,9 +414,18 @@ class TestAnalytic(object):
             return
         elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
             expect = 0.0
+        # max(K-S(T),0) = 0
+        elif init_swap_rate > 0.0 and option_strike < 0.0:
+            expect = 0.0
+        # max(K-S(T),0) = K + S(T)
+        elif init_swap_rate < 0.0 and option_strike > 0.0:
+            expect = swap_annuity * (option_strike - init_swap_rate)
+        # max(K-S(T),0) = max((-S(T)) - (-K),0)
+        elif init_swap_rate < 0.0 and option_strike < 0.0:
+            option_value = target.calc_black_scholes_call_formula(
+                -init_swap_rate, -option_strike, 0.0, option_maturity, vol)
+            expect = swap_annuity * option_value
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
             value = target.calc_black_scholes_put_formula(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * value
