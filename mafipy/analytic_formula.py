@@ -508,10 +508,7 @@ def black_payers_swaption_value(
     :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
-    # option is expired
-    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
-        return 0.0
-    option_value = calc_black_scholes_call_formula(
+    option_value = calc_black_scholes_call_value(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * option_value
 
@@ -549,10 +546,7 @@ def black_receivers_swaption_value(
     :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
-    # option is expired
-    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
-        return 0.0
-    option_value = calc_black_scholes_put_formula(
+    option_value = calc_black_scholes_put_value(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * option_value
 
