@@ -385,7 +385,19 @@ def black_scholes_call_value_fhess_by_strike(
     :rtype: float.
     """
     norm = scipy.stats.norm
-    assert(maturity > 0.0)
+
+    # option is expired
+    if maturity < 0.0 or np.isclose(maturity, 0.0):
+        return 0.0
+    # never below strike
+    elif strike <= 0.0 and underlying > 0.0:
+        return 0.0
+    # never beyond strike
+    elif strike > 0.0 and underlying < 0.0:
+        return 0.0
+    elif underlying < 0.0 and strike < 0.0:
+        underlying = -underlying
+        strike = -strike
 
     discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
@@ -643,9 +655,6 @@ def black_payers_swaption_value_fhess_by_strike(
     :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
-    # option is expired
-    if option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
-        return 0.0
 
     value = black_scholes_call_value_fhess_by_strike(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)

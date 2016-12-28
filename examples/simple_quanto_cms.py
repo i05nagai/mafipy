@@ -4,19 +4,17 @@ from mafipy import pricer_quanto_cms
 from mafipy import analytic_formula
 
 
-def linear_annuity(payoff_type):
-    if payoff_type == "call":
-        gen_payoff_params = gen_call_params
-    elif payoff_type == "bull_spread":
-        gen_payoff_params = gen_bull_spread_params
+def linear_annuity(payoff_type, payoff_params, quanto_cms_params):
 
-    init_swap_rate = 0.018654
-    swap_annuity = 2.004720
-    maturity = 2.0
-    vol_swap_rate = 0.39
-    vol_put = 0.39
-    vol_call = 0.39
-    vol_forward_fx = 0.03
+    init_swap_rate = quanto_cms_params["init_swap_rate"]
+    swap_annuity = quanto_cms_params["swap_annuity"]
+    maturity = quanto_cms_params["maturity"]
+    vol_swap_rate = quanto_cms_params["vol_swap_rate"]
+    vol_put = quanto_cms_params["vol_put"]
+    vol_call = quanto_cms_params["vol_call"]
+    vol_forward_fx = quanto_cms_params["vol_forward_fx"]
+    corr_forward_fx = quanto_cms_params["corr_forward_fx"]
+
     swap_rate_cdf = pricer_quanto_cms.make_cdf_black_swaption(
         init_swap_rate=init_swap_rate,
         swap_annuity=swap_annuity,
@@ -36,11 +34,10 @@ def linear_annuity(payoff_type):
         "alpha0": (0.97990869 / swap_annuity - 0.5) / swap_annuity - 0.5,
         "alpha1": 1.0 / 2.0
     }
-    payoff_params = gen_payoff_params()
     forward_fx_diffusion_params = {
         "time": 2.0,
         "vol": vol_forward_fx,
-        "corr": 0.1,
+        "corr": corr_forward_fx,
         "swap_rate_cdf": swap_rate_cdf,
         "swap_rate_pdf": swap_rate_pdf,
         "swap_rate_pdf_fprime": swap_rate_pdf_fprime
@@ -73,31 +70,108 @@ def linear_annuity(payoff_type):
         forward_fx_diffusion_params,
         "linear",
         annuity_mapping_params,
-        min_put_range=0.0002,
-        max_call_range=0.050)
-    print("price:", price)
+        min_put_range=1e-6,
+        max_call_range=0.040)
+    print("  price:", price)
 
 
-def gen_call_params():
+def gen_call_params1(cms_params):
+    cms_strike = cms_params["cms_strike"]
     return {
-        "strike": 0.0001,
-        "gearing": 1.0,
+        "strike": 1e-4,
+        "gearing": 1.0 / cms_strike,
     }
 
 
-def gen_bull_spread_params():
+def gen_call_params2(cms_params):
+    cms_strike = cms_params["cms_strike"]
+    return {
+        "strike": cms_strike,
+        "gearing": 1.0 / cms_strike,
+    }
+
+
+def gen_bull_spread_params(cms_params):
+    cms_strike = cms_params["cms_strike"]
     return {
         "lower_strike": 0.00001,
-        "upper_strike": 0.09327,
-        "gearing": 1.0 / 0.09327,
+        "upper_strike": cms_strike,
+        "gearing": 1.0 / cms_strike,
+    }
+
+
+def gen_cms_params_atm():
+    return {
+        "init_swap_rate": 0.018654,
+        "cms_strike": 0.018654,
+        "swap_annuity": 2.004720,
+        "maturity": 2.0,
+        "vol_swap_rate": 0.39,
+        "vol_put": 0.39,
+        "vol_call": 0.39,
+        "vol_forward_fx": 0.03,
+        "corr_forward_fx": 0.3,
+    }
+
+
+def gen_cms_params_otm():
+    return {
+        "init_swap_rate": 0.018654,
+        "cms_strike": 0.018654 / 2.0,
+        "swap_annuity": 2.004720,
+        "maturity": 2.0,
+        "vol_swap_rate": 0.39,
+        "vol_put": 0.39,
+        "vol_call": 0.39,
+        "vol_forward_fx": 0.03,
+        "corr_forward_fx": 0.3,
+    }
+
+
+def gen_cms_params_itm():
+    return {
+        "init_swap_rate": 0.018654,
+        "cms_strike": 0.018654 * 1.5,
+        "swap_annuity": 2.004720,
+        "maturity": 2.0,
+        "vol_swap_rate": 0.39,
+        "vol_put": 0.39,
+        "vol_call": 0.39,
+        "vol_forward_fx": 0.03,
+        "corr_forward_fx": 0.1,
     }
 
 
 def main():
-    print("call")
-    linear_annuity("call")
-    print("bull_spread")
-    linear_annuity("bull_spread")
+    print("--call")
+    print("----ATM")
+    cms_params = gen_cms_params_atm()
+    payoff_params = gen_call_params1(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    payoff_params = gen_call_params2(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    print("----OTM")
+    cms_params = gen_cms_params_otm()
+    payoff_params = gen_call_params1(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    payoff_params = gen_call_params2(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    print("----ITM")
+    cms_params = gen_cms_params_itm()
+    payoff_params = gen_call_params1(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    payoff_params = gen_call_params2(cms_params)
+    linear_annuity("call", payoff_params, cms_params)
+    print()
+    print("--bull_spread")
+    print("----ATM")
+    cms_params = gen_cms_params_atm()
+    payoff_params = gen_bull_spread_params(cms_params)
+    linear_annuity("bull_spread", payoff_params, cms_params)
+    print("----OTM")
+    cms_params = gen_cms_params_otm()
+    payoff_params = gen_bull_spread_params(cms_params)
+    linear_annuity("bull_spread", payoff_params, cms_params)
 
 
 if __name__ == '__main__':

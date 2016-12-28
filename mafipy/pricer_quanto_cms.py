@@ -260,9 +260,11 @@ def _calc_h(swap_rate_cdf, swap_rate):
     :return: :math:`\Phi^{-1}(\Phi^{A}(s))`.
     :rtype: float
     """
-    norm = scipy.stats.norm
+    prob = swap_rate_cdf(swap_rate)
+    prob = max(1e-16, prob)
+    # prob = min(9.0, prob)
 
-    return norm.ppf(swap_rate_cdf(swap_rate))
+    return scipy.stats.norm.ppf(prob)
 
 
 def _calc_h_fprime(swap_rate_pdf, swap_rate, h):
@@ -290,15 +292,7 @@ def _calc_h_fprime(swap_rate_pdf, swap_rate, h):
     """
     norm = scipy.stats.norm
 
-    try:
-        h_fprime = swap_rate_pdf(swap_rate) / norm.pdf(h)
-    except RuntimeWarning:
-        print("swap_rate:", swap_rate,
-              "swap_rate_pdf(swap_rate):", swap_rate_pdf(swap_rate),
-              "h:", h,
-              "norm.pdf(h):", norm.pdf(h))
-    finally:
-        return h_fprime
+    return swap_rate_pdf(swap_rate) / norm.pdf(h)
 
 
 def _calc_h_fhess(swap_rate_pdf_fprime, swap_rate_pdf, swap_rate, h, h_fprime):
@@ -1430,8 +1424,8 @@ def replicate(init_swap_rate,
     # calculate
     numerator = numerator_replication.eval(
         init_swap_rate, min_put_range, max_call_range)
-    print("numerator", numerator)
+    print(" numerator:", numerator)
     denominator = denominator_replication.eval(
         init_swap_rate, min_put_range, max_call_range)
-    print("denominator", denominator)
+    print(" denominator:", denominator)
     return discount_factor * numerator / denominator
