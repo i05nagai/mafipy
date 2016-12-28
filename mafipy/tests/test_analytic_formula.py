@@ -242,23 +242,30 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
+            # vol <= 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            # maturity < 0
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
             # underlying > strike
             (2.0, 1.0, 1.0, 1.0, 0.1, 0.0),
             # underlying == strike
             (1.0, 1.0, 1.0, 1.0, 0.1, 0.0),
             # underlying < strike
             (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
-            # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
         ])
     def test_black_scholes_call_value_fhess_by_strike(
             self, underlying, strike, rate, maturity, vol, today):
 
         # raise AssertionError
-        if maturity < 0.0 or vol < 0.0:
+        if vol < 0.0:
             with pytest.raises(AssertionError):
                 actual = target.black_scholes_call_value_fhess_by_strike(
                     underlying, strike, rate, maturity, vol)
+        elif maturity < 0.0:
+            expect = 0.0
+            actual = target.black_scholes_call_value_fhess_by_strike(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
         else:
             norm = scipy.stats.norm
             # double checking implimentation of formula
@@ -485,11 +492,19 @@ class TestAnalytic(object):
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
         [
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1),
+            (1.1, 2.2, 1.3, 1.4, -0.1),
             # maturity < 0
-            (1.0, 2.0, 1.0, -1.0, 0.1),
+            (1.1, 2.2, 1.3, -1.4, 0.1),
+            # maturity = 0
+            (1.1, 1.2, 1.3, 0.0, 1.5),
+            # underlying > 0, strike < 0
+            (1.1, -1.3, 1.2, 1.1, 1.5),
+            # underlying < 0, strike > 0
+            (-1.1, 1.3, 1.2, 1.1, 1.5),
+            # underlying < 0, stirke < 0
+            (-1.1, -2.3, 1.2, 1.1, 1.5),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1),
+            (1.1, 2.2, 1.3, 1.4, 0.1),
         ])
     def test_black_payers_swaption_value_fhess_by_strike(self,
                                                          init_swap_rate,
@@ -509,11 +524,25 @@ class TestAnalytic(object):
             return
         elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
             expect = 0.0
-        else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
+        elif init_swap_rate > 0.0 and option_strike < 0.0:
+            expect = 0.0
+        elif init_swap_rate < 0.0 and option_strike > 0.0:
+            expect = 0.0
+        elif init_swap_rate < 0.0 and option_strike < 0.0:
             value = target.black_scholes_call_value_fhess_by_strike(
-                init_swap_rate, option_strike, 0.0, option_maturity, vol)
+                init_swap_rate,
+                option_strike,
+                0.0,
+                option_maturity,
+                vol)
+            expect = swap_annuity * value
+        else:
+            value = target.black_scholes_call_value_fhess_by_strike(
+                init_swap_rate,
+                option_strike,
+                0.0,
+                option_maturity,
+                vol)
             expect = swap_annuity * value
 
         actual = target.black_payers_swaption_value_fhess_by_strike(
