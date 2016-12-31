@@ -21,4 +21,4 @@ def _to_bool(value):
 
 
 def get_bool(size=1):
-    return map(_to_bool, get_real(size))
+    return [_to_bool(v) for v in get_real(size)]
