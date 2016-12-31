@@ -150,6 +150,12 @@ class TestAnalytic(object):
             (-1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
             # underlying < 0, stirke < 0
             (-1.0, -2.0, 1.0, 1.0, 1.0, 0.0),
+            # underlying = 0
+            (0.0, 1.1, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying > 0
+            (1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying < 0
+            (-1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
             # vol < 0
             (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
             # today > 0
@@ -157,6 +163,7 @@ class TestAnalytic(object):
         ])
     def test_calc_black_scholes_call_value(
             self, underlying, strike, rate, maturity, vol, today):
+        time = maturity - today
         if vol <= 0.0:
             with pytest.raises(AssertionError):
                 actual = target.calc_black_scholes_call_value(
@@ -169,19 +176,30 @@ class TestAnalytic(object):
                 assert expect == approx(actual)
             # never below strike
             elif underlying > 0.0 and strike < 0.0:
-                expect = underlying - math.exp(-rate * maturity) * strike
+                expect = underlying - math.exp(-rate * time) * strike
                 assert expect == approx(actual)
             # never beyond strike
             elif underlying < 0.0 and strike > 0.0:
                 expect = 0.0
                 assert expect == approx(actual)
             # underlying and strike are negative
-            elif underlying < 0.0:
+            elif underlying < 0.0 and strike < 0.0:
                 expect = (-1.0 + 2.0) + 0.478587969669
+                assert expect == approx(actual)
+            # underlying = 0
+            elif np.isclose(underlying, 0.0):
+                assert 0.0 == approx(actual)
+            # strike = 0, underlying > 0
+            elif np.isclose(strike, 0.0) and underlying > 0.0:
+                expect = underlying * math.exp(-rate * today)
+                assert expect == approx(actual)
+            # strike = 0, underlying < 0
+            elif np.isclose(strike, 0.0) and underlying < 0.0:
+                expect = 0.0
                 assert expect == approx(actual)
             else:
                 expect = target.calc_black_scholes_call_formula(
-                    underlying, strike, rate, maturity - today, vol)
+                    underlying, strike, rate, time, vol)
                 assert expect == approx(actual)
 
     @pytest.mark.parametrize(

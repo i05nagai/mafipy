@@ -254,6 +254,12 @@ def calc_black_scholes_call_value(
     # option is expired
     if time < 0.0 or np.isclose(time, 0.0):
         return 0.0
+    elif np.isclose(underlying, 0.0):
+        return math.exp(-rate * time) * max(-strike, 0.0)
+    elif np.isclose(strike, 0.0) and underlying > 0.0:
+        return math.exp(-rate * today) * underlying
+    elif np.isclose(strike, 0.0) and underlying < 0.0:
+        return 0.0
     # never below strike
     elif strike < 0.0 and underlying > 0.0:
         return underlying - math.exp(-rate * time) * strike
