@@ -338,7 +338,8 @@ def _forward_fx_diffusion(
         corr,
         swap_rate_cdf,
         swap_rate_pdf,
-        swap_rate_pdf_fprime):
+        swap_rate_pdf_fprime,
+        is_inverse):
     """_forward_fx_diffusion
     calculate following value:
 
@@ -367,6 +368,8 @@ def _forward_fx_diffusion(
         under annuity measure.
     :param callable swap_rate_pdf_fprime: not used. derivative of p.d.f.
         of foward swap rate under annuity measure.
+    :param bool is_inverse:
+
     :return: value of forward fx diffusion.
     :rtype: float
     """
@@ -375,7 +378,10 @@ def _forward_fx_diffusion(
     h = _calc_h(swap_rate_cdf, swap_rate)
     term1 = corr * vol * math.sqrt(time) * h
     term2 = vol * vol * time * (1.0 - corr * corr) * 0.5
-    return math.exp(term1 + term2)
+    if is_inverse:
+        return math.exp(-term1 + term2)
+    else:
+        return math.exp(term1 + term2)
 
 
 def _forward_fx_diffusion_fprime(
@@ -385,7 +391,8 @@ def _forward_fx_diffusion_fprime(
         corr,
         swap_rate_cdf,
         swap_rate_pdf,
-        swap_rate_pdf_fprime):
+        swap_rate_pdf_fprime,
+        is_inverse):
     """_forward_fx_diffusion_fprime
     derivative of forward fx diffusion.
     See :py:func:`_forward_fx_diffusion`.
@@ -412,6 +419,8 @@ def _forward_fx_diffusion_fprime(
         under annuity measure.
     :param callable swap_rate_pdf_fprime: not used. derivative of p.d.f.
         of foward swap rate under annuity measure.
+    :param bool is_inverse:
+
     :return: value of derivative of forward fx diffusion.
     :rtype: float
     """
@@ -424,10 +433,15 @@ def _forward_fx_diffusion_fprime(
         corr,
         swap_rate_cdf,
         swap_rate_pdf,
-        swap_rate_pdf_fprime)
+        swap_rate_pdf_fprime,
+        is_inverse)
     h = _calc_h(swap_rate_cdf, swap_rate)
     h_fprime = _calc_h_fprime(swap_rate_pdf, swap_rate, h)
-    return corr * vol * math.sqrt(time) * h_fprime * forward_fx_diffusion
+    value = corr * vol * math.sqrt(time) * h_fprime * forward_fx_diffusion
+    if is_inverse:
+        return -value
+    else:
+        return value
 
 
 def _forward_fx_diffusion_fhess(
@@ -437,7 +451,8 @@ def _forward_fx_diffusion_fhess(
         corr,
         swap_rate_cdf,
         swap_rate_pdf,
-        swap_rate_pdf_fprime):
+        swap_rate_pdf_fprime,
+        is_inverse):
     """_forward_fx_diffusion_fhess
     Calculate second derivative of diffusion part of forward FX.
     See :py:func:`_forward_fx_diffusion`
@@ -462,6 +477,8 @@ def _forward_fx_diffusion_fhess(
         under annuity measure
     :param callable swap_rate_pdf_fprime: derivative of probability density of
         forward swap rate under annuity measure.
+    :param bool is_inverse:
+
     :return: second derivative of diffusion part of forward FX.
     :rtype: float
     """
@@ -481,9 +498,13 @@ def _forward_fx_diffusion_fhess(
         corr,
         swap_rate_cdf,
         swap_rate_pdf,
-        swap_rate_pdf_fprime)
+        swap_rate_pdf_fprime,
+        is_inverse)
     factor1 = corr * vol * math.sqrt(time) * forward_fx_diffusion
-    factor2 = h_fhess + corr * vol * math.sqrt(time) * (h_fprime ** 2)
+    if is_inverse:
+        factor2 = -h_fhess + corr * vol * math.sqrt(time) * (h_fprime ** 2)
+    else:
+        factor2 = h_fhess + corr * vol * math.sqrt(time) * (h_fprime ** 2)
     return factor1 * factor2
 
 
@@ -493,6 +514,14 @@ class _ForwardFxDiffusionHelper(object):
     This helper class makes forward FX diffusion,
     differential of the diffusion
     and second derivative of the diffusion as a function of swap rate.
+
+    :param float time:
+    :param float vol: must be positive. volatility.
+    :param float corr: must be within [-1, 1]. correlation.
+    :param callable swap_rate_cdf:
+    :param callable swap_rate_pdf:
+    :param callable swap_rate_pdf_fprime:
+    :param bool is_inverse:
     """
 
     def __init__(self,
@@ -501,15 +530,9 @@ class _ForwardFxDiffusionHelper(object):
                  corr,
                  swap_rate_cdf,
                  swap_rate_pdf,
-                 swap_rate_pdf_fprime):
+                 swap_rate_pdf_fprime,
+                 is_inverse):
         """__init__
-
-        :param float time:
-        :param float vol: must be positive. volatility.
-        :param float corr: must be within [-1, 1]. correlation.
-        :param callable swap_rate_cdf:
-        :param callable swap_rate_pdf:
-        :param callable swap_rate_pdf_fprime:
         """
         assert(time >= 0.0)
         assert(vol >= 0.0)
@@ -520,6 +543,7 @@ class _ForwardFxDiffusionHelper(object):
         self.swap_rate_cdf = swap_rate_cdf
         self.swap_rate_pdf = swap_rate_pdf
         self.swap_rate_pdf_fprime = swap_rate_pdf_fprime
+        self.is_inverse = is_inverse
 
     def make_func(self):
         """make_func
@@ -533,7 +557,8 @@ class _ForwardFxDiffusionHelper(object):
             corr=self.corr,
             swap_rate_cdf=self.swap_rate_cdf,
             swap_rate_pdf=self.swap_rate_pdf,
-            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime)
+            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime,
+            is_inverse=self.is_inverse)
 
     def make_fprime(self):
         """make_fprime
@@ -547,7 +572,8 @@ class _ForwardFxDiffusionHelper(object):
             corr=self.corr,
             swap_rate_cdf=self.swap_rate_cdf,
             swap_rate_pdf=self.swap_rate_pdf,
-            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime)
+            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime,
+            is_inverse=self.is_inverse)
 
     def make_fhess(self):
         """make_fhess
@@ -562,7 +588,8 @@ class _ForwardFxDiffusionHelper(object):
             corr=self.corr,
             swap_rate_cdf=self.swap_rate_cdf,
             swap_rate_pdf=self.swap_rate_pdf,
-            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime)
+            swap_rate_pdf_fprime=self.swap_rate_pdf_fprime,
+            is_inverse=self.is_inverse)
 
 
 class SimpleQuantoCmsHelper(object):

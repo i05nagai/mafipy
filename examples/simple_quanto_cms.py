@@ -40,7 +40,8 @@ def linear_annuity(payoff_type, payoff_params, quanto_cms_params):
         "corr": corr_forward_fx,
         "swap_rate_cdf": swap_rate_cdf,
         "swap_rate_pdf": swap_rate_pdf,
-        "swap_rate_pdf_fprime": swap_rate_pdf_fprime
+        "swap_rate_pdf_fprime": swap_rate_pdf_fprime,
+        "is_inverse": True
     }
     payer_pricer_params = {
         "init_swap_rate": init_swap_rate,
@@ -110,7 +111,7 @@ def gen_cms_params_atm():
         "vol_put": 0.39,
         "vol_call": 0.39,
         "vol_forward_fx": 0.03,
-        "corr_forward_fx": 0.3,
+        "corr_forward_fx": 0.0,
     }
 
 
