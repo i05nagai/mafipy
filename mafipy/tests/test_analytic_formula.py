@@ -205,7 +205,7 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            (2.0, 1.0, 1.0, 1.0, 1.0, 0.5),
+            (2.1, 1.2, 1.3, 1.4, 1.5, 0.5),
         ])
     def test_calc_black_scholes_put_value(
             self, underlying, strike, rate, maturity, vol, today):
