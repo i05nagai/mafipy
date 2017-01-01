@@ -30,7 +30,7 @@ def _is_d1_or_d2_infinity(underlying, strike, vol):
 def func_d1(underlying, strike, rate, maturity, vol):
     """func_d1
     calculate :math:`d_{1}` in black scholes formula.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_scholes_call_formula`.
 
     :param float underlying: underlying/strike must be non-negative.
     :param float strike: underlying/strike must be non-negative.
@@ -52,7 +52,7 @@ def func_d1(underlying, strike, rate, maturity, vol):
 def func_d2(underlying, strike, rate, maturity, vol):
     """func_d2
     calculate :math:`d_{2}` in black scholes formula.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_scholes_call_formula`.
 
     :param float underlying: underlying/strike must be non-negative.
     :param float strike: underlying/strike must be non-negative.
@@ -127,8 +127,8 @@ def d_fhess_by_strike(underlying, strike, rate, maturity, vol):
     return 1.0 / (math.sqrt(maturity) * vol * strike * strike)
 
 
-def calc_black_scholes_call_formula(underlying, strike, rate, maturity, vol):
-    """calc_black_scholes_call_formula
+def black_scholes_call_formula(underlying, strike, rate, maturity, vol):
+    """black_scholes_call_formula
     calculate well known black scholes formula for call option.
 
     .. math::
@@ -171,8 +171,8 @@ def calc_black_scholes_call_formula(underlying, strike, rate, maturity, vol):
             - strike * math.exp(-rate * maturity) * scipy.special.ndtr(d2))
 
 
-def calc_black_scholes_put_formula(underlying, strike, rate, maturity, vol):
-    """calc_black_scholes_put_formula
+def black_scholes_put_formula(underlying, strike, rate, maturity, vol):
+    """black_scholes_put_formula
     calculate well known black scholes formula for put option.
     Here value of put option is calculated by put-call parity.
 
@@ -196,7 +196,7 @@ def calc_black_scholes_put_formula(underlying, strike, rate, maturity, vol):
     :math:`\sigma` is vol.
 
     :math:`c(\cdot)` is calculated
-    by :py:func:`calc_black_scholes_call_formula`.
+    by :py:func:`black_scholes_call_formula`.
 
     :param float underlying: value of underlying.
     :param float strike: strike of put option.
@@ -206,23 +206,23 @@ def calc_black_scholes_put_formula(underlying, strike, rate, maturity, vol):
     :return: put value.
     :rtype: float
     """
-    call_value = calc_black_scholes_call_formula(
+    call_value = black_scholes_call_formula(
         underlying, strike, rate, maturity, vol)
     discount = math.exp(-rate * maturity)
     return call_value - (underlying - strike * discount)
 
 
-def calc_black_scholes_call_value(
+def black_scholes_call_value(
         underlying,
         strike,
         rate,
         maturity,
         vol,
         today=0.0):
-    """calc_black_scholes_call_value
+    """black_scholes_call_value
     calculate call value in the case of today is not zero.
     (`maturity` - `today`) is treated as time to expiry.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_scholes_call_formula`.
 
     * case :math:`S > 0, K < 0`
 
@@ -254,6 +254,12 @@ def calc_black_scholes_call_value(
     # option is expired
     if time < 0.0 or np.isclose(time, 0.0):
         return 0.0
+    elif np.isclose(underlying, 0.0):
+        return math.exp(-rate * time) * max(-strike, 0.0)
+    elif np.isclose(strike, 0.0) and underlying > 0.0:
+        return math.exp(-rate * today) * underlying
+    elif np.isclose(strike, 0.0) and underlying < 0.0:
+        return 0.0
     # never below strike
     elif strike < 0.0 and underlying > 0.0:
         return underlying - math.exp(-rate * time) * strike
@@ -262,25 +268,25 @@ def calc_black_scholes_call_value(
         return 0.0
     elif underlying < 0.0:
         # max(S - K, 0) = (S - K) + max(-(S - K), 0)
-        value = calc_black_scholes_call_formula(
+        value = black_scholes_call_formula(
             -underlying, -strike, rate, time, vol)
         return (underlying - strike) + value
 
-    return calc_black_scholes_call_formula(
+    return black_scholes_call_formula(
         underlying, strike, rate, time, vol)
 
 
-def calc_black_scholes_put_value(
+def black_scholes_put_value(
         underlying,
         strike,
         rate,
         maturity,
         vol,
         today=0.0):
-    """calc_black_scholes_put_value
+    """black_scholes_put_value
     evaluates value of put option using put-call parity so that
-    this function calls :py:func:`calc_black_scholes_call_value`.
-    See :py:func:`calc_black_scholes_put_formula`.
+    this function calls :py:func:`black_scholes_call_value`.
+    See :py:func:`black_scholes_put_formula`.
 
     :param float underlying:
     :param float strike:
@@ -295,8 +301,12 @@ def calc_black_scholes_put_value(
     # option is expired
     if time < 0.0 or np.isclose(time, 0.0):
         return 0.0
+    elif np.isclose(strike, 0.0) and underlying > 0.0:
+        return 0.0
+    elif np.isclose(strike, 0.0) and underlying < 0.0:
+        return underlying * math.exp(-rate * today)
 
-    call_value = calc_black_scholes_call_value(
+    call_value = black_scholes_call_value(
         underlying, strike, rate, maturity, vol, today)
     discount = math.exp(-rate * time)
     return call_value - (underlying - strike * discount)
@@ -311,7 +321,7 @@ def black_scholes_call_value_fprime_by_strike(
     """black_scholes_call_value_fprime_by_strike
     First derivative of value of call option with respect to strike
     under black scholes model.
-    See :py:func:`calc_black_scholes_call_formula`.
+    See :py:func:`black_scholes_call_formula`.
 
     .. math::
         \\frac{\partial }{\partial K} c(K; S, r, T, \sigma)
@@ -324,7 +334,7 @@ def black_scholes_call_value_fprime_by_strike(
     :math:`T` is maturity,
     :math:`\sigma` is vol,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_scholes_call_formula`,
+    in :py:func:`black_scholes_call_formula`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
@@ -354,7 +364,7 @@ def black_scholes_call_value_fhess_by_strike(
     """black_scholes_call_value_fhess_by_strike
     Second derivative of value of call option with respect to strike
     under black scholes model.
-    See :py:func:`calc_black_scholes_call_formula`
+    See :py:func:`black_scholes_call_formula`
     and :py:func:`black_scholes_call_value_fprime_by_strike`.
 
     .. math::
@@ -372,7 +382,7 @@ def black_scholes_call_value_fhess_by_strike(
     :math:`T` is maturity,
     :math:`\sigma` is vol,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_scholes_call_formula`,
+    in :py:func:`black_scholes_call_formula`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
@@ -416,7 +426,7 @@ def black_scholes_call_value_third_by_strike(
     """black_scholes_call_value_third_by_strike
     Third derivative of value of call option with respect to strike
     under black scholes model.
-    See :py:func:`calc_black_scholes_call_formula`
+    See :py:func:`black_scholes_call_formula`
     and :py:func:`black_scholes_call_value_fprime_by_strike`,
     and :py:func:`black_scholes_call_value_fhess_by_strike`.
 
@@ -438,7 +448,7 @@ def black_scholes_call_value_third_by_strike(
     :math:`T` is maturity,
     :math:`\sigma` is vol,
     :math:`d_{1}, d_{2}` is defined
-    in :py:func:`calc_black_scholes_call_formula`,
+    in :py:func:`black_scholes_call_formula`,
     :math:`\Phi(\cdot)` is c.d.f. of standard normal distribution,
     :math:`\phi(\cdot)` is p.d.f. of standard normal distribution.
 
@@ -520,7 +530,7 @@ def black_payers_swaption_value(
     :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
-    option_value = calc_black_scholes_call_value(
+    option_value = black_scholes_call_value(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * option_value
 
@@ -558,7 +568,7 @@ def black_receivers_swaption_value(
     :raises AssertionError: if volatility is not positive.
     """
     assert(vol > 0.0)
-    option_value = calc_black_scholes_put_value(
+    option_value = black_scholes_put_value(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * option_value
 
@@ -778,7 +788,7 @@ def black_scholes_call_gamma(
     :math:`d_{1}` is defined in
     :py:func:`func_d1`.
 
-    See :py:func:`calc_black_scholes_call_value`.
+    See :py:func:`black_scholes_call_value`.
 
     :param float underlying:
     :param float strike:
@@ -818,7 +828,7 @@ def black_scholes_call_vega(
     :math:`d_{1}` is defined in
     :py:func:`func_d1`.
 
-    See :py:func:`calc_black_scholes_call_value`.
+    See :py:func:`black_scholes_call_value`.
 
     :param float underlying:
     :param float strike:
@@ -862,7 +872,7 @@ def black_scholes_call_theta(
     :math:`d_{1}` is defined in
     :py:func:`func_d1`.
 
-    See :py:func:`calc_black_scholes_call_value`.
+    See :py:func:`black_scholes_call_value`.
 
     :param float underlying:
     :param float strike:
@@ -909,7 +919,7 @@ def black_scholes_call_rho(
     :math:`d_{2}` is defined in
     :py:func:`func_d2`.
 
-    See :py:func:`calc_black_scholes_call_value`.
+    See :py:func:`black_scholes_call_value`.
 
     :param float underlying:
     :param float strike:
@@ -1183,7 +1193,7 @@ class BlackScholesPricerHelper(object):
             today=0.0):
         """make_call_wrt_strike
         make function of black shcoles call formula with respect to function.
-        This function return :py:func:`calc_black_scholes_call_value`
+        This function return :py:func:`black_scholes_call_value`
         as funciton of a single variable.
 
         .. math::
@@ -1198,7 +1208,7 @@ class BlackScholesPricerHelper(object):
         :return: call option pricer as a function of strike.
         :rtype: LambdaType
         """
-        return lambda strike: calc_black_scholes_call_value(
+        return lambda strike: black_scholes_call_value(
             underlying=underlying,
             strike=strike,
             rate=rate,
@@ -1215,7 +1225,7 @@ class BlackScholesPricerHelper(object):
             today=0.0):
         """make_put_wrt_strike
         make function of black shcoles put formula with respect to function.
-        This function return :py:func:`calc_black_scholes_put_value`
+        This function return :py:func:`black_scholes_put_value`
         as funciton of a single variable.
 
         .. math::
@@ -1230,7 +1240,7 @@ class BlackScholesPricerHelper(object):
         :return: put option pricer as a function of strike.
         :rtype: LambdaType.
         """
-        return lambda strike: calc_black_scholes_put_value(
+        return lambda strike: black_scholes_put_value(
             underlying=underlying,
             strike=strike,
             rate=rate,

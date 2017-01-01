@@ -115,9 +115,9 @@ class TestAnalytic(object):
             # underlying < strike
             (1.0, 2.0, 1.0, 1.0, 1.0, 0.478587969669),
         ])
-    def test_calc_black_scholes_call_formula(
+    def test_black_scholes_call_formula(
             self, underlying, strike, rate, maturity, vol, expect):
-        actual = target.calc_black_scholes_call_formula(
+        actual = target.black_scholes_call_formula(
             underlying, strike, rate, maturity, vol)
         assert actual == approx(expect)
 
@@ -127,13 +127,13 @@ class TestAnalytic(object):
             # underlying > strike
             (2.0, 1.0, 1.0, 1.0, 1.0),
         ])
-    def test_calc_black_scholes_put_formula(
+    def test_black_scholes_put_formula(
             self, underlying, strike, rate, maturity, vol):
-        call_value = target.calc_black_scholes_call_formula(
+        call_value = target.black_scholes_call_formula(
             underlying, strike, rate, maturity, vol)
         discount = math.exp(-rate * maturity)
         expect = call_value - (underlying - strike * discount)
-        actual = target.calc_black_scholes_put_formula(
+        actual = target.black_scholes_put_formula(
             underlying, strike, rate, maturity, vol)
         assert actual == approx(expect)
 
@@ -150,53 +150,100 @@ class TestAnalytic(object):
             (-1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
             # underlying < 0, stirke < 0
             (-1.0, -2.0, 1.0, 1.0, 1.0, 0.0),
+            # underlying = 0
+            (0.0, 1.1, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying > 0
+            (1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying < 0
+            (-1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
             # vol < 0
             (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
             # today > 0
             (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
         ])
-    def test_calc_black_scholes_call_value(
+    def test_black_scholes_call_value(
             self, underlying, strike, rate, maturity, vol, today):
+        time = maturity - today
         if vol <= 0.0:
             with pytest.raises(AssertionError):
-                actual = target.calc_black_scholes_call_value(
+                actual = target.black_scholes_call_value(
                     underlying, strike, rate, maturity, vol, today)
         else:
-            actual = target.calc_black_scholes_call_value(
+            actual = target.black_scholes_call_value(
                 underlying, strike, rate, maturity, vol, today)
             if maturity < 0 or np.isclose(maturity, 0.0):
                 expect = 0.0
                 assert expect == approx(actual)
             # never below strike
             elif underlying > 0.0 and strike < 0.0:
-                expect = underlying - math.exp(-rate * maturity) * strike
+                expect = underlying - math.exp(-rate * time) * strike
                 assert expect == approx(actual)
             # never beyond strike
             elif underlying < 0.0 and strike > 0.0:
                 expect = 0.0
                 assert expect == approx(actual)
             # underlying and strike are negative
-            elif underlying < 0.0:
+            elif underlying < 0.0 and strike < 0.0:
                 expect = (-1.0 + 2.0) + 0.478587969669
                 assert expect == approx(actual)
+            # underlying = 0
+            elif np.isclose(underlying, 0.0):
+                assert 0.0 == approx(actual)
+            # strike = 0, underlying > 0
+            elif np.isclose(strike, 0.0) and underlying > 0.0:
+                expect = underlying * math.exp(-rate * today)
+                assert expect == approx(actual)
+            # strike = 0, underlying < 0
+            elif np.isclose(strike, 0.0) and underlying < 0.0:
+                expect = 0.0
+                assert expect == approx(actual)
             else:
-                expect = target.calc_black_scholes_call_formula(
-                    underlying, strike, rate, maturity - today, vol)
+                expect = target.black_scholes_call_formula(
+                    underlying, strike, rate, time, vol)
                 assert expect == approx(actual)
 
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            (2.0, 1.0, 1.0, 1.0, 1.0, 0.5),
+            # maturity < 0
+            (1.0, 1.0, 1.0, -1.0, 1.0, 0.0),
+            # maturity = 0
+            (1.0, 1.0, 1.0, 0.0, 1.0, 0.0),
+            # stirke = 0, underlying > 0
+            (1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying < 0
+            (-1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # underlying = 0, strike > 0
+            (0.0, 1.1, 1.2, 1.3, 1.4, 0.2),
+            # underlying = 0, strike < 0
+            (0.0, -1.1, 1.2, 1.3, 1.4, 0.2),
+            # otherwise
+            (2.1, 1.2, 1.3, 1.4, 1.5, 0.5),
         ])
-    def test_calc_black_scholes_put_value(
+    def test_black_scholes_put_value(
             self, underlying, strike, rate, maturity, vol, today):
-        call_value = target.calc_black_scholes_call_value(
+        time = maturity - today
+        call_value = target.black_scholes_call_value(
             underlying, strike, rate, maturity, vol, today)
-        discount = math.exp(-rate * (maturity - today))
+        discount = math.exp(-rate * time)
         expect = call_value - (underlying - discount * strike)
-        actual = target.calc_black_scholes_put_value(
+        actual = target.black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
+        if time < 0.0 or np.isclose(time, 0.0):
+            expect = 0.0
+        elif np.isclose(strike, 0.0) and underlying > 0.0:
+            # max(-|S|, 0)
+            expect = 0.0
+        elif np.isclose(strike, 0.0) and underlying < 0.0:
+            # max(|S|, 0)
+            expect = underlying * math.exp(-rate * today)
+        elif np.isclose(underlying, 0.0) and strike > 0.0:
+            # max(K, 0)
+            expect = strike * math.exp(-rate * time)
+        elif np.isclose(underlying, 0.0) and strike < 0.0:
+            # max(-|K|, 0)
+            expect = 0
+
         assert expect == approx(actual)
 
     @pytest.mark.parametrize(
@@ -369,11 +416,11 @@ class TestAnalytic(object):
             expect = 0.0
         # max(S(T)-K,0) = max((-K)-(-S(T)),0)
         elif init_swap_rate < 0.0 and option_strike < 0.0:
-            option_value = target.calc_black_scholes_put_formula(
+            option_value = target.black_scholes_put_formula(
                 -init_swap_rate, -option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * option_value
         else:
-            value = target.calc_black_scholes_call_formula(
+            value = target.black_scholes_call_formula(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * value
 
@@ -429,11 +476,11 @@ class TestAnalytic(object):
             expect = swap_annuity * (option_strike - init_swap_rate)
         # max(K-S(T),0) = max((-S(T)) - (-K),0)
         elif init_swap_rate < 0.0 and option_strike < 0.0:
-            option_value = target.calc_black_scholes_call_formula(
+            option_value = target.black_scholes_call_formula(
                 -init_swap_rate, -option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * option_value
         else:
-            value = target.calc_black_scholes_put_formula(
+            value = target.black_scholes_put_formula(
                 init_swap_rate, option_strike, 0.0, option_maturity, vol)
             expect = swap_annuity * value
 
@@ -891,7 +938,7 @@ class TestBlackScholesPricerHelper:
     ])
     def test_make_call_wrt_strike(
             self, underlying, rate, maturity, vol, today):
-        expect_func = lambda strike: target.calc_black_scholes_call_value(
+        expect_func = lambda strike: target.black_scholes_call_value(
             underlying=underlying,
             strike=strike,
             rate=rate,
@@ -907,7 +954,7 @@ class TestBlackScholesPricerHelper:
     ])
     def test_make_put_wrt_strike(
             self, underlying, rate, maturity, vol, today):
-        expect_func = lambda strike: target.calc_black_scholes_put_value(
+        expect_func = lambda strike: target.black_scholes_put_value(
             underlying=underlying,
             strike=strike,
             rate=rate,
@@ -1002,9 +1049,9 @@ class TestModelAnalyticFormula(object):
     def test_put_call_parity_black_scholes(
             self, underlying, strike, rate, maturity, vol, today):
 
-        call_value = target.calc_black_scholes_call_value(
+        call_value = target.black_scholes_call_value(
             underlying, strike, rate, maturity, vol, today)
-        put_value = target.calc_black_scholes_put_value(
+        put_value = target.black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
         # forward
         time = maturity - today
