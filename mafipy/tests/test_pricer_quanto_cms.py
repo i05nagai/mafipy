@@ -1462,7 +1462,7 @@ class TestModelPricerQuantoCMS(object):
             return max(strike - payoff_strike, 0.0) * pdf(strike)
         call_value_integral = integrate.quad(
             call_integrand, payoff_strike, np.inf)[0]
-        call_value_analytic = analytic_formula.calc_black_scholes_call_value(
+        call_value_analytic = analytic_formula.black_scholes_call_value(
             underlying, payoff_strike, rate, maturity, vol)
         assert call_value_integral == approx(call_value_analytic)
 
@@ -1471,7 +1471,7 @@ class TestModelPricerQuantoCMS(object):
             return max(payoff_strike - strike, 0.0) * pdf(strike)
         put_value_integral = integrate.quad(
             put_integrand, 0.0, payoff_strike)[0]
-        put_value_analytic = analytic_formula.calc_black_scholes_put_value(
+        put_value_analytic = analytic_formula.black_scholes_put_value(
             underlying, payoff_strike, rate, maturity, vol)
         assert put_value_integral == approx(put_value_analytic)
 
@@ -1493,7 +1493,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(strike - payoff_strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, payoff_strike, np.inf)[0]
-            value_analytic = analytic_formula.calc_black_scholes_call_value(
+            value_analytic = analytic_formula.black_scholes_call_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_call()
@@ -1509,7 +1509,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(payoff_strike - strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, 0.0, payoff_strike)[0]
-            value_analytic = analytic_formula.calc_black_scholes_put_value(
+            value_analytic = analytic_formula.black_scholes_put_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_put()
@@ -1532,7 +1532,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(strike - payoff_strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, payoff_strike, np.inf)[0]
-            value_analytic = analytic_formula.calc_black_scholes_call_value(
+            value_analytic = analytic_formula.black_scholes_call_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_call()
@@ -1548,7 +1548,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(payoff_strike - strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, 0.0, payoff_strike)[0]
-            value_analytic = analytic_formula.calc_black_scholes_put_value(
+            value_analytic = analytic_formula.black_scholes_put_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_put()
