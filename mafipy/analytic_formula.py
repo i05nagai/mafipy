@@ -301,6 +301,10 @@ def calc_black_scholes_put_value(
     # option is expired
     if time < 0.0 or np.isclose(time, 0.0):
         return 0.0
+    elif np.isclose(strike, 0.0) and underlying > 0.0:
+        return 0.0
+    elif np.isclose(strike, 0.0) and underlying < 0.0:
+        return underlying * math.exp(-rate * today)
 
     call_value = calc_black_scholes_call_value(
         underlying, strike, rate, maturity, vol, today)

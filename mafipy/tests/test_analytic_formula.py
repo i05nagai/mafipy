@@ -205,16 +205,45 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
+            # maturity < 0
+            (1.0, 1.0, 1.0, -1.0, 1.0, 0.0),
+            # maturity = 0
+            (1.0, 1.0, 1.0, 0.0, 1.0, 0.0),
+            # stirke = 0, underlying > 0
+            (1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # stirke = 0, underlying < 0
+            (-1.1, 0.0, 1.2, 1.3, 1.4, 0.2),
+            # underlying = 0, strike > 0
+            (0.0, 1.1, 1.2, 1.3, 1.4, 0.2),
+            # underlying = 0, strike < 0
+            (0.0, -1.1, 1.2, 1.3, 1.4, 0.2),
+            # otherwise
             (2.1, 1.2, 1.3, 1.4, 1.5, 0.5),
         ])
     def test_calc_black_scholes_put_value(
             self, underlying, strike, rate, maturity, vol, today):
+        time = maturity - today
         call_value = target.calc_black_scholes_call_value(
             underlying, strike, rate, maturity, vol, today)
-        discount = math.exp(-rate * (maturity - today))
+        discount = math.exp(-rate * time)
         expect = call_value - (underlying - discount * strike)
         actual = target.calc_black_scholes_put_value(
             underlying, strike, rate, maturity, vol, today)
+        if time < 0.0 or np.isclose(time, 0.0):
+            expect = 0.0
+        elif np.isclose(strike, 0.0) and underlying > 0.0:
+            # max(-|S|, 0)
+            expect = 0.0
+        elif np.isclose(strike, 0.0) and underlying < 0.0:
+            # max(|S|, 0)
+            expect = underlying * math.exp(-rate * today)
+        elif np.isclose(underlying, 0.0) and strike > 0.0:
+            # max(K, 0)
+            expect = strike * math.exp(-rate * time)
+        elif np.isclose(underlying, 0.0) and strike < 0.0:
+            # max(-|K|, 0)
+            expect = 0
+
         assert expect == approx(actual)
 
     @pytest.mark.parametrize(
