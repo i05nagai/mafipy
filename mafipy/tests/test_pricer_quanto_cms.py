@@ -1014,51 +1014,6 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
             assert expect == approx(actual)
         case4()
 
-    def test__make_denominator_integrands(self):
-        data = util.get_real(1)
-        swap_rate = data[0]
-        funcs = self.target._make_denominator_integrands()
-        # size
-        assert 3 == len(funcs)
-        # func1
-        actual = funcs[0](swap_rate)
-        expect = (self.annuity_mapping_fhess(swap_rate)
-                  * self.forward_fx_diffusion(swap_rate))
-        assert expect == approx(actual)
-        # func2
-        actual = funcs[1](swap_rate)
-        expect = (self.annuity_mapping_func(swap_rate)
-                  * self.forward_fx_diffusion_fhess(swap_rate))
-        assert expect == approx(actual)
-        # func3
-        actual = funcs[2](swap_rate)
-        expect = (2.0
-                  * self.annuity_mapping_fprime(swap_rate)
-                  * self.forward_fx_diffusion_fprime(swap_rate))
-        assert expect == approx(actual)
-
-    def test_make_denominator_call_integrands(self):
-        # just call _make_denominator_call_integrands()
-        # so that no needs to test
-        pass
-
-    def test_make_denominator_put_integrands(self):
-        # just call _make_denominator_call_integrands()
-        # so that no needs to test
-        pass
-
-    def test_make_denominator_analytic_func(self):
-        data = util.get_real(1)
-        init_swap_rate = data[0]
-        funcs = self.target.make_denominator_analytic_funcs()
-        # size
-        assert 1 == len(funcs)
-        # func1
-        actual = funcs[0](init_swap_rate)
-        expect = (self.annuity_mapping_func(init_swap_rate)
-                  * self.forward_fx_diffusion(init_swap_rate))
-        assert expect == approx(actual)
-
 
 class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
 
@@ -1119,15 +1074,15 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         self.min_call_range = min_call_range
         self.max_call_range = max_call_range
         # annuity mapping params
-        annuity_mapping_params = {
+        self.annuity_mapping_params = {
             "alpha0": self.alpha0,
             "alpha1": self.alpha1
         }
-        annuity_mapping_helper = replication.LinearAnnuityMappingFuncHelper(
-            **annuity_mapping_params)
-        self.annuity_mapping_func = annuity_mapping_helper.make_func()
-        self.annuity_mapping_fprime = annuity_mapping_helper.make_fprime()
-        self.annuity_mapping_fhess = annuity_mapping_helper.make_fhess()
+        self.annuity_mapping_helper = replication.LinearAnnuityMappingFuncHelper(
+            **self.annuity_mapping_params)
+        self.annuity_mapping_func = self.annuity_mapping_helper.make_func()
+        self.annuity_mapping_fprime = self.annuity_mapping_helper.make_fprime()
+        self.annuity_mapping_fhess = self.annuity_mapping_helper.make_fhess()
         # payoff helper
         self.payoff_params = {
             "lower_strike": self.payoff_lower_strike,
@@ -1139,7 +1094,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
         # foward fx diffusion
-        forward_fx_diffusion_params = {
+        self.forward_fx_diffusion_params = {
             "time": self.maturity,
             "vol": self.forward_fx_vol,
             "corr": self.forward_fx_corr,
@@ -1148,13 +1103,13 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             "swap_rate_pdf_fprime": self._swap_rate_pdf_fprime,
             "is_inverse": False
         }
-        forward_fx_diffusion_helper = target._ForwardFxDiffusionHelper(
-            **forward_fx_diffusion_params)
-        self.forward_fx_diffusion = forward_fx_diffusion_helper.make_func()
+        self.forward_fx_diffusion_helper = target._ForwardFxDiffusionHelper(
+            **self.forward_fx_diffusion_params)
+        self.forward_fx_diffusion = self.forward_fx_diffusion_helper.make_func()
         self.forward_fx_diffusion_fprime = (
-            forward_fx_diffusion_helper.make_fprime())
+            self.forward_fx_diffusion_helper.make_fprime())
         self.forward_fx_diffusion_fhess = (
-            forward_fx_diffusion_helper.make_fhess())
+            self.forward_fx_diffusion_helper.make_fhess())
         # pricer
         bs_pricer = analytic_formula.BlackScholesPricerHelper()
         call_pricer_params = {
@@ -1175,9 +1130,9 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         self.put_pricer = bs_pricer.make_put_wrt_strike(**put_pricer_params)
         # target
         self.target = target._SimpleQuantoCmsLinearBullSpreadHelper(
-            annuity_mapping_helper,
+            self.annuity_mapping_helper,
             call_payoff_helper,
-            forward_fx_diffusion_helper,
+            self.forward_fx_diffusion_helper,
             self.call_pricer,
             self.put_pricer,
             self.payoff_lower_strike,
@@ -1380,27 +1335,28 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             check(expect_list, funcs, init_swap_rate)
         case5()
 
-    def test__make_denominator_integrands(self):
-        data = util.get_real(1)
-        swap_rate = data[0]
-        funcs = self.target._make_denominator_integrands()
-        # size
-        assert 3 == len(funcs)
-        # func1
-        actual = funcs[0](swap_rate)
-        expect = (self.annuity_mapping_fhess(swap_rate)
-                  * self.forward_fx_diffusion(swap_rate))
-        assert expect == approx(actual)
-        # func2
-        actual = funcs[1](swap_rate)
-        expect = (self.annuity_mapping_func(swap_rate)
-                  * self.forward_fx_diffusion_fhess(swap_rate))
-        assert expect == approx(actual)
-        # func3
-        actual = funcs[2](swap_rate)
-        expect = (2.0
-                  * self.annuity_mapping_fprime(swap_rate)
-                  * self.forward_fx_diffusion_fprime(swap_rate))
+    def test__replicate_denominator(self):
+        # correlation = 0
+        self.forward_fx_corr = 0.0
+        min_put_range = 1e-10
+        max_put_range = self.init_swap_rate
+        min_call_range = self.init_swap_rate
+        max_call_range = self.payoff_upper_strike * 1.55
+        self._set_target(min_put_range, max_put_range,
+                         min_call_range, max_call_range)
+        forward_fx_factor = math.exp(0.5
+                                     * (self.forward_fx_vol ** 2)
+                                     * self.maturity)
+        expect = (self.alpha0 * self.init_swap_rate
+                  + self.alpha1) * forward_fx_factor
+        actual = target._replicate_denominator(
+            self.init_swap_rate,
+            self.call_pricer,
+            self.put_pricer,
+            self.annuity_mapping_helper,
+            self.forward_fx_diffusion_helper,
+            min_put_range,
+            max_call_range)
         assert expect == approx(actual)
 
     def test_make_denominator_call_integrands(self):
