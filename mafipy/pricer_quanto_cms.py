@@ -1166,44 +1166,35 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         return terms
 
 
-def _make_numerator_replication(quanto_cms_helper, call_pricer, put_pricer):
-    """_make_numerator_replication
+def _replicate_numerator(init_swap_rate,
+                         quanto_cms_helper,
+                         call_pricer,
+                         put_pricer,
+                         min_put_range=-np.inf,
+                         max_call_range=np.inf):
+    """_replicate_numerator
 
+    :param float init_swap_rate:
     :param SimpleQuantoCmsHelper quanto_cms_helper:
-    :param call_pricer:
-    :param put_pricer:
-    :return: generated replication object
-    :rtype: :py:class:`AnalyticReplication`
+    :param callable call_pricer:
+    :param callable put_pricer:
+    :param float min_put_range:
+    :param float max_call_range:
+
+    :return: expectation in numerator.
+    :rtype: float.
     """
     put_integrands = quanto_cms_helper.make_numerator_put_integrands()
     call_integrands = quanto_cms_helper.make_numerator_call_integrands()
     analytic_funcs = quanto_cms_helper.make_numerator_analytic_funcs()
-    return replication.AnalyticReplication(
+    replicator = replication.AnalyticReplication(
         call_pricer,
         put_pricer,
         analytic_funcs,
         put_integrands,
         call_integrands)
-
-
-def _make_denominator_replication(quanto_cms_helper, call_pricer, put_pricer):
-    """_make_denominator_replication
-
-    :param qunato_cms_helper:
-    :param call_pricer:
-    :param put_pricer:
-    :return: generated replication object
-    :rtype: :py:class:`AnalyticReplication`
-    """
-    put_integrands = quanto_cms_helper.make_denominator_put_integrands()
-    call_integrands = quanto_cms_helper.make_denominator_call_integrands()
-    analytic_funcs = quanto_cms_helper.make_denominator_analytic_funcs()
-    return replication.AnalyticReplication(
-        call_pricer,
-        put_pricer,
-        analytic_funcs,
-        put_integrands,
-        call_integrands)
+    return replicator.eval(
+        init_swap_rate, min_put_range, max_call_range)
 
 
 def _replicate_denominator(init_swap_rate,
@@ -1379,12 +1370,12 @@ def replicate(init_swap_rate,
             max_call_range)
 
     # replication
-    numerator_replication = _make_numerator_replication(
-        quanto_cms_helper, call_pricer, put_pricer)
-
-    # calculate
-    numerator = numerator_replication.eval(
-        init_swap_rate, min_put_range, max_call_range)
+    numerator = _replicate_numerator(init_swap_rate,
+                                     quanto_cms_helper,
+                                     call_pricer,
+                                     put_pricer,
+                                     min_put_range,
+                                     max_call_range)
     print(" numerator:", numerator)
     denominator = _replicate_denominator(init_swap_rate,
                                          call_pricer,
