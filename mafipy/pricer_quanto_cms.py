@@ -745,10 +745,11 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
                  call_pricer,
                  put_pricer,
                  payoff_strike,
-                 min_put_range=-np.inf,
-                 max_put_range=np.inf,
-                 min_call_range=-np.inf,
-                 max_call_range=np.inf):
+                 payoff_gearing,
+                 min_put_range,
+                 max_put_range,
+                 min_call_range,
+                 max_call_range):
         """__init__
         """
         # annutiy mapping funciton
@@ -759,6 +760,7 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
         self.payoff_strike = payoff_strike
+        self.payoff_gearing = payoff_gearing
         # forawad fx diffusion
         fwd_fx_helper = forward_fx_diffusion_helper
         self.forward_fx_diffusion = fwd_fx_helper.make_func()
@@ -869,24 +871,30 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         :rtype: array.
         """
         def func1(init_swap_rate):
+            # g * a * chi
             return (self.payoff_func(init_swap_rate)
+                    * self.payoff_gearing
                     * self.annuity_mapping_func(init_swap_rate)
                     * self.forward_fx_diffusion(init_swap_rate))
 
         def func2(init_swap_rate):
+            # p * g'' * a * chi
             return (self.put_pricer(self.payoff_strike)
+                    * self.payoff_gearing
                     * self.annuity_mapping_func(self.payoff_strike)
                     * self.forward_fx_diffusion(self.payoff_strike))
 
         def func3(init_swap_rate):
+            # c * g'' * a * chi
             return (self.call_pricer(self.payoff_strike)
+                    * self.payoff_gearing
                     * self.annuity_mapping_func(self.payoff_strike)
                     * self.forward_fx_diffusion(self.payoff_strike))
 
         terms = [func1]
-        if self.min_put_range < self.payoff_strike < self.max_put_range:
+        if self.min_put_range <= self.payoff_strike <= self.max_put_range:
             terms.append(func2)
-        if self.min_call_range < self.payoff_strike < self.max_call_range:
+        if self.min_call_range <= self.payoff_strike <= self.max_call_range:
             terms.append(func3)
         return terms
 
@@ -986,10 +994,11 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                  put_pricer,
                  payoff_lower_strike,
                  payoff_upper_strike,
-                 min_put_range=-np.inf,
-                 max_put_range=np.inf,
-                 min_call_range=-np.inf,
-                 max_call_range=np.inf):
+                 payoff_gearing,
+                 min_put_range,
+                 max_put_range,
+                 min_call_range,
+                 max_call_range):
         """__init__
         """
         # annutiy mapping funciton
@@ -1001,6 +1010,7 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         self.payoff_fprime = bull_spread_payoff_helper.make_fprime()
         self.payoff_lower_strike = payoff_lower_strike
         self.payoff_upper_strike = payoff_upper_strike
+        self.payoff_gearing = payoff_gearing
         # forawad fx diffusion
         fwd_fx_helper = forward_fx_diffusion_helper
         self.forward_fx_diffusion = fwd_fx_helper.make_func()
@@ -1014,6 +1024,11 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         self.max_put_range = max_put_range
         self.min_call_range = min_call_range
         self.max_call_range = max_call_range
+        # check range condition
+        # min_put_range <= max_put_range = min_call_range <= max_call_range
+        assert(min_put_range <= max_put_range)
+        assert(np.isclose(max_put_range, min_call_range))
+        assert(min_call_range <= max_call_range)
 
     def _make_numerator_integrands(self):
         """_make_numerator_integrands
@@ -1128,31 +1143,35 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
 
         # put term1
         def func21(init_swap_rate):
-            # p * a * chi at lower_strike
+            # p * g'' * a * chi at lower_strike
             return (self.put_pricer(self.payoff_lower_strike)
+                    * self.payoff_gearing
                     * self.annuity_mapping_func(self.payoff_lower_strike)
                     * self.forward_fx_diffusion(self.payoff_lower_strike))
 
         # put term2
         def func22(init_swap_rate):
-            # p * a * chi at upper_strike
-            return (self.put_pricer(self.payoff_upper_strike)
-                    * self.annuity_mapping_func(self.payoff_upper_strike)
-                    * self.forward_fx_diffusion(self.payoff_upper_strike))
+            # p * g'' * a * chi at upper_strike
+            return -(self.put_pricer(self.payoff_upper_strike)
+                     * self.payoff_gearing
+                     * self.annuity_mapping_func(self.payoff_upper_strike)
+                     * self.forward_fx_diffusion(self.payoff_upper_strike))
 
         # call term1
         def func31(init_swap_rate):
-            # c * a * chi at lower_strike
+            # c * g'' * a * chi at lower_strike
             return (self.call_pricer(self.payoff_lower_strike)
+                    * self.payoff_gearing
                     * self.annuity_mapping_func(self.payoff_lower_strike)
                     * self.forward_fx_diffusion(self.payoff_lower_strike))
 
         # call term2
         def func32(init_swap_rate):
-            # c * a * chi ato upper_strike
-            return (self.call_pricer(self.payoff_upper_strike)
-                    * self.annuity_mapping_func(self.payoff_upper_strike)
-                    * self.forward_fx_diffusion(self.payoff_upper_strike))
+            # c * g'' * a * chi at upper_strike
+            return -(self.call_pricer(self.payoff_upper_strike)
+                     * self.payoff_gearing
+                     * self.annuity_mapping_func(self.payoff_upper_strike)
+                     * self.forward_fx_diffusion(self.payoff_upper_strike))
 
         terms = [func1]
         if self.min_put_range <= self.payoff_lower_strike <= self.max_put_range:
@@ -1191,8 +1210,8 @@ def _replicate_numerator(init_swap_rate,
         call_pricer,
         put_pricer,
         analytic_funcs,
-        put_integrands,
-        call_integrands)
+        call_integrands,
+        put_integrands)
     return replicator.eval(
         init_swap_rate, min_put_range, max_call_range)
 
@@ -1259,8 +1278,8 @@ def _replicate_denominator(init_swap_rate,
         call_pricer,
         put_pricer,
         analytic_funcs,
-        put_integrands,
-        call_integrands)
+        call_integrands,
+        put_integrands)
     return replicator.eval(
         init_swap_rate, min_put_range, max_call_range)
 
@@ -1355,7 +1374,10 @@ def replicate(init_swap_rate,
             call_pricer,
             put_pricer,
             payoff_params["strike"],
+            payoff_params["gearing"],
             min_put_range,
+            init_swap_rate,
+            init_swap_rate,
             max_call_range)
     elif payoff_type == 3 and annuity_mapping_type == 1:
         quanto_cms_helper = _SimpleQuantoCmsLinearBullSpreadHelper(
@@ -1366,7 +1388,10 @@ def replicate(init_swap_rate,
             put_pricer,
             payoff_params["lower_strike"],
             payoff_params["upper_strike"],
+            payoff_params["gearing"],
             min_put_range,
+            init_swap_rate,
+            init_swap_rate,
             max_call_range)
 
     # replication
