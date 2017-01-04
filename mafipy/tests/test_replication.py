@@ -4,6 +4,7 @@
 from __future__ import division
 
 import mafipy.replication as target
+import mafipy.analytic_formula as analytic_formula
 import pytest
 from mafipy.tests import util
 from pytest import approx
@@ -173,3 +174,69 @@ class TestAnalyticReplication(object):
             expect = expect_analytic + expect_put + expect_call
             assert expect == approx(actual)
         case2()
+
+
+class TestModelAnalyticReplication:
+
+    # before all tests starts
+    @classmethod
+    def setup_class(cls):
+        pass
+
+    # after all tests finish
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    # before each test start
+    def setup(self):
+        pass
+
+    # after each test finish
+    def teardown(self):
+        pass
+
+    def test_replication(self):
+        # call option
+        data = sorted(util.get_real(3))
+        min_put_range = 1e-10
+        init_swap_rate = data[1]
+        max_call_range = 10.0
+
+        data = util.get_real(3)
+        option_strike = data[0]
+        option_maturity = data[1]
+        swap_rate_vol = data[2]
+
+        pricer_helper = analytic_formula.BlackSwaptionPricerHelper()
+        call_pricer = pricer_helper.make_payers_swaption_wrt_strike(
+            init_swap_rate, 1.0, option_maturity, swap_rate_vol)
+        put_pricer = pricer_helper.make_receivers_swaption_wrt_strike(
+            init_swap_rate, 1.0, option_maturity, swap_rate_vol)
+
+        def analytic_func(init_swap_rate):
+            return max(init_swap_rate - option_strike, 0.0)
+
+        def analytic_from_put_term_delta(init_swap_rate):
+            return put_pricer(option_strike)
+
+        def analytic_from_call_term_delta(init_swap_rate):
+            return call_pricer(option_strike)
+
+        analytic_funcs = [analytic_func]
+        if min_put_range <= option_strike <= init_swap_rate:
+            analytic_funcs.append(analytic_from_put_term_delta)
+        if init_swap_rate <= option_strike <= max_call_range:
+            analytic_funcs.append(analytic_from_call_term_delta)
+
+        put_integrands = []
+        call_integrands = []
+        self.target = target.AnalyticReplication(call_pricer,
+                                                 put_pricer,
+                                                 analytic_funcs,
+                                                 call_integrands,
+                                                 put_integrands)
+        actual = self.target.eval(
+            init_swap_rate, min_put_range, max_call_range)
+        expect = call_pricer(option_strike)
+        assert expect == approx(actual)
