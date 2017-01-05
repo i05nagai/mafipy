@@ -1324,6 +1324,10 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             self.forward_fx_corr = 0.0
             self.alpha0 = 0.0
 
+            self.min_put_range = 1e-10
+            self.max_put_range = self.init_swap_rate
+            self.min_call_range = self.init_swap_rate
+            self.max_call_range = self.init_swap_rate * 3.0
             self.payoff_lower_strike = (self.min_put_range
                                         + self.max_put_range) * 0.5
             self.payoff_upper_strike = (self.min_call_range
@@ -1379,6 +1383,56 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             self.max_call_range)
         assert expect == approx(actual)
 
+    def test_model_linear_tsr_bull_spread_quanto_cms(self):
+        """
+        model is redeuced to the following equation when
+        :math:`alpha_{0}=0`, :math:`\\rho_{X}=0`.
+
+        .. math::
+            \mathrm{E}^{A}
+            \left[
+                g(S(T))
+            \\right].
+        """
+        self.alpha0 = 0.0
+        self.forward_fx_corr = 0.0
+
+        self.gearing = 1.0 / self.init_swap_rate
+        self.min_put_range = 1e-10
+        self.max_put_range = self.init_swap_rate
+        self.min_call_range = self.init_swap_rate
+        self.max_call_range = self.payoff_upper_strike * 2.0
+        self.payoff_lower_strike = (self.min_put_range
+                                    + self.max_put_range) * 0.5
+        self.payoff_upper_strike = self.init_swap_rate * 1.5
+        self._set_target()
+        actual = target.replicate(
+            self.init_swap_rate,
+            1.0,
+            self.call_pricer,
+            self.put_pricer,
+            "bull_spread",
+            self.payoff_params,
+            self.forward_fx_diffusion_params,
+            "linear",
+            self.annuity_mapping_params,
+            self.min_put_range,
+            self.max_call_range)
+        # expect
+        call_value_lower_strike = analytic_formula.black_payers_swaption_value(
+            self.init_swap_rate,
+            self.payoff_lower_strike,
+            1.0,
+            self.maturity,
+            self.swap_rate_vol)
+        call_value_upper_strike = analytic_formula.black_payers_swaption_value(
+            self.init_swap_rate,
+            self.payoff_upper_strike,
+            1.0,
+            self.maturity,
+            self.swap_rate_vol)
+        expect = ((call_value_lower_strike - call_value_upper_strike)
+                  * self.payoff_gearing)
         assert expect == approx(actual)
 
 
