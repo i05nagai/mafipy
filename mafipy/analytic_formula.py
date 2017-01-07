@@ -915,6 +915,52 @@ def black_scholes_call_vega(
     return math.sqrt(maturity) * underlying * scipy.stats.norm.pdf(d1)
 
 
+def black_scholes_call_volga(
+        underlying, strike, rate, maturity, vol):
+    """black_scholes_call_volg
+    calculates black scholes volga.
+
+    .. math::
+        \\frac{\partial^{2}}{\partial \sigma^{2}} c(S, K, r, T, \sigma)
+            S \phi^{\prime}(d_{1}(\sigma))
+            \\frac{
+                (\\frac{1}{2} \sigma^{2} - r)T
+            }{
+                \sigma^{2}
+            }
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: must be non-negative.
+    :param float vol: volatility. This must be positive.
+
+    :return: value of volga.
+    :rtype: float.
+    """
+    assert(vol >= 0.0)
+
+    if maturity < 0.0:
+        return 0.0
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    pdf_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+    factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
+
+    return underlying * pdf_fprime * factor
+
+
 def black_scholes_call_theta(
         underlying,
         strike,

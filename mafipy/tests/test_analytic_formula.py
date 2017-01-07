@@ -812,6 +812,41 @@ class TestAnalytic(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
+            # vol < 0 raise AssertionError
+            (1.1, 2.2, 1.3, 1.4, -0.1, 0.0),
+            # maturity <= 0 return 0
+            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
+            # otherwise
+            (1.1, 2.2, 1.3, 1.4, 0.1, 0.0),
+        ])
+    def test_black_scholes_call_volga(
+            self, underlying, strike, rate, maturity, vol, today):
+
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_volga(
+                    underlying, strike, rate, maturity, vol)
+        elif maturity <= 0.0:
+            expect = 0
+            actual = target.black_scholes_call_volga(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
+            pdf_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+            factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
+            expect = underlying * pdf_fprime * factor
+
+            actual = target.black_scholes_call_volga(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, today",
+        [
             # maturity < 0 raise AssertionError
             (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
             # vol < 0 raise AssertionError
