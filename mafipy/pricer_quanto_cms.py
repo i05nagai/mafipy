@@ -774,6 +774,11 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         self.max_put_range = max_put_range
         self.min_call_range = min_call_range
         self.max_call_range = max_call_range
+        # check range condition
+        # min_put_range <= max_put_range = min_call_range <= max_call_range
+        assert(min_put_range <= max_put_range)
+        assert(np.isclose(max_put_range, min_call_range))
+        assert(min_call_range <= max_call_range)
 
     def _make_numerator_integrands(self):
         """_make_numerator_integrands
@@ -873,7 +878,6 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         def func1(init_swap_rate):
             # g * a * chi
             return (self.payoff_func(init_swap_rate)
-                    * self.payoff_gearing
                     * self.annuity_mapping_func(init_swap_rate)
                     * self.forward_fx_diffusion(init_swap_rate))
 

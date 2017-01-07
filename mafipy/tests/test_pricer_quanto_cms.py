@@ -741,32 +741,20 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
         self.init_swap_rate = data[11]
         self.rate = data[12]
         # ordered data
-        data = sorted(util.get_real(2))
-        min_put_range = data[0]
-        max_put_range = data[1]
-        data = sorted(util.get_real(2))
-        min_call_range = data[0]
-        max_call_range = data[1]
+        data = sorted(util.get_real(3))
+        self.init_swap_rate = data[1]
+        self.min_put_range = data[0]
+        self.max_put_range = data[1]
+        self.min_call_range = data[1]
+        self.max_call_range = data[2]
         # set
-        self._set_target(min_put_range,
-                         max_put_range,
-                         min_call_range,
-                         max_call_range)
+        self._set_target()
 
     # after each test finish
     def teardown(self):
         pass
 
-    def _set_target(self,
-                    min_put_range,
-                    max_put_range,
-                    min_call_range,
-                    max_call_range):
-        # range
-        self.min_put_range = min_put_range
-        self.max_put_range = max_put_range
-        self.min_call_range = min_call_range
-        self.max_call_range = max_call_range
+    def _set_target(self):
         # annuity mapping params
         annuity_mapping_params = {
             "alpha0": self.alpha0,
@@ -830,10 +818,10 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
             self.put_pricer,
             self.payoff_strike,
             self.payoff_gearing,
-            min_put_range,
-            max_put_range,
-            min_call_range,
-            max_call_range)
+            self.min_put_range,
+            self.max_put_range,
+            self.min_call_range,
+            self.max_call_range)
 
     def _swap_rate_cdf(self, swap_rate):
         return scipy.stats.norm.cdf(swap_rate)
@@ -903,22 +891,21 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
     def test_make_numerator_analytic_funcs(self):
         data = util.get_real(1)
         init_swap_rate = data[0]
+        self.min_put_range = 1e-10
+        self.max_put_range = init_swap_rate
+        self.min_call_range = init_swap_rate
+        self.max_call_range = init_swap_rate * 2.0
 
         def case1():
-            # min_put_range < strike < max_put_range
-            # min_call_range < strike < max_put_range
-            min_put_range = self.payoff_strike / 2.0
-            max_put_range = self.payoff_strike * 1.01
-            min_call_range = self.payoff_strike / 2.0
-            max_call_range = self.payoff_strike * 1.01
-            self._set_target(min_put_range,
-                             max_put_range,
-                             min_call_range,
-                             max_call_range)
+            # min_put_range < strike < max_put_range = min_call_range
+            # min_call_range < max_put_range
+            self.payoff_strike = (self.min_put_range
+                                  + self.max_put_range) * 0.5
+            self._set_target()
             funcs = self.target.make_numerator_analytic_funcs()
 
             # size
-            assert 3 == len(funcs)
+            assert 2 == len(funcs)
             # func1
             actual = funcs[0](init_swap_rate)
             expect = (self.payoff_func(init_swap_rate)
@@ -933,27 +920,14 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
                       * self.annuity_mapping_func(self.payoff_strike)
                       * self.forward_fx_diffusion(self.payoff_strike))
             assert expect == approx(actual)
-            # call term
-            # c * g'' * a * chi
-            actual = funcs[2](init_swap_rate)
-            expect = (self.call_pricer(self.payoff_strike)
-                      * self.payoff_gearing
-                      * self.annuity_mapping_func(self.payoff_strike)
-                      * self.forward_fx_diffusion(self.payoff_strike))
-            assert expect == approx(actual)
         case1()
 
-        # min_put_range < strike < max_put_range
-        # strike < min_call_range < max_call_range
+        # min_put_range < max_put_range = min_call_range
+        # min_call_range < strike < max_call_range
         def case2():
-            min_put_range = self.payoff_strike / 2.0
-            max_put_range = self.payoff_strike * 1.01
-            min_call_range = self.payoff_strike * 1.005
-            max_call_range = self.payoff_strike * 1.01
-            self._set_target(min_put_range,
-                             max_put_range,
-                             min_call_range,
-                             max_call_range)
+            self.payoff_strike = (self.min_call_range
+                                  + self.max_call_range) * 0.5
+            self._set_target()
             funcs = self.target.make_numerator_analytic_funcs()
             # size
             assert 2 == len(funcs)
@@ -963,65 +937,15 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
                       * self.annuity_mapping_func(init_swap_rate)
                       * self.forward_fx_diffusion(init_swap_rate))
             assert expect == approx(actual)
-            # func2
+            # call term
+            # c * g'' * a * chi
             actual = funcs[1](init_swap_rate)
-            expect = (self.put_pricer(self.payoff_strike)
+            expect = (self.call_pricer(self.payoff_strike)
                       * self.payoff_gearing
                       * self.annuity_mapping_func(self.payoff_strike)
                       * self.forward_fx_diffusion(self.payoff_strike))
             assert expect == approx(actual)
         case2()
-
-        # strike < min_put_range < max_put_range
-        # min_call_range < strike < max_call_range
-        def case3():
-            min_put_range = self.payoff_strike * 1.005
-            max_put_range = self.payoff_strike * 1.01
-            min_call_range = self.payoff_strike / 2.0
-            max_call_range = self.payoff_strike * 1.01
-            self._set_target(min_put_range,
-                             max_put_range,
-                             min_call_range,
-                             max_call_range)
-            funcs = self.target.make_numerator_analytic_funcs()
-            # size
-            assert 2 == len(funcs)
-            # func1
-            actual = funcs[0](init_swap_rate)
-            expect = (self.payoff_func(init_swap_rate)
-                      * self.annuity_mapping_func(init_swap_rate)
-                      * self.forward_fx_diffusion(init_swap_rate))
-            assert expect == approx(actual)
-            # func3
-            actual = funcs[1](init_swap_rate)
-            expect = (self.call_pricer(self.payoff_strike)
-                      * self.payoff_gearing
-                      * self.annuity_mapping_func(self.payoff_strike)
-                      * self.forward_fx_diffusion(self.payoff_strike))
-            assert expect == approx(actual)
-        case3()
-
-        # strike < min_put_range < max_put_range
-        # strike < min_call_range < max_call_range
-        def case4():
-            min_put_range = self.payoff_strike * 1.005
-            max_put_range = self.payoff_strike * 1.01
-            min_call_range = self.payoff_strike * 1.005
-            max_call_range = self.payoff_strike * 1.01
-            self._set_target(min_put_range,
-                             max_put_range,
-                             min_call_range,
-                             max_call_range)
-            funcs = self.target.make_numerator_analytic_funcs()
-            # size
-            assert 1 == len(funcs)
-            # func1
-            actual = funcs[0](init_swap_rate)
-            expect = (self.payoff_func(init_swap_rate)
-                      * self.annuity_mapping_func(init_swap_rate)
-                      * self.forward_fx_diffusion(init_swap_rate))
-            assert expect == approx(actual)
-        case4()
 
 
 class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
@@ -1401,7 +1325,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         self.min_put_range = 1e-10
         self.max_put_range = self.init_swap_rate
         self.min_call_range = self.init_swap_rate
-        self.max_call_range = self.payoff_upper_strike * 2.0
+        self.max_call_range = self.init_swap_rate * 2.0
         self.payoff_lower_strike = (self.min_put_range
                                     + self.max_put_range) * 0.5
         self.payoff_upper_strike = self.init_swap_rate * 1.5
