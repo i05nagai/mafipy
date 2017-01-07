@@ -241,16 +241,16 @@ class TestModelAnalyticReplication:
         assert expect == approx(actual)
 
     def test_replication_bull_spread(self):
-        data = sorted(util.get_real(3))
+        data = util.get_real(1)
         min_put_range = 1e-10
-        init_swap_rate = data[1]
+        init_swap_rate = data[0]
         max_call_range = 10.0
 
         data = util.get_real(2)
         option_maturity = data[0]
         swap_rate_vol = data[1]
 
-        data = sorted(util.get_real(2))
+        data = sorted(util.get_real(2, min_put_range, max_call_range))
         lower_strike = data[0]
         upper_strike = data[1]
 
