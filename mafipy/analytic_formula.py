@@ -821,7 +821,7 @@ def black_scholes_call_vega(
 
     .. math::
         \\frac{\partial}{\partial \sigma} c(S, K, r, T, \sigma)
-            = -\sqrt{T}S\phi(d_{1}(S, K, r, T, \sigma))
+            = \sqrt{T}S\phi(d_{1}(S, K, r, T, \sigma))
 
     where
     :math:`S` is underlying,
@@ -846,7 +846,7 @@ def black_scholes_call_vega(
     assert(maturity >= 0.0)
     assert(vol >= 0.0)
     d1 = func_d1(underlying, strike, rate, maturity, vol)
-    return - underlying * scipy.stats.norm.pdf(d1)
+    return math.sqrt(maturity) * underlying * scipy.stats.norm.pdf(d1)
 
 
 def black_scholes_call_theta(

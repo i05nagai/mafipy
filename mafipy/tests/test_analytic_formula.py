@@ -707,11 +707,11 @@ class TestAnalytic(object):
         "underlying, strike, rate, maturity, vol, today",
         [
             # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            (1.1, 2.2, 1.3, 1.4, -0.1, 0.0),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            (1.1, 2.2, 1.3, 1.4, 0.1, 0.0),
         ])
     def test_black_scholes_call_vega(
             self, underlying, strike, rate, maturity, vol, today):
@@ -725,8 +725,8 @@ class TestAnalytic(object):
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
             d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            expect = -(math.sqrt(maturity)
-                       * underlying * scipy.stats.norm.pdf(d1))
+            expect = (math.sqrt(maturity)
+                      * underlying * scipy.stats.norm.pdf(d1))
 
             actual = target.black_scholes_call_vega(
                 underlying, strike, rate, maturity, vol)
