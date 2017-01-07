@@ -33,6 +33,9 @@ class TestAnalytic(object):
     def teardown(self):
         pass
 
+    # -------------------------------------------------------------------------
+    # Black scholes european call/put
+    # -------------------------------------------------------------------------
     @pytest.mark.parametrize(
         "underlying, strike, vol, expect", [
             # underlying = 0
@@ -368,6 +371,80 @@ class TestAnalytic(object):
             actual = target.black_scholes_call_value_third_by_strike(
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
+
+    def test_implied_vol_brenner_subrahmanyam(self):
+        data = util.get_real(5)
+        underlying = data[0]
+        strike = data[1]
+        rate = data[2]
+        maturity = data[3]
+        option_value = data[4]
+        expect = math.sqrt(2.0 * math.pi / maturity) * option_value / strike
+        actual = target.implied_vol_brenner_subrahmanyam(
+            underlying, strike, rate, maturity, option_value)
+        assert expect == approx(actual)
+
+        # maturity = 0
+        maturity = 0.0
+        expect = 0.0
+        actual = target.implied_vol_brenner_subrahmanyam(
+            underlying, strike, rate, maturity, option_value)
+        assert expect == approx(actual)
+
+        # maturity < 0
+        maturity = -1.0
+        expect = 0.0
+        actual = target.implied_vol_brenner_subrahmanyam(
+            underlying, strike, rate, maturity, option_value)
+        assert expect == approx(actual)
+
+        # strike = 0
+        strike = 0.0
+        expect = 0.0
+        actual = target.implied_vol_brenner_subrahmanyam(
+            underlying, strike, rate, maturity, option_value)
+        assert expect == approx(actual)
+
+    def test_implied_vol_quadratic_approx(self):
+        data = util.get_real(5)
+        underlying = data[0]
+        strike = data[1]
+        rate = data[2]
+        maturity = data[3]
+        option_value = data[4]
+
+        def case1():
+            # expect
+            discount_strike = math.exp(-rate * maturity) * strike
+            moneyness_delta = underlying - discount_strike
+            diff = option_value - moneyness_delta / 2.0
+            moneyness_delta2 = moneyness_delta ** 2
+            sqrt_inner = max(diff ** 2 - moneyness_delta2 / math.pi, 0.0)
+            factor1 = diff + math.sqrt(sqrt_inner)
+            factor2 = (math.sqrt(2.0 * math.pi / maturity)
+                       / (underlying + discount_strike))
+            expect = factor1 * factor2
+            # actual
+            actual = target.implied_vol_quadratic_approx(
+                underlying, strike, rate, maturity, option_value)
+            assert expect == approx(actual)
+        case1()
+
+        def case_maturity_is_not_positive():
+            maturity = -1.0
+            expect = 0.0
+            actual = target.implied_vol_quadratic_approx(
+                underlying, strike, rate, maturity, option_value)
+            assert expect == approx(actual)
+        case_maturity_is_not_positive()
+
+        def case_maturity_is_zero():
+            maturity = 0.0
+            expect = 0.0
+            actual = target.implied_vol_quadratic_approx(
+                underlying, strike, rate, maturity, option_value)
+            assert expect == approx(actual)
+        case_maturity_is_zero()
 
     # -------------------------------------------------------------------------
     # Black payers/recievers swaption
