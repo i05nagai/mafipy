@@ -5,6 +5,7 @@ from __future__ import division
 from mafipy import analytic_formula
 import scipy.optimize
 import numpy as np
+import math
 
 
 def black_scholes_implied_vol(underlying,
@@ -84,6 +85,116 @@ def black_swaption_implied_vol(init_swap_rate,
         maxiter=max_iter)
 
     return result
+
+
+# ----------------------------------------------------------------------------
+# SABR calibration
+# ----------------------------------------------------------------------------
+def _guess_alpha_from_vol_atm(underlying, vol_atm, beta):
+    """_guess_alpha_from_vol_atm_
+    guess alpha from volatility at the money
+    by using Hagan's approximated atm implied volatility.
+
+    .. math::
+        \ln\sigma(F, F)
+            \\approx \ln \\alpha - (1 - \\beta) \ln F
+
+    :param float underlying: must be positive.
+    :param float vol_atm: volatility at the money. This must be positive.
+    :param float beta:
+
+    :return: alpha.
+    :rtype: float.
+    """
+    assert(underlying > 0.0)
+    assert(vol_atm > 0.0)
+    ln_underlying = math.log(underlying)
+    ln_vol_atm = math.log(vol_atm)
+    one_minus_beta = 1.0 - beta
+    ln_alpha = ln_vol_atm + one_minus_beta * ln_underlying
+    return math.exp(ln_alpha)
+
+
+def sabr_caibration_simple(market_vols,
+                           market_strikes,
+                           option_maturity,
+                           beta,
+                           init_alpha=None,
+                           init_rho=0.1,
+                           init_nu=0.1,
+                           nu_lower_bound=1e-8,
+                           tol=1e-10):
+    """sabr_caibration_simple
+    calibrates SABR parametes, alpha, rho and nu to market volatilities
+    by simultaneously minimizing error of market volatilities.
+
+    :param array market_vols: market volatilities.
+        Middle of elements in the array must be atm volatility.
+    :param array market_strikes: market strikes.
+        Middle of elements in the array must be atm strike.
+    :param float option_maturity:
+    :param float beta: pre-determined beta.
+        beta must be within [0, 1].
+    :param float init_alpha: initial guess of alpha.
+        Default value is meaningless value, 0.1.
+        alpha must be positive.
+    :param float init_rho: initial guess of rho.
+        Default value is meaningless value, 0.1.
+        rho must be within [-1, 1].
+    :param float init_nu: initial guess of nu.
+        Default value is meaningless value, 0.1.
+        nu must be positive.
+    :param float nu_lower_bound:
+    :param float tol: tolerance of minimization.
+
+    :return: alpha, beta, rho, nu.
+    :rtype: four float value.
+
+    :raise AssertionError: if length of `market_vols` is not odd.
+    :raise AssertionError:
+        if length of `market_vols` and `market_strikes` are not same.
+    """
+    assert len(market_vols) % 2 == 1, \
+        "lenght of makret_vols must be odd"
+    assert len(market_strikes) == len(market_vols), \
+        "market_vols and market_strikes must be same lenght"
+
+    # atm strike is underlying
+    underlying = market_strikes[int(len(market_strikes) / 2)]
+    vol_atm = market_vols[int(len(market_vols) / 2)]
+
+    if init_alpha is None:
+        init_alpha = _guess_alpha_from_vol_atm(underlying, vol_atm, beta)
+
+    # parameter check
+    assert(underlying > 0.0)
+    assert(vol_atm > 0.0)
+    assert(0.0 <= beta <= 1.0)
+    assert(init_alpha > 0.0)
+    assert(-1.0 <= init_rho <= 1.0)
+    assert(init_nu > 0.0)
+
+    # 3-dim func
+    # (alpha, rho, nu)
+    def objective_func(alpha_rho_nu):
+        sabr_vols = [analytic_formula.sabr_implied_vol_hagan(
+            underlying,
+            strike,
+            option_maturity,
+            alpha_rho_nu[0],
+            beta,
+            alpha_rho_nu[1],
+            alpha_rho_nu[2]) for strike in market_strikes]
+        return np.linalg.norm(np.subtract(market_vols, sabr_vols)) ** 2
+
+    result = scipy.optimize.minimize(
+        objective_func,
+        [init_alpha, init_rho, init_nu],
+        method="L-BFGS-B",
+        bounds=((0.0, None), (-1.0, 1.0), (nu_lower_bound, None)),
+        tol=tol)
+    alpha, rho, nu = result.x
+    return alpha, beta, rho, nu
 
 
 def _is_real_and_positive(val):
@@ -213,10 +324,10 @@ def sabr_caibration_west(market_vols,
     :raise AssertionError:
         if length of `market_vols` and `market_strikes` are not same.
     """
-    assert(len(market_vols) % 2 == 1,
-           "lenght of makret_vols must be odd")
-    assert(len(market_strikes) == len(market_vols),
-           "market_vols and market_strikes must be same lenght")
+    assert len(market_vols) % 2 == 1, \
+        "lenght of makret_vols must be odd"
+    assert len(market_strikes) == len(market_vols), \
+        "market_vols and market_strikes must be same lenght"
 
     # atm strike is underlying
     underlying = market_strikes[int(len(market_strikes) / 2)]
@@ -226,6 +337,7 @@ def sabr_caibration_west(market_vols,
         return _find_alpha(underlying, option_maturity, vol_atm, beta, rho, nu)
 
     # 2-dim func
+    # (rho, nu)
     def objective_func(rho_nu):
         alpha = find_alpha(rho_nu[0], rho_nu[1])
         sabr_vols = [analytic_formula.sabr_implied_vol_hagan(

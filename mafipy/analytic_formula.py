@@ -1227,8 +1227,14 @@ def sabr_implied_vol_hagan(
     # factor2
     z = (nu * common_factor1 * log_val / alpha)
     numerator2 = math.sqrt(1.0 - 2 * rho * z + z * z) + z - rho
-    x = math.log(numerator2 / (1.0 - rho)) if abs(rho - 1.0) > 1E-10 else 1.0
-    factor2 = 1.0 if (abs(x - z) < 1E-10) else z / x
+    if numerator2 <= 0.0:
+        factor2 = 0.0
+    elif np.isclose(abs(1.0 - rho), 0.0):
+        x = 1.0
+        factor2 = 1.0 if (abs(x - z) < 1E-10) else z / x
+    else:
+        x = math.log(numerator2 / (1.0 - rho))
+        factor2 = 1.0 if (abs(x - z) < 1E-10) else z / x
     # factor3
     numerator31 = one_minus_beta2 * (alpha ** 2)
     denominator31 = 24.0 * ((underlying * strike) ** one_minus_beta)
