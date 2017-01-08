@@ -1072,15 +1072,9 @@ def calc_local_vol_model_implied_vol(
     return local_vol_val * term
 
 
-def calc_sabr_implied_vol(
-        underlying,
-        strike,
-        maturity,
-        alpha,
-        beta,
-        rho,
-        nu):
-    """calc_sabr_model_implied_vol
+def sabr_implied_vol_hagan(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """sabr_implied_vol_hagan
     calculate implied volatility under SABR model.
 
     .. math::
@@ -1198,14 +1192,9 @@ def calc_sabr_implied_vol(
     return factor1 * factor2 * factor3
 
 
-def calc_sabr_atm_implied_vol(
-        underlying,
-        maturity,
-        alpha,
-        beta,
-        rho,
-        nu):
-    """calc_sabr_atm_implied_vol
+def sabr_atm_implied_vol_hagan(
+        underlying, maturity, alpha, beta, rho, nu):
+    """sabr_atm_implied_vol_hagan
     calculate implied volatility under SABR model at the money.
 
     .. math::
