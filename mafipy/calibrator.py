@@ -154,10 +154,10 @@ def sabr_caibration_simple(market_vols,
     :raise AssertionError:
         if length of `market_vols` and `market_strikes` are not same.
     """
-    assert(len(market_vols) % 2 == 1,
-           "lenght of makret_vols must be odd")
-    assert(len(market_strikes) == len(market_vols),
-           "market_vols and market_strikes must be same lenght")
+    assert len(market_vols) % 2 == 1, \
+        "lenght of makret_vols must be odd"
+    assert len(market_strikes) == len(market_vols), \
+        "market_vols and market_strikes must be same lenght"
 
     # atm strike is underlying
     underlying = market_strikes[int(len(market_strikes) / 2)]
@@ -324,10 +324,10 @@ def sabr_caibration_west(market_vols,
     :raise AssertionError:
         if length of `market_vols` and `market_strikes` are not same.
     """
-    assert(len(market_vols) % 2 == 1,
-           "lenght of makret_vols must be odd")
-    assert(len(market_strikes) == len(market_vols),
-           "market_vols and market_strikes must be same lenght")
+    assert len(market_vols) % 2 == 1, \
+        "lenght of makret_vols must be odd"
+    assert len(market_strikes) == len(market_vols), \
+        "market_vols and market_strikes must be same lenght"
 
     # atm strike is underlying
     underlying = market_strikes[int(len(market_strikes) / 2)]
