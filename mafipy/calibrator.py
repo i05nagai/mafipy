@@ -123,7 +123,7 @@ def sabr_caibration_simple(market_vols,
                            init_rho=0.1,
                            init_nu=0.1,
                            nu_lower_bound=1e-8,
-                           tol=1e-8):
+                           tol=1e-10):
     """sabr_caibration_simple
     calibrates SABR parametes, alpha, rho and nu to market volatilities
     by simultaneously minimizing error of market volatilities.
