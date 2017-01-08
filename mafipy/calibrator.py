@@ -99,13 +99,15 @@ def _guess_alpha_from_vol_atm(underlying, vol_atm, beta):
         \ln\sigma(F, F)
             \\approx \ln \\alpha - (1 - \\beta) \ln F
 
-    :param float underlying:
-    :param float vol_atm: volatility at the money.
+    :param float underlying: must be positive.
+    :param float vol_atm: volatility at the money. This must be positive.
     :param float beta:
 
     :return: alpha.
     :rtype: float.
     """
+    assert(underlying > 0.0)
+    assert(vol_atm > 0.0)
     ln_underlying = math.log(underlying)
     ln_vol_atm = math.log(vol_atm)
     one_minus_beta = 1.0 - beta
@@ -131,12 +133,16 @@ def sabr_caibration_simple(market_vols,
         Middle of elements in the array must be atm strike.
     :param float option_maturity:
     :param float beta: pre-determined beta.
+        beta must be within [0, 1].
     :param float init_alpha: initial guess of alpha.
         Default value is meaningless value, 0.1.
-    :param float init_rho: initial guess of beta.
+        alpha must be positive.
+    :param float init_rho: initial guess of rho.
         Default value is meaningless value, 0.1.
+        rho must be within [-1, 1].
     :param float init_nu: initial guess of nu.
         Default value is meaningless value, 0.1.
+        nu must be positive.
     :param float nu_lower_bound:
 
     :return: alpha, beta, rho, nu.
@@ -157,6 +163,14 @@ def sabr_caibration_simple(market_vols,
 
     if init_alpha is None:
         init_alpha = _guess_alpha_from_vol_atm(underlying, vol_atm, beta)
+
+    # parameter check
+    assert(underlying > 0.0)
+    assert(vol_atm > 0.0)
+    assert(0.0 <= beta <= 1.0)
+    assert(init_alpha > 0.0)
+    assert(-1.0 <= init_rho <= 1.0)
+    assert(init_nu > 0.0)
 
     # 3-dim func
     # (alpha, rho, nu)
