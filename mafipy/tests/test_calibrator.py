@@ -138,7 +138,7 @@ class TestModelCalibrator:
         # for travis CI tests
         assert 0.0729991374 == approx(alpha, rel=1e-4)
         assert expect_beta == approx(beta)
-        assert -0.3051180437 == approx(rho)
+        assert -0.3051180437 == approx(rho, rel=5e-3)
         assert 2.5609685118e-05 == approx(nu)
 
         # beta 1.0
