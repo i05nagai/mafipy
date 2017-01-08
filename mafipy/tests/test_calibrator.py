@@ -134,11 +134,11 @@ class TestModelCalibrator:
                                                              init_rho=0.2,
                                                              init_nu=1.0,
                                                              nu_lower_bound=1e-8,
-                                                             tol=1e-12)
-        assert 0.07298722681 == approx(alpha)
+                                                             tol=1e-32)
+        assert 0.0729991374 == approx(alpha)
         assert expect_beta == approx(beta)
-        assert -0.30511803563 == approx(rho)
-        assert 2.56109959961e-05 == approx(nu)
+        assert -0.3051180437 == approx(rho)
+        assert 2.5609685118e-05 == approx(nu)
 
         # beta 1.0
         expect_beta = 1.0
