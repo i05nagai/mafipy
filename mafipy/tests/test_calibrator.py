@@ -103,3 +103,45 @@ class TestModelCalibrator:
                                                         option_maturity,
                                                         option_value)
         assert implied_vol == approx(vol)
+
+    def test_sabr_calibration_west(self):
+        market_vols = [45.6, 41.6, 37.9, 36.6, 37.8, 39.2, 40.0]
+        market_vols = [vol / 100.0 for vol in market_vols]
+        market_strikes = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+        market_strikes = [strike / 100.0 for strike in market_strikes]
+        option_maturity = 3.0
+
+        # beta 0
+        expect_beta = 0.0
+        alpha, beta, rho, nu = target.sabr_caibration_west(market_vols,
+                                                           market_strikes,
+                                                           option_maturity,
+                                                           expect_beta)
+        assert 0.01120935448488606 == approx(alpha)
+        assert expect_beta == approx(beta)
+        assert 0.42563951834424474 == approx(rho)
+        assert 0.84492709640795993 == approx(nu)
+
+        # beta 0.5
+        expect_beta = 0.5
+        alpha, beta, rho, nu = target.sabr_caibration_west(market_vols,
+                                                           market_strikes,
+                                                           option_maturity,
+                                                           expect_beta)
+        assert 0.05847588694407545 == approx(alpha)
+        assert expect_beta == approx(beta)
+        assert 0.20565391641295228 == approx(rho)
+        assert 0.79689209024466956 == approx(nu)
+
+        # beta 1.0
+        expect_beta = 1.0
+        alpha, beta, rho, nu = target.sabr_caibration_west(market_vols,
+                                                           market_strikes,
+                                                           option_maturity,
+                                                           expect_beta,
+                                                           init_rho=0.3,
+                                                           init_nu=0.8)
+        assert 0.31548238677601786 == approx(alpha)
+        assert expect_beta == approx(beta)
+        assert -0.030890193169276017 == approx(rho)
+        assert 0.81566639230647286 == approx(nu)

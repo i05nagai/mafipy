@@ -951,7 +951,7 @@ class TestAnalytic(object):
         "underlying, strike, maturity, alpha, beta, rho, nu", [
             (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
         ])
-    def test_calc_sabr_implied_vol(
+    def test_sabr_implied_vol_hagan(
             self, underlying, strike, maturity, alpha, beta, rho, nu):
         one_minus_beta = 1.0 - beta
         one_minus_beta2 = one_minus_beta ** 2
@@ -989,7 +989,7 @@ class TestAnalytic(object):
         expect = factor1 * factor2 * factor3
 
         # actual
-        actual = target.calc_sabr_implied_vol(
+        actual = target.sabr_implied_vol_hagan(
             underlying, strike, maturity, alpha, beta, rho, nu)
         assert expect == actual
 
@@ -998,7 +998,7 @@ class TestAnalytic(object):
         "underlying, maturity, alpha, beta, rho, nu", [
             (0.0357, 2, 0.036, 0.5, -0.25, 0.35)
         ])
-    def test_calc_sabr_atm_implied_vol(
+    def test_sabr_atm_implied_vol_hagan(
             self, underlying, maturity, alpha, beta, rho, nu):
         one_minus_beta = 1.0 - beta
         one_minus_beta2 = one_minus_beta ** 2
@@ -1019,7 +1019,7 @@ class TestAnalytic(object):
         # expect
         expect = factor1 * factor2
         # actual
-        actual = target.calc_sabr_atm_implied_vol(
+        actual = target.sabr_atm_implied_vol_hagan(
             underlying, maturity, alpha, beta, rho, nu)
         assert expect == actual
 
