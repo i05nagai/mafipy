@@ -122,7 +122,8 @@ def sabr_caibration_simple(market_vols,
                            init_alpha=None,
                            init_rho=0.1,
                            init_nu=0.1,
-                           nu_lower_bound=1e-8):
+                           nu_lower_bound=1e-8,
+                           tol=1e-8):
     """sabr_caibration_simple
     calibrates SABR parametes, alpha, rho and nu to market volatilities
     by simultaneously minimizing error of market volatilities.
@@ -144,6 +145,7 @@ def sabr_caibration_simple(market_vols,
         Default value is meaningless value, 0.1.
         nu must be positive.
     :param float nu_lower_bound:
+    :param float tol: tolerance of minimization.
 
     :return: alpha, beta, rho, nu.
     :rtype: four float value.
@@ -189,7 +191,8 @@ def sabr_caibration_simple(market_vols,
         objective_func,
         [init_alpha, init_rho, init_nu],
         method="L-BFGS-B",
-        bounds=((0.0, None), (-1.0, 1.0), (nu_lower_bound, None)))
+        bounds=((0.0, None), (-1.0, 1.0), (nu_lower_bound, None)),
+        tol=tol)
     alpha, rho, nu = result.x
     return alpha, beta, rho, nu
 
