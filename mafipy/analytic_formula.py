@@ -1154,13 +1154,15 @@ def sabr_implied_vol_hagan(
     :rtype: float.
     """
     if alpha <= 0.0:
-        raise ValueError("alpha must be greater than 0.")
+        raise ValueError("alpha({0}) must be greater than 0.".format(alpha))
     if rho > 1.0 or rho < -1.0:
-        raise ValueError("rho must be between -1 and 1.")
+        raise ValueError("rho({0}) must be between -1 and 1.".format(rho))
     if nu <= 0.0:
-        raise ValueError("nu must be greater than 0.")
+        raise ValueError("nu must be greater than 0.".format(nu))
     if underlying <= 0.0:
-        raise ValueError("Approximation not defined for non-positive underlying.")
+        raise ValueError(
+            "Approximation not defined for non-positive underlying({0})."
+            .format(underlying))
 
     log_val = math.log(underlying / strike)
     log_val2 = log_val ** 2
