@@ -1155,7 +1155,8 @@ def sabr_implied_vol_hagan(
     """
     if alpha <= 0.0:
         raise ValueError("alpha({0}) must be greater than 0.".format(alpha))
-    if rho > 1.0 or rho < -1.0:
+    if ((rho > 1.0 and not np.isclose(rho, 1.0))
+            or (rho < -1.0 and not np.isclose(rho, -1.0))):
         raise ValueError("rho({0}) must be between -1 and 1.".format(rho))
     if nu <= 0.0:
         raise ValueError("nu must be greater than 0.".format(nu))
