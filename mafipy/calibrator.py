@@ -320,6 +320,7 @@ def sabr_caibration_west(market_vols,
         return _find_alpha(underlying, option_maturity, vol_atm, beta, rho, nu)
 
     # 2-dim func
+    # (rho, nu)
     def objective_func(rho_nu):
         alpha = find_alpha(rho_nu[0], rho_nu[1])
         sabr_vols = [analytic_formula.sabr_implied_vol_hagan(
