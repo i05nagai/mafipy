@@ -119,10 +119,10 @@ class TestModelCalibrator:
                                                              expect_beta,
                                                              init_alpha=1.0,
                                                              init_nu=0.4)
-        assert 0.0135724377 == approx(alpha)
+        assert 0.0116352114 == approx(alpha)
         assert expect_beta == approx(beta)
-        assert 0.8879962646 == approx(rho)
-        assert 0.3376939549 == approx(nu)
+        assert 0.4495084250 == approx(rho)
+        assert 0.7902295128 == approx(nu)
 
         # beta 0.5
         expect_beta = 0.5
@@ -133,10 +133,10 @@ class TestModelCalibrator:
                                                              init_alpha=1.0,
                                                              init_rho=0.4,
                                                              init_nu=1.0)
-        assert 0.072998468816 == approx(alpha)
+        assert 0.0729983863 == approx(alpha)
         assert expect_beta == approx(beta)
-        assert -0.002287560228 == approx(rho)
-        assert 1e-08 == approx(nu)
+        assert -0.0022693202 == approx(rho)
+        assert 7.2087802678e-06 == approx(nu)
 
         # beta 1.0
         expect_beta = 1.0
@@ -144,10 +144,10 @@ class TestModelCalibrator:
                                                              market_strikes,
                                                              option_maturity,
                                                              expect_beta)
-        assert 0.3242845824 == approx(alpha)
+        assert 0.3242804455 == approx(alpha)
         assert expect_beta == approx(beta)
-        assert -0.041674869 == approx(rho)
-        assert 0.779416715 == approx(nu)
+        assert -0.0416661971 == approx(rho)
+        assert 0.7794312489 == approx(nu)
 
     def test_sabr_calibration_west(self):
         market_vols = [45.6, 41.6, 37.9, 36.6, 37.8, 39.2, 40.0]
