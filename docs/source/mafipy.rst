@@ -7,6 +7,7 @@ Submodules
 .. toctree::
 
    mafipy.analytic_formula
+   mafipy.calibrator
    mafipy.error
    mafipy.math_formula
    mafipy.payoff
