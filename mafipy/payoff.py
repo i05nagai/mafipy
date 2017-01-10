@@ -70,7 +70,7 @@ def payoff_bull_spread(underlying, lower_strike, upper_strike, gearing=1.0):
 
     .. math::
 
-        g(\max(S - K_{\mathrm{lower}}, 0) - \min(K_{\mathrm{upper}} - S, 0))
+        g(\max(S - K_{\mathrm{lower}}, 0) - \min(S - K_{\mathrm{upper}}, 0))
         = g\min(K_{\mathrm{upper}}, \max(S - K_{\mathrm{lower}}))
 
     where :math:`S` is underlying, :math:`g` is gearing.
