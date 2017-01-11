@@ -1118,6 +1118,9 @@ def calc_local_vol_model_implied_vol(
     return local_vol_val * term
 
 
+# ----------------------------------------------------------------------------
+# SABR model
+# ----------------------------------------------------------------------------
 def sabr_implied_vol_hagan(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """sabr_implied_vol_hagan
@@ -1290,6 +1293,389 @@ def sabr_atm_implied_vol_hagan(
     term3 = (2.0 - 3.0 * rho * rho) * nu * nu / 24.0
     vol = (alpha / A) * (1 + (term1 + term2 + term3) * maturity)
     return vol
+
+
+def _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    return (underlying * strike) ** ((1.0 - beta) / 2.0)
+
+
+def _sabr_implied_vol_hagan_A11_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    one_plus_beta_half = (1.0 + beta) / 2.0
+
+    factor = (one_minus_beta_half * (underlying ** one_minus_beta_half))
+    return factor * (strike ** (-one_plus_beta_half))
+
+
+def _sabr_implied_vol_hagan_A11_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    one_plus_beta_half = (1.0 + beta) / 2.0
+    three_plus_beta_half = (3.0 + beta) / 2.0
+
+    factor = -(one_minus_beta_half
+               * (underlying ** one_minus_beta_half)
+               * one_plus_beta_half)
+    return factor * (strike ** (-three_plus_beta_half))
+
+
+def _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta = 1.0 - beta
+    one_minus_beta2 = one_minus_beta ** 2
+    one_minus_beta4 = one_minus_beta ** 4
+    ln_moneyness = math.log(underlying / strike)
+    ln_moneyness2 = ln_moneyness ** 2
+    ln_moneyness4 = ln_moneyness ** 4
+
+    term1 = one_minus_beta2 * ln_moneyness2 / 24.0
+    term2 = one_minus_beta4 * ln_moneyness4 / 1920.0
+    return 1.0 + term1 + term2
+
+
+def _sabr_implied_vol_hagan_A12_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(underlying / strike > 0.0)
+    assert(not np.isclose(strike, 0.0))
+
+    one_minus_beta = 1.0 - beta
+    one_minus_beta2 = one_minus_beta ** 2
+    one_minus_beta4 = one_minus_beta ** 4
+    ln_moneyness = math.log(underlying / strike)
+    ln_moneyness3 = ln_moneyness ** 3
+
+    term1 = -one_minus_beta2 * ln_moneyness / 12.0
+    term2 = -one_minus_beta4 * ln_moneyness3 / 480.0
+    return (term1 + term2) / strike
+
+
+def _sabr_implied_vol_hagan_A12_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(underlying / strike > 0.0)
+    assert(not np.isclose(strike, 0.0))
+
+    one_minus_beta = 1.0 - beta
+    one_minus_beta2 = one_minus_beta ** 2
+    one_minus_beta4 = one_minus_beta ** 4
+    ln_moneyness = math.log(underlying / strike)
+    ln_moneyness2 = ln_moneyness ** 2
+
+    term1 = one_minus_beta2 / 12.0
+    term2 = one_minus_beta4 * ln_moneyness2 / 160.0
+    return (term1 + term2) / (strike ** 2)
+
+
+def _sabr_implied_vol_hagan_A1(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(underlying / strike > 0.0)
+
+    A11 = _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12 = _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    return A11 * A12
+
+
+def _sabr_implied_vol_hagan_A1_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A11 = _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fprime = _sabr_implied_vol_hagan_A11_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    A12 = _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fprime = _sabr_implied_vol_hagan_A12_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    return A11 * A12_fprime + A11_fprime * A12
+
+
+def _sabr_implied_vol_hagan_A1_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A11 = _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fprime = _sabr_implied_vol_hagan_A11_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fhess = _sabr_implied_vol_hagan_A11_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    A12 = _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fprime = _sabr_implied_vol_hagan_A12_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fhess = _sabr_implied_vol_hagan_A12_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    return A11 * A12_fhess + 2.0 * A11_fprime * A12_fprime + A11_fhess * A12
+
+
+def _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    ln_moneyness = math.log(underlying / strike)
+
+    factor1 = nu / alpha
+    factor2 = (underlying * strike) ** one_minus_beta_half
+    return factor1 * factor2 * ln_moneyness
+
+
+def _sabr_implied_vol_hagan_A2_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(alpha > 0.0)
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    one_plus_beta_half = (1.0 + beta) / 2.0
+    ln_moneyness = math.log(underlying / strike)
+
+    factor1 = (underlying ** one_minus_beta_half) * nu / alpha
+    factor2 = strike ** (-one_plus_beta_half)
+    factor3 = ln_moneyness - 1.0
+    return factor1 * factor2 * factor3
+
+
+def _sabr_implied_vol_hagan_A2_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    assert(alpha > 0.0)
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    one_plus_beta_half = (1.0 + beta) / 2.0
+    three_plus_beta_half = (3.0 + beta) / 2.0
+    ln_moneyness = math.log(underlying / strike)
+
+    factor1 = (underlying ** one_minus_beta_half) * nu / alpha
+    factor2 = strike ** (-three_plus_beta_half)
+    factor3 = -one_plus_beta_half * ln_moneyness - one_minus_beta_half
+    return factor1 * factor2 * factor3
+
+
+def _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    assert(1.0 - 2.0 * rho * A2 + A2 * A2 >= 0.0)
+    return math.sqrt(1.0 - 2.0 * rho * A2 + A2 * A2) + A2 - rho
+
+
+def _sabr_implied_vol_hagan_A31_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    assert(1.0 - 2.0 * rho * A2 + A2 * A2 > 0.0)
+
+    numerator = (-rho + A2) * A2_fprime
+    denominator = math.sqrt(1.0 - 2.0 * rho * A2 + A2 * A2)
+    return numerator / denominator + 1.0
+
+
+def _sabr_implied_vol_hagan_A31_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fhess = _sabr_implied_vol_hagan_A2_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    sqrt_inner = 1.0 - 2.0 * rho * A2 + A2 * A2
+    assert(sqrt_inner > 0.0)
+
+    factor11 = -rho * A2_fhess + A2_fprime ** 2 + A2 * A2_fprime
+    term1 = factor11 * math.sqrt(sqrt_inner)
+    term2 = (-rho * A2_fprime + A2 * A2_fprime) ** 2
+    numerator = term1 + term2
+    denominator = (sqrt_inner) ** 1.5
+    return numerator / denominator
+
+
+def _sabr_implied_vol_hagan_A3(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A31 = _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    assert(A31 / (1.0 - rho) > 0.0)
+    return math.log(A31 / (1.0 - rho))
+
+
+def _sabr_implied_vol_hagan_A3_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A31 = _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fprime = _sabr_implied_vol_hagan_A31_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    assert(not np.isclose(A31, 0.0))
+    return A31_fprime / A31
+
+
+def _sabr_implied_vol_hagan_A3_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A31 = _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fprime = _sabr_implied_vol_hagan_A31_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fhess = _sabr_implied_vol_hagan_A31_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    term1 = -((A31_fprime / A31) ** 2)
+    term2 = A31_fhess / A31
+    return term1 + term2
+
+
+def _sabr_implied_vol_hagan_A4(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    one_minus_beta = 1.0 - beta
+    one_minus_beta_half = one_minus_beta / 2.0
+    one_minus_beta2 = one_minus_beta ** 2
+
+    numerator1 = one_minus_beta2 * alpha * alpha
+    denominator1 = 24.0 * ((underlying * strike) ** one_minus_beta)
+    term1 = numerator1 / denominator1
+
+    numerator2 = rho * beta * nu * alpha
+    denominator2 = 4.0 * ((underlying * strike) ** one_minus_beta_half)
+    term2 = numerator2 / denominator2
+
+    term3 = (2.0 - 3.0 * rho * rho) * nu * nu / 24.0
+
+    return 1.0 + (term1 + term2 + term3) * maturity
+
+
+def _sabr_implied_vol_hagan_A4_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    one_minus_beta = 1.0 - beta
+    one_minus_beta_half = one_minus_beta / 2.0
+    one_minus_beta2 = one_minus_beta ** 2
+    two_minus_beta = 2.0 - beta
+    three_minus_beta_half = (3.0 - beta) / 2.0
+
+    numerator1 = one_minus_beta2 * (alpha ** 2) * (strike ** (-two_minus_beta))
+    denominator1 = 24.0 * (underlying ** one_minus_beta)
+    term1 = numerator1 / denominator1
+
+    numerator2 = rho * beta * nu * alpha * (strike ** (-three_minus_beta_half))
+    denominator2 = 8.0 * (underlying ** one_minus_beta_half)
+    term2 = numerator2 / denominator2
+
+    return -(term1 + term2) * maturity * one_minus_beta
+
+
+def _sabr_implied_vol_hagan_A4_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    one_minus_beta = 1.0 - beta
+    one_minus_beta_half = one_minus_beta / 2.0
+    one_minus_beta2 = one_minus_beta ** 2
+    two_minus_beta = 2.0 - beta
+    three_minus_beta = 3.0 - beta
+    five_minus_beta_half = (5.0 - beta) / 2.0
+
+    factor1 = strike ** (-three_minus_beta)
+    numerator1 = one_minus_beta2 * (alpha ** 2) * (-two_minus_beta)
+    denominator1 = 24.0 * (underlying ** one_minus_beta)
+    term1 = numerator1 * factor1 / denominator1
+
+    factor2 = strike ** (-five_minus_beta_half)
+    numerator2 = rho * beta * nu * alpha * (-three_minus_beta)
+    denominator2 = 16.0 * (underlying ** one_minus_beta_half)
+    term2 = numerator2 * factor2 / denominator2
+
+    return -(term1 + term2) * maturity * one_minus_beta
+
+
+def sabr_implied_vol_hagan_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A1 = _sabr_implied_vol_hagan_A1(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fprime = _sabr_implied_vol_hagan_A1_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3 = _sabr_implied_vol_hagan_A3(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fprime = _sabr_implied_vol_hagan_A3_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4 = _sabr_implied_vol_hagan_A4(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fprime = _sabr_implied_vol_hagan_A4_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    factor1 = alpha / A1
+    factor2 = A2 / A3
+    factor3 = A4
+
+    factor11 = -alpha * A1_fprime / (A1 ** 2)
+    term1 = factor11 * factor2 * factor3
+
+    factor22 = A2_fprime / A3 - A2 * A3_fprime / (A3 ** 2)
+    term2 = factor1 * factor22 * factor3
+
+    factor33 = A4_fprime
+    term3 = factor1 * factor2 * factor33
+
+    return term1 + term2 + term3
+
+
+def sabr_implied_vol_hagan_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    A1 = _sabr_implied_vol_hagan_A1(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fprime = _sabr_implied_vol_hagan_A1_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fhess = _sabr_implied_vol_hagan_A1_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fhess = _sabr_implied_vol_hagan_A2_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3 = _sabr_implied_vol_hagan_A3(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fprime = _sabr_implied_vol_hagan_A3_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fhess = _sabr_implied_vol_hagan_A3_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4 = _sabr_implied_vol_hagan_A4(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fprime = _sabr_implied_vol_hagan_A4_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fhess = _sabr_implied_vol_hagan_A4_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    factor1 = alpha / A1
+    A1_2 = A1 ** 2
+    fprime1 = -alpha * A1_fprime / A1_2
+    fhess1 = -alpha * (-2.0 * (A1_fprime ** 2) / (A1 ** 3) + A1_fhess / A1_2)
+
+    factor2 = A2 / A3
+    A3_2 = A3 ** 2
+    fprime2 = A2_fprime / A3 - 2.0 * A2 * A3_fprime / A3_2
+    fhess2 = (A2_fhess / A3
+              - 2.0 * A2_fprime * A3_fprime / A3_2
+              - A2 * A3_fhess / A3_2
+              + 2.0 * A2 * (A3_fprime ** 2) / (A3 ** 3))
+
+    factor3 = A4
+    fprime3 = A4_fprime
+    fhess3 = A4_fhess
+
+    term1 = fhess1 * factor2 * factor3
+    term2 = factor1 * fhess2 * factor3
+    term3 = factor1 * factor2 * fhess3
+    term4 = 2.0 * fprime1 * fprime2 * factor3
+    term5 = 2.0 * fprime1 * factor2 * fprime3
+    term6 = 2.0 * factor1 * fprime2 * fprime3
+    return term1 + term2 + term3 + term4 + term5 + term6
 
 
 class BlackScholesPricerHelper(object):

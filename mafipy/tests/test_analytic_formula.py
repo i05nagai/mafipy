@@ -946,6 +946,9 @@ class TestAnalytic(object):
             assert expect == actual
         case2()
 
+    # -------------------------------------------------------------------------
+    # SABR model
+    # -------------------------------------------------------------------------
     # TODO: add more test cases
     @pytest.mark.parametrize(
         "underlying, strike, maturity, alpha, beta, rho, nu", [
@@ -1022,6 +1025,45 @@ class TestAnalytic(object):
         actual = target.sabr_atm_implied_vol_hagan(
             underlying, maturity, alpha, beta, rho, nu)
         assert expect == actual
+
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model_sabr_implied_vol_hagan(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        vol1 = target.sabr_implied_vol_hagan(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        A1 = target._sabr_implied_vol_hagan_A1(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+        A2 = target._sabr_implied_vol_hagan_A2(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+        A3 = target._sabr_implied_vol_hagan_A3(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+        A4 = target._sabr_implied_vol_hagan_A4(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+        vol2 = alpha * A2 * A4 / (A1 * A3)
+
+        assert vol1 == approx(vol2)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model_sabr_implied_vol_hagan_fprime_by_strike(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-5
+        vol1 = target.sabr_implied_vol_hagan(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        vol2 = target.sabr_implied_vol_hagan(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        vol_diff = (vol1 - vol2) / (2.0 * shock)
+
+        vol_analytic = target.sabr_implied_vol_hagan_fprime_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert vol_analytic == approx(vol_diff)
 
 
 class TestBlackScholesPricerHelper:
