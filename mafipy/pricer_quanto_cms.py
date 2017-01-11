@@ -1405,7 +1405,6 @@ def replicate(init_swap_rate,
                                      put_pricer,
                                      min_put_range,
                                      max_call_range)
-    print(" numerator:", numerator)
     denominator = _replicate_denominator(init_swap_rate,
                                          call_pricer,
                                          put_pricer,
@@ -1413,5 +1412,4 @@ def replicate(init_swap_rate,
                                          forward_fx_diffusion_helper,
                                          min_put_range,
                                          max_call_range)
-    print(" denominator:", denominator)
     return discount_factor * numerator / denominator
