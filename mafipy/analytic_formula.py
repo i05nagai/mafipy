@@ -461,7 +461,11 @@ def black_scholes_call_value_third_by_strike(
     :rtype: float.
     """
     norm = scipy.stats.norm
-    assert(maturity > 0.0)
+    assert(vol > 0.0)
+
+    # option is expired
+    if maturity < 0.0 or np.isclose(maturity, 0.0):
+        return 0.0
 
     discount = math.exp(-rate * maturity)
     d2 = func_d2(underlying, strike, rate, maturity, vol)
