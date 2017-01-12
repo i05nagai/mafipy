@@ -342,15 +342,23 @@ class TestAnalytic(object):
             (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
             # maturity < 0 raise AssertionError
             (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.1, -0.1, 0.0),
         ])
     def test_black_scholes_call_value_third_by_strike(
             self, underlying, strike, rate, maturity, vol, today):
 
         # raise AssertionError
-        if maturity < 0.0 or vol < 0.0:
+        if vol < 0.0:
             with pytest.raises(AssertionError):
                 actual = target.black_scholes_call_value_third_by_strike(
                     underlying, strike, rate, maturity, vol)
+            return
+        if maturity < 0.0:
+            expect = 0.0
+            actual = target.black_scholes_call_value_third_by_strike(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
         else:
             norm = scipy.stats.norm
             # double checking implimentation of formula
