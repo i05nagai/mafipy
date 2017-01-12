@@ -240,7 +240,7 @@ def make_cdf_black_scholes(
             underlying, strike, rate, maturity, vol))
 
 
-def _calc_h(swap_rate_cdf, swap_rate):
+def _calc_h(swap_rate_cdf, swap_rate, min_prob=1e-16, max_prob=0.99999):
     """_calc_h
     calculates following value:
 
@@ -257,12 +257,17 @@ def _calc_h(swap_rate_cdf, swap_rate):
 
     :param float swap_rate_cdf:
     :param float swap_rate:
+    :param float min_prob: lower bound of swap rate probability.
+        Default value is 1e-16.
+    :param float max_prob: upper bound of swap rate probability.
+        Default value is 0.99999.
+
     :return: :math:`\Phi^{-1}(\Phi^{A}(s))`.
     :rtype: float
     """
     prob = swap_rate_cdf(swap_rate)
-    prob = max(1e-16, prob)
-    # prob = min(9.0, prob)
+    prob = max(min_prob, prob)
+    prob = min(max_prob, prob)
 
     return scipy.stats.norm.ppf(prob)
 
