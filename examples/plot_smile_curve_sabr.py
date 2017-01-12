@@ -121,7 +121,7 @@ def calc_smile(strikes, **param):
     r = param["rho"]
     n = param["nu"]
     return [
-        af.calc_sabr_implied_vol(
+        af.sabr_implied_vol_hagan(
             u, strike, m, a, b, r, n) for strike in strikes
     ]
 
