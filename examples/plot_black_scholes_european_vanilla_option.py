@@ -97,9 +97,9 @@ def main():
     strike = STRIKE
 
     # price
-    prices_call = [af.calc_black_scholes_call_value(
+    prices_call = [af.black_scholes_call_value(
         underlying, strike, rate, maturity, vol) for underlying in underlyings]
-    prices_put = [af.calc_black_scholes_put_value(
+    prices_put = [af.black_scholes_put_value(
         underlying, strike, rate, maturity, vol) for underlying in underlyings]
     payoffs_call = [payoff.payoff_call(
         underlying, strike) for underlying in underlyings]
