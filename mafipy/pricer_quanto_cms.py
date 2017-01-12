@@ -1185,11 +1185,11 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
         terms = [func1]
         if self.min_put_range <= self.payoff_lower_strike <= self.max_put_range:
             terms.append(func21)
+        elif self.min_call_range <= self.payoff_lower_strike <= self.max_call_range:
+            terms.append(func31)
         if self.min_put_range <= self.payoff_upper_strike <= self.max_put_range:
             terms.append(func22)
-        if self.min_call_range <= self.payoff_lower_strike <= self.max_call_range:
-            terms.append(func31)
-        if self.min_call_range <= self.payoff_upper_strike <= self.max_call_range:
+        elif self.min_call_range <= self.payoff_upper_strike <= self.max_call_range:
             terms.append(func32)
         return terms
 
