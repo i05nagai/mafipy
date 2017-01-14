@@ -1,0 +1,38 @@
+machine:
+  # Set the timezone
+  timezone: America/Los_Angeles 
+  python:
+    version: 3.5.2
+  # Add some environment variables
+  environment:
+    - COVERAGE="false"
+    - SKIP_TESTS="true"
+    - CODECLIMATE_COVERAGE_REPORT="false"
+    - PERFORMANCE_TEST="true"
+## Customize checkout
+checkout:
+  # use submodules
+  post:
+    - git submodule sync
+    - git submodule update --init 
+## Customize dependencies
+dependencies:
+  pre:
+  override:
+    - bash ci/circle_ci/dependencies.sh
+        timeout: 180 # fail if command has no output for 3 minutes
+  # we automatically cache and restore many dependencies between
+  # builds. If you need to, you can add custom paths to cache:
+  cache_directories:
+    - "~/.cache" # relative to the user's home directory
+## Customize test commands
+test:
+  override:
+    - bash ci/circle_ci/test.sh
+deployment:
+  benchmarks:
+    branch: master
+    commands:
+      - bash ci/circle_ci/deployment.sh
+## Custom notifications
+notify:
