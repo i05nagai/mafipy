@@ -18,7 +18,6 @@ pip install scipy
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
-python -c "import pytest; print('pytest %s' % pytest.__version__)"
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
 	pip install asv
