@@ -5,10 +5,7 @@ machine:
     version: 3.5.2
   # Add some environment variables
   environment:
-    COVERAGE: "false"
-    SKIP_TESTS: "true"
-    CODECLIMATE_COVERAGE_REPORT: "false"
-    PERFORMANCE_TEST: "true"
+    BENCHMARK_TEST: "true"
 ## Customize checkout
 checkout:
   # use submodules
