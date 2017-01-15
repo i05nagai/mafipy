@@ -6,6 +6,7 @@ set -x
 echo 'List files from cached directories'
 echo 'pip:'
 ls $HOME/.cache/pip
+ls -la
 
 # Set up our own virtualenv environment to avoid travis' numpy.
 # This venv points to the python interpreter of the travis build
@@ -22,5 +23,5 @@ python -c "import scipy; print('scipy %s' % scipy.__version__)"
 if [ "${BENCHMARK_TEST}" = "true" ]; then
 	pip install asv
 	pip install virtualenv
-	cp ci/circle_ci/.asv-machine.json ~/.asv-machine.json
+	cp ~/mafipy/ci/circle_ci/.asv-machine.json ~/.asv-machine.json
 fi

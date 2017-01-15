@@ -13,7 +13,6 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 	# Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 	if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$CIRCLE_BRANCH" != "$TEST_BRANCH" ]; then
 		echo "Skipping deploy; just doing a build."
-		curl https://api.csswg.org/bikeshed/ -f -F file=@index.bs > index.html;
 		exit 0
 	fi
 
@@ -24,7 +23,7 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 	BENCHMARKED_SHA1="$CIRCLE_SHA1"
 
 	# move to submodule
-	cd benchmarks/html
+	cd ~/mafipy/benchmarks/asv_files
 	git config user.name "Circle CI"
 	git config user.email "circle_ci@i05nagai.me"
 
