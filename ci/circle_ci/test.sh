@@ -13,5 +13,5 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 	pushd benchmarks
 	python run.py run NEW
 	python run.py publish
-	popd ..
+	popd
 fi
