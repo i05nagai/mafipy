@@ -34,5 +34,5 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 
 	git add .
 	git commit -m "Deploy to GitHub Pages: ${BENCHMARKED_SHA1}"
-	git push $TARGET_REPOSITORY $TARGET_BRANCH
+	git push -f $TARGET_REPOSITORY $TARGET_BRANCH
 fi
