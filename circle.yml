@@ -6,6 +6,7 @@ machine:
   # Add some environment variables
   environment:
     BENCHMARK_TEST: "true"
+    PYTHONPATH: ~/mafipy
 ## Customize checkout
 checkout:
   # use submodules
