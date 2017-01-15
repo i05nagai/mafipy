@@ -7,6 +7,8 @@ set -x
 TEST_BRANCH="master"
 # mafipy_benchmarks/master
 TARGET_BRANCH="master"
+# origin/master of mafipy_benchmarks
+TARGET_REPOSITORY="origin"
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
 
@@ -16,9 +18,6 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 		exit 0
 	fi
 
-	# repository url
-	REPO_URL=`git config remote.origin.url`
-
 	# Save some useful information from original repository
 	BENCHMARKED_SHA1="$CIRCLE_SHA1"
 
@@ -26,7 +25,6 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 	cd ~/mafipy/benchmarks/asv_files
 	git config user.name "Circle CI"
 	git config user.email "circle_ci@i05nagai.me"
-
 
 	# If there are no changes (e.g. this is a README update) then just bail.
 	if [ -z `git diff --exit-code` ]; then
@@ -36,5 +34,5 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
 
 	git add .
 	git commit -m "Deploy to GitHub Pages: ${BENCHMARKED_SHA1}"
-	git push $REPO_URL $TARGET_BRANCH
+	git push $TARGET_REPOSITORY $TARGET_BRANCH
 fi
