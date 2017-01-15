@@ -4,9 +4,14 @@ set -e
 set -x
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
+	# for detached HEAD
+	pushd benchmarks/asv_files
+	git checkout master
+	popd
+
 	# run benchmarks test
-	cd benchmarks
+	pushd benchmarks
 	python run.py run NEW
 	python run.py publish
-	cd ..
+	popd
 fi
