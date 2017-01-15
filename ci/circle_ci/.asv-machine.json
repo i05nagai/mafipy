@@ -1,0 +1,10 @@
+{
+    "circleci_vm": {
+        "arch": "x86_64",
+        "cpu": "Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz",
+        "machine": "circleci_vm",
+        "os": "Ubuntu 14.04",
+        "ram": "251902864"
+    },
+    "version": 1
+}
