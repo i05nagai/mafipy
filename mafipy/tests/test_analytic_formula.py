@@ -1047,6 +1047,147 @@ class TestAnalytic(object):
 
         assert vol1 == approx(vol2)
 
+    # A1 fprime
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A1_fprime(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-5
+
+        A1_plus = target._sabr_implied_vol_hagan_A1(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A1_minus = target._sabr_implied_vol_hagan_A1(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A1_fprime = (A1_plus - A1_minus) / (2.0 * shock)
+
+        A1_prime_analytic = target._sabr_implied_vol_hagan_A1_fprime_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A1_prime_analytic == approx(A1_fprime)
+
+    # A1 fhess
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A1_fhess(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-6
+
+        A1_plus = target._sabr_implied_vol_hagan_A1_fprime_by_strike(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A1_minus = target._sabr_implied_vol_hagan_A1_fprime_by_strike(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A1_diff = (A1_plus - A1_minus) / (2.0 * shock)
+
+        A1_analytic = target._sabr_implied_vol_hagan_A1_fhess_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A1_analytic == approx(A1_diff, rel=5e-4)
+
+    # A2 fprime
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A2(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-5
+
+        A2_plus = target._sabr_implied_vol_hagan_A2(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A2_minus = target._sabr_implied_vol_hagan_A2(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A2_fprime = (A2_plus - A2_minus) / (2.0 * shock)
+
+        A2_prime_analytic = target._sabr_implied_vol_hagan_A2_fprime_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A2_prime_analytic == approx(A2_fprime)
+
+    # A2 fhess
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A2_fhess(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-6
+
+        A2_plus = target._sabr_implied_vol_hagan_A2_fprime_by_strike(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A2_minus = target._sabr_implied_vol_hagan_A2_fprime_by_strike(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A2_diff = (A2_plus - A2_minus) / (2.0 * shock)
+
+        A2_analytic = target._sabr_implied_vol_hagan_A2_fhess_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A2_analytic == approx(A2_diff)
+
+    # A3 fprime
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A3(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-5
+
+        A3_plus = target._sabr_implied_vol_hagan_A3(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A3_minus = target._sabr_implied_vol_hagan_A3(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A3_fprime = (A3_plus - A3_minus) / (2.0 * shock)
+
+        A3_prime_analytic = target._sabr_implied_vol_hagan_A3_fprime_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A3_prime_analytic == approx(A3_fprime)
+
+    # A3 fhess
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A3_fhess(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-6
+
+        A3_plus = target._sabr_implied_vol_hagan_A3_fprime_by_strike(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A3_minus = target._sabr_implied_vol_hagan_A3_fprime_by_strike(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A3_diff = (A3_plus - A3_minus) / (2.0 * shock)
+
+        A3_analytic = target._sabr_implied_vol_hagan_A3_fhess_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A3_analytic == approx(A3_diff)
+
+    # A4 fhess
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model__sabr_implied_vol_hagan_A4_fhess(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-6
+
+        A4_plus = target._sabr_implied_vol_hagan_A4_fprime_by_strike(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        A4_minus = target._sabr_implied_vol_hagan_A4_fprime_by_strike(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        A4_diff = (A4_plus - A4_minus) / (2.0 * shock)
+
+        A4_analytic = target._sabr_implied_vol_hagan_A4_fhess_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert A4_analytic == approx(A4_diff)
+
+    # implied vol fprime
     @pytest.mark.parametrize(
         "underlying, strike, maturity, alpha, beta, rho, nu", [
             (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
@@ -1064,6 +1205,25 @@ class TestAnalytic(object):
             underlying, strike, maturity, alpha, beta, rho, nu)
 
         assert vol_analytic == approx(vol_diff)
+
+    # implied vol fhess
+    @pytest.mark.parametrize(
+        "underlying, strike, maturity, alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model_sabr_implied_vol_hagan_fhess_by_strike(
+            self, underlying, strike, maturity, alpha, beta, rho, nu):
+        shock = 1e-5
+        vol_fprime1 = target.sabr_implied_vol_hagan_fprime_by_strike(
+            underlying, strike + shock, maturity, alpha, beta, rho, nu)
+        vol_fprime2 = target.sabr_implied_vol_hagan_fprime_by_strike(
+            underlying, strike - shock, maturity, alpha, beta, rho, nu)
+        vol_diff = (vol_fprime1 - vol_fprime2) / (2.0 * shock)
+
+        vol_analytic = target.sabr_implied_vol_hagan_fhess_by_strike(
+            underlying, strike, maturity, alpha, beta, rho, nu)
+
+        assert vol_analytic == approx(vol_diff, rel=5e-5)
 
 
 class TestBlackScholesPricerHelper:

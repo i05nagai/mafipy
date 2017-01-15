@@ -1363,10 +1363,15 @@ def _sabr_implied_vol_hagan_A12_fhess_by_strike(
     one_minus_beta4 = one_minus_beta ** 4
     ln_moneyness = math.log(underlying / strike)
     ln_moneyness2 = ln_moneyness ** 2
+    ln_moneyness3 = ln_moneyness ** 3
 
-    term1 = one_minus_beta2 / 12.0
-    term2 = one_minus_beta4 * ln_moneyness2 / 160.0
-    return (term1 + term2) / (strike ** 2)
+    strike2 = strike ** 2
+    factor1 = one_minus_beta2 / (12.0 * strike2)
+    term1 = factor1 * (ln_moneyness + 1.0)
+    # term2
+    factor2 = one_minus_beta4 / (160.0 * strike2)
+    term2 = factor2 * (ln_moneyness3 + 3.0 * ln_moneyness2)
+    return term1 + term2
 
 
 def _sabr_implied_vol_hagan_A1(
@@ -1436,7 +1441,7 @@ def _sabr_implied_vol_hagan_A2_fprime_by_strike(
 
     factor1 = (underlying ** one_minus_beta_half) * nu / alpha
     factor2 = strike ** (-one_plus_beta_half)
-    factor3 = ln_moneyness - 1.0
+    factor3 = one_minus_beta_half * ln_moneyness - 1.0
     return factor1 * factor2 * factor3
 
 
@@ -1446,14 +1451,14 @@ def _sabr_implied_vol_hagan_A2_fhess_by_strike(
     assert(underlying / strike > 0.0)
 
     one_minus_beta_half = (1.0 - beta) / 2.0
-    one_plus_beta_half = (1.0 + beta) / 2.0
     three_plus_beta_half = (3.0 + beta) / 2.0
     ln_moneyness = math.log(underlying / strike)
 
     factor1 = (underlying ** one_minus_beta_half) * nu / alpha
     factor2 = strike ** (-three_plus_beta_half)
-    factor3 = -one_plus_beta_half * ln_moneyness - one_minus_beta_half
-    return factor1 * factor2 * factor3
+
+    term1 = (beta ** 2 - 1.0) * ln_moneyness / 4.0
+    return factor1 * factor2 * (term1 + beta)
 
 
 def _sabr_implied_vol_hagan_A31(
@@ -1475,7 +1480,7 @@ def _sabr_implied_vol_hagan_A31_fprime_by_strike(
 
     numerator = (-rho + A2) * A2_fprime
     denominator = math.sqrt(1.0 - 2.0 * rho * A2 + A2 * A2)
-    return numerator / denominator + 1.0
+    return numerator / denominator + A2_fprime
 
 
 def _sabr_implied_vol_hagan_A31_fhess_by_strike(
@@ -1490,12 +1495,12 @@ def _sabr_implied_vol_hagan_A31_fhess_by_strike(
     sqrt_inner = 1.0 - 2.0 * rho * A2 + A2 * A2
     assert(sqrt_inner > 0.0)
 
-    factor11 = -rho * A2_fhess + A2_fprime ** 2 + A2 * A2_fprime
-    term1 = factor11 * math.sqrt(sqrt_inner)
+    factor1 = -rho * A2_fhess + A2_fprime ** 2 + A2 * A2_fhess
+    term1 = factor1 * sqrt_inner
     term2 = (-rho * A2_fprime + A2 * A2_fprime) ** 2
-    numerator = term1 + term2
+    numerator = term1 - term2
     denominator = (sqrt_inner) ** 1.5
-    return numerator / denominator
+    return numerator / denominator + A2_fhess
 
 
 def _sabr_implied_vol_hagan_A3(
@@ -1659,7 +1664,7 @@ def sabr_implied_vol_hagan_fhess_by_strike(
 
     factor2 = A2 / A3
     A3_2 = A3 ** 2
-    fprime2 = A2_fprime / A3 - 2.0 * A2 * A3_fprime / A3_2
+    fprime2 = A2_fprime / A3 - A2 * A3_fprime / A3_2
     fhess2 = (A2_fhess / A3
               - 2.0 * A2_fprime * A3_fprime / A3_2
               - A2 * A3_fhess / A3_2
