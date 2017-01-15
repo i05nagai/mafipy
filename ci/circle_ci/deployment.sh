@@ -11,7 +11,7 @@ TARGET_BRANCH="master"
 if [ "${BENCHMARK_TEST}" = "true" ]; then
 
 	# Pull requests and commits to other branches shouldn't try to deploy, just build to verify
-	if [ "$CI_PULL_REQUEST" == "" -o "$CIRCLE_BRANCH" != "$TEST_BRANCH" ]; then
+	if [ "$CI_PULL_REQUEST" != "" -o "$CIRCLE_BRANCH" != "$TEST_BRANCH" ]; then
 		echo "Skipping deploy; just doing a build."
 		exit 0
 	fi
