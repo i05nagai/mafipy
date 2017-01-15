@@ -1,6 +1,3 @@
 [submodule "docs/build"]
 	path = docs/build
 	url = https://github.com/i05nagai/mafipy_docs.git
-[submodule "benchmarks/html"]
-	path = benchmarks/asv_files/html
-	url = https://github.com/i05nagai/mafipy_benchmarks.git
