@@ -959,6 +959,44 @@ class TestAnalytic(object):
     # -------------------------------------------------------------------------
     # TODO: add more test cases
     @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity", [
+            (0.0357, 0.03, 1.1, 2.0)
+        ])
+    def test_sabr_payers_swaption_value(
+            self, init_swap_rate, option_strike, swap_annuity, option_maturity):
+        expect = target.black_payers_swaption_value(
+            init_swap_rate, option_strike, swap_annuity, option_maturity, 1.0)
+
+        # actual
+        def implied_vol_func(underlying, strike, maturity):
+            return 1.0
+        actual = target.sabr_payers_swaption_value(
+            init_swap_rate, option_strike, swap_annuity,
+            option_maturity, implied_vol_func)
+        assert expect == actual
+
+    # TODO: add more test cases
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity", [
+            (0.0357, 0.03, 1.1, 2.0)
+        ])
+    def test_sabr_receivers_swaption_value(
+            self, init_swap_rate, option_strike, swap_annuity, option_maturity):
+        def implied_vol_func(underlying, strike, maturity):
+            return 1.0
+        call_value = target.sabr_payers_swaption_value(
+            init_swap_rate, option_strike, swap_annuity, option_maturity, implied_vol_func)
+        forward_value = swap_annuity * (init_swap_rate - option_strike)
+        expect = call_value - forward_value
+
+        # actual
+        actual = target.sabr_receivers_swaption_value(
+            init_swap_rate, option_strike, swap_annuity,
+            option_maturity, implied_vol_func)
+        assert expect == actual
+
+    # TODO: add more test cases
+    @pytest.mark.parametrize(
         "underlying, strike, maturity, alpha, beta, rho, nu", [
             (0.0357, 0.03, 2, 0.036, 0.5, -0.25, 0.35)
         ])
