@@ -1125,6 +1125,67 @@ def calc_local_vol_model_implied_vol(
 # ----------------------------------------------------------------------------
 # SABR model
 # ----------------------------------------------------------------------------
+def sabr_payers_swaption_value(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        implied_vol_func):
+    """sabr_payers_swaption_value
+    calculate european payer's swaption value.
+    See
+    Hagan, P. S., Kumar, D., Lesniewski, A. S., & Woodward, D. E. (2002).
+    Managing smile risk.
+    Wilmott Magazine, m, 84–108.
+    Retrieved from http://www.math.columbia.edu/~lrb/sabrAll.pdf
+
+    :param float init_swap_rate:
+    :param float option_strike:
+    :param float swap_annuity:
+    :param float option_maturity:
+    :param callable implied_vol_func: arguments are
+        underlying, strike, swap_annuity.
+
+    :return: value.
+    :rtype: float.
+    """
+    vol = implied_vol_func(
+        init_swap_rate, option_strike, option_maturity)
+    return black_payers_swaption_value(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
+
+
+def sabr_receivers_swaption_value(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        implied_vol_func):
+    """sabr_receivers_swaption_value
+    calculate european reciever's swaption value.
+    This value is calculated by put-call parity.
+    See :py:func:`sabr_payers_swaption_value`.
+
+    :param float init_swap_rate:
+    :param float option_strike:
+    :param float swap_annuity:
+    :param float option_maturity:
+    :param callable implied_vol_func: arguments are
+        underlying, strike, swap_annuity.
+
+    :return: value.
+    :rtype: float.
+    """
+    payers_value = sabr_payers_swaption_value(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        implied_vol_func)
+    forward_value = swap_annuity * (init_swap_rate - option_strike)
+    return payers_value - forward_value
+
+
 def sabr_implied_vol_hagan(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """sabr_implied_vol_hagan
