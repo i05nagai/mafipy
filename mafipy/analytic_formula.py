@@ -541,7 +541,8 @@ def implied_vol_quadratic_approx(
     # take lower bound
     sqrt_inner = max(diff ** 2 - moneyness_delta2 / math.pi, 0.0)
     factor1 = diff + math.sqrt(sqrt_inner)
-    factor2 = (math.sqrt(2.0 * math.pi / maturity) / (underlying + discount_strike))
+    factor2 = (math.sqrt(2.0 * math.pi / maturity)
+               / (underlying + discount_strike))
     return factor1 * factor2
 
 

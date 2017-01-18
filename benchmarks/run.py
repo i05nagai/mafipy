@@ -29,7 +29,8 @@ def run_asv(args):
     except OSError as err:
         if err.errno == 2:
             print("Error when running '%s': %s\n" % (" ".join(cmd), str(err),))
-            print("You need to install Airspeed Velocity https://spacetelescope.github.io/asv/")
+            print("You need to install Airspeed Velocity \
+                  https://spacetelescope.github.io/asv/")
             print("to run Scipy benchmarks")
             return 1
         raise
