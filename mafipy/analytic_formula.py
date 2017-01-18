@@ -2759,14 +2759,29 @@ def sabr_implied_vol_hagan_fhess_by_underlying(
 # SABR greeks
 # ----------------------------------------------------------------------------
 def sabr_payers_swaption_delta(
-        init_swap_rate,
-        option_strike,
-        swap_annuity,
-        option_maturity,
-        alpha,
-        beta,
-        rho,
-        nu):
+        init_swap_rate, option_strike, swap_annuity, option_maturity,
+        alpha, beta, rho, nu):
+    """sabr_payers_swaption_delta
+    calculate payer's swaption delta under SABR model.
+    See :py:func:`sabr_payers_swaption_value`.
+
+    :param float init_swap_rate:
+    :param float option_strike:
+    :param float swap_annuity:
+    :param float option_maturity:
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
+
+    :return: payer's swaption delta.
+    :rtype: float.
+    """
+    assert(alpha > 0)
+    assert(0 <= beta <= 1.0)
+    assert(-1.0 <= rho <= 1.0)
+    assert(nu > 0.0)
+
     if option_maturity <= 0.0:
         return 0.0
 
