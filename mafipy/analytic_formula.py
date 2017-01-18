@@ -1177,7 +1177,10 @@ def sabr_payers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func):
+        alpha,
+        beta,
+        rho,
+        nu):
     """sabr_payers_swaption_value
     calculate european payer's swaption value.
     See
@@ -1190,14 +1193,16 @@ def sabr_payers_swaption_value(
     :param float option_strike:
     :param float swap_annuity:
     :param float option_maturity:
-    :param callable implied_vol_func: arguments are
-        underlying, strike, swap_annuity.
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
 
     :return: value.
     :rtype: float.
     """
-    vol = implied_vol_func(
-        init_swap_rate, option_strike, option_maturity)
+    vol = sabr_implied_vol_hagan(
+        init_swap_rate, option_strike, option_maturity, alpha, beta, rho, nu)
     return black_payers_swaption_value(
         init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
 
@@ -1207,7 +1212,10 @@ def sabr_receivers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func):
+        alpha,
+        beta,
+        rho,
+        nu):
     """sabr_receivers_swaption_value
     calculate european reciever's swaption value.
     This value is calculated by put-call parity.
@@ -1217,8 +1225,10 @@ def sabr_receivers_swaption_value(
     :param float option_strike:
     :param float swap_annuity:
     :param float option_maturity:
-    :param callable implied_vol_func: arguments are
-        underlying, strike, swap_annuity.
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
 
     :return: value.
     :rtype: float.
@@ -1228,7 +1238,10 @@ def sabr_receivers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func)
+        alpha,
+        beta,
+        rho,
+        nu)
     forward_value = swap_annuity * (init_swap_rate - option_strike)
     return payers_value - forward_value
 

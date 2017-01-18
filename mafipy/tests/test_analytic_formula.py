@@ -959,40 +959,44 @@ class TestAnalytic(object):
     # -------------------------------------------------------------------------
     # TODO: add more test cases
     @pytest.mark.parametrize(
-        "init_swap_rate, option_strike, swap_annuity, option_maturity", [
-            (0.0357, 0.03, 1.1, 2.0)
+        "init_swap_rate, option_strike, swap_annuity, option_maturity,\
+        alpha, beta, rho, nu", [
+            (0.0357, 0.03, 1.0, 2.0, 0.036, 0.5, -0.25, 0.35)
         ])
     def test_sabr_payers_swaption_value(
-            self, init_swap_rate, option_strike, swap_annuity, option_maturity):
+            self, init_swap_rate, option_strike, swap_annuity, option_maturity,
+            alpha, beta, rho, nu):
+        vol = target.sabr_implied_vol_hagan(
+            init_swap_rate, option_strike, option_maturity,
+            alpha, beta, rho, nu)
         expect = target.black_payers_swaption_value(
-            init_swap_rate, option_strike, swap_annuity, option_maturity, 1.0)
+            init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
 
         # actual
-        def implied_vol_func(underlying, strike, maturity):
-            return 1.0
         actual = target.sabr_payers_swaption_value(
-            init_swap_rate, option_strike, swap_annuity,
-            option_maturity, implied_vol_func)
+            init_swap_rate, option_strike, swap_annuity, option_maturity,
+            alpha, beta, rho, nu)
         assert expect == actual
 
     # TODO: add more test cases
     @pytest.mark.parametrize(
-        "init_swap_rate, option_strike, swap_annuity, option_maturity", [
-            (0.0357, 0.03, 1.1, 2.0)
+        "init_swap_rate, option_strike, swap_annuity, option_maturity,\
+        alpha, beta, rho, nu", [
+            (0.0357, 0.03, 1.0, 2.0, 0.036, 0.5, -0.25, 0.35)
         ])
     def test_sabr_receivers_swaption_value(
-            self, init_swap_rate, option_strike, swap_annuity, option_maturity):
-        def implied_vol_func(underlying, strike, maturity):
-            return 1.0
+            self, init_swap_rate, option_strike, swap_annuity, option_maturity,
+            alpha, beta, rho, nu):
         call_value = target.sabr_payers_swaption_value(
-            init_swap_rate, option_strike, swap_annuity, option_maturity, implied_vol_func)
+            init_swap_rate, option_strike, swap_annuity, option_maturity,
+            alpha, beta, rho, nu)
         forward_value = swap_annuity * (init_swap_rate - option_strike)
         expect = call_value - forward_value
 
         # actual
         actual = target.sabr_receivers_swaption_value(
-            init_swap_rate, option_strike, swap_annuity,
-            option_maturity, implied_vol_func)
+            init_swap_rate, option_strike, swap_annuity, option_maturity,
+            alpha, beta, rho, nu)
         assert expect == actual
 
     # TODO: add more test cases
@@ -1469,6 +1473,9 @@ class TestAnalytic(object):
 
         assert vol_analytic == approx(vol_diff, rel=5e-4)
 
+    # -------------------------------------------------------------------------
+    # SABR greeks
+    # -------------------------------------------------------------------------
     # SABR payer's swaption delta
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity,\
@@ -1478,18 +1485,13 @@ class TestAnalytic(object):
     def test_model_sabr_payers_swaption_delta(
             self, init_swap_rate, option_strike, swap_annuity, option_maturity,
             alpha, beta, rho, nu):
-
-        def implied_vol_func(underlying, strike, maturity):
-            return target.sabr_implied_vol_hagan(
-                underlying, strike, maturity, alpha, beta, rho, nu)
-
         shock = 1e-6
         value_plus = target.sabr_payers_swaption_value(
             init_swap_rate + shock, option_strike, swap_annuity,
-            option_maturity, implied_vol_func)
+            option_maturity, alpha, beta, rho, nu)
         value_minus = target.sabr_payers_swaption_value(
             init_swap_rate - shock, option_strike, swap_annuity,
-            option_maturity, implied_vol_func)
+            option_maturity, alpha, beta, rho, nu)
         delta_diff = (value_plus - value_minus) / (2.0 * shock)
 
         delta_analytic = target.sabr_payers_swaption_delta(
