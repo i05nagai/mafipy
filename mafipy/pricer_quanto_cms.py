@@ -307,7 +307,8 @@ def _calc_h_fhess(swap_rate_pdf_fprime, swap_rate_pdf, swap_rate, h, h_fprime):
     .. math::
         h^{\prime\prime}(s)
         & = & \\frac{
-            (\psi^{A})^{\prime}(s) \phi(h(s)) - \psi^{A}(s) \phi^{\prime}(h(s)) h^{\prime}(s)
+            (\psi^{A})^{\prime}(s) \phi(h(s))
+            - \psi^{A}(s) \phi^{\prime}(h(s)) h^{\prime}(s)
         }{
             \phi(h(s))^{2}
         }
@@ -674,37 +675,46 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
 
         .. math::
             \\begin{eqnarray}
-                g_{\mathrm{call}}^{\prime\prime}(s; K)\\alpha(s)\\tilde{\chi}(s)
+                g_{\mathrm{call}}^{\prime\prime}(s; K)
+                    \\alpha(s)\\tilde{\chi}(s)
                     & = &
                     \delta(s - K)\\alpha(s)\\tilde{\chi}(s),
                 \\\\
-                g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
+                g_{\mathrm{call}}(s; K)\\alpha(s)
+                    \\tilde{\chi}^{\prime\prime}(s)
                     & = &
                     (s - K)^{+}
                     (\\alpha_{1}s + \\alpha_{2})
                     \\rho_{XS}\sigma_{X}\sqrt{T}
                     \left(
                        h^{\prime\prime}(s)\\tilde{\chi}(s)
-                        + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                        + \\rho_{XS}\sigma_{X}\sqrt{T}
+                            h^{\prime}(s)^{2} \\tilde{\chi}(s)
                     \\right),
                 \\\\
-                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+                2g_{\mathrm{call}}^{\prime}(s; K)
+                    \\alpha^{\prime}(s)\\tilde{\chi}(s)
                     & = & 2 1_{[K, \infty)}(s) \\alpha_{1}
                         \exp
                         \left(
                             \\rho_{XS}\sigma_{X}\sqrt{T}\Phi^{-1}(\Psi^{A}(s))
-                                + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
+                                + \\frac{\sigma_{X}^{2}T}{2}
+                                    (1 - \\rho_{XS}^{2})
                         \\right),
                 \\\\
-                2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{call}}^{\prime}(s; K)
+                    \\alpha(s)\\tilde{\chi}^{\prime}(s)
                     & = & 2 1_{[K, \infty)}(s)
                         (\\alpha_{1}s + \\alpha_{2})
-                        \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                        \\rho_{XS}\sigma_{X}\sqrt{T}
+                            h^{\prime}(s)\\tilde{\chi}(s),
                 \\\\
-                2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+                2g_{\mathrm{call}}(s; K)
+                    \\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
                     & = &
                         2(s - K)^{+} \\alpha_{1}
-                            \\rho_{XS}\sigma_{X}\sqrt{T}h^{\prime}(s)\\tilde{\chi}(s),
+                            \\rho_{XS}\sigma_{X}\sqrt{T}
+                                h^{\prime}(s)\\tilde{\chi}(s),
             \end{eqnarray}
 
     where
@@ -725,8 +735,9 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
                 (\\alpha_{1}s + \\alpha_{2})
                 \\rho_{XS}\sigma_{X}\sqrt{T}
                 \left(
-                       h^{\prime\prime}(s)\\tilde{\chi}(s)
-                    + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                   h^{\prime\prime}(s)\\tilde{\chi}(s)
+                    + \\rho_{XS}\sigma_{X}\sqrt{T}
+                        h^{\prime}(s)^{2} \\tilde{\chi}(s)
                 \\right),
                 \\\\
             2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
@@ -792,11 +803,14 @@ class _SimpleQuantoCmsLinearCallHelper(SimpleQuantoCmsHelper):
         .. math::
             g_{\mathrm{call}}(s; K)\\alpha(s)\\tilde{\chi}^{\prime\prime}(s)
             \\\\
-            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}(s)
+            2g_{\mathrm{call}}^{\prime}(s; K)
+                \\alpha^{\prime}(s)\\tilde{\chi}(s)
             \\\\
-            2g_{\mathrm{call}}^{\prime}(s; K)\\alpha(s)\\tilde{\chi}^{\prime}(s)
+            2g_{\mathrm{call}}^{\prime}(s; K)
+                \\alpha(s)\\tilde{\chi}^{\prime}(s)
             \\\\
-            2g_{\mathrm{call}}(s; K)\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
+            2g_{\mathrm{call}}(s; K)
+                \\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
 
         :return: array of function.
         :rtype: array.
@@ -938,7 +952,8 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                         \exp
                         \left(
                             \\rho_{XS}\sigma_{X}\sqrt{T}\Phi^{-1}(\Psi^{A}(s))
-                                + \\frac{\sigma_{X}^{2}T}{2}(1 - \\rho_{XS}^{2})
+                                + \\frac{\sigma_{X}^{2}T}{2}
+                                    (1 - \\rho_{XS}^{2})
                         \\right),
                 \\\\
                 2g_{\mathrm{bullspread}}^{\prime}(s; K)
@@ -975,7 +990,8 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                 \\rho_{XS}\sigma_{X}\sqrt{T}
                 \left(
                        h^{\prime\prime}(s)\\tilde{\chi}(s)
-                    + \\rho_{XS}\sigma_{X}\sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
+                    + \\rho_{XS} \sigma_{X}
+                        \sqrt{T} h^{\prime}(s)^{2} \\tilde{\chi}(s)
                 \\right),
                 \\\\
             2\\alpha^{\prime}(s)\\tilde{\chi}^{\prime}(s)
@@ -1183,13 +1199,28 @@ class _SimpleQuantoCmsLinearBullSpreadHelper(SimpleQuantoCmsHelper):
                      * self.forward_fx_diffusion(self.payoff_upper_strike))
 
         terms = [func1]
-        if self.min_put_range <= self.payoff_lower_strike <= self.max_put_range:
+        # check whether delta function concentrate within integral range
+        # second derivative of payoff function heuristically is
+        # dirac delta function which cocentrates on strike so that
+        # the terms need to be calculated as analytic term
+        # if integral range includes strike
+
+        # integral with put pricer
+        if (self.min_put_range
+                <= self.payoff_lower_strike
+                <= self.max_put_range):
             terms.append(func21)
-        elif self.min_call_range <= self.payoff_lower_strike <= self.max_call_range:
+        elif (self.min_call_range
+              <= self.payoff_lower_strike
+              <= self.max_call_range):
             terms.append(func31)
-        if self.min_put_range <= self.payoff_upper_strike <= self.max_put_range:
+        if (self.min_put_range
+                <= self.payoff_upper_strike
+                <= self.max_put_range):
             terms.append(func22)
-        elif self.min_call_range <= self.payoff_upper_strike <= self.max_call_range:
+        elif (self.min_call_range
+              <= self.payoff_upper_strike
+              <= self.max_call_range):
             terms.append(func32)
         return terms
 
@@ -1266,7 +1297,8 @@ def _replicate_denominator(init_swap_rate,
 
     # integrands with pricer
     def alpha_fhess_chi(swap_rate):
-        return annuity_mapping_fhess(swap_rate) * forward_fx_diffusion(swap_rate)
+        return (annuity_mapping_fhess(swap_rate)
+                * forward_fx_diffusion(swap_rate))
 
     def alpha_fprime_chi_fprime(swap_rate):
         return (2.0
