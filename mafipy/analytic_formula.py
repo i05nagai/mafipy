@@ -1059,6 +1059,53 @@ def black_scholes_call_rho(
 
 
 # ----------------------------------------------------------------------------
+# black payer's/reciever's swaption greeks
+# ----------------------------------------------------------------------------
+def black_payers_swaption_delta(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_delta
+    calculates delta of payer's swaptions under black model.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: delta
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_delta = black_scholes_call_delta(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_delta
+
+
+def black_payers_swaption_vega(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_vega
+    calculates vega of payer's swaption under black model.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: vega.
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_vega = black_scholes_call_vega(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_vega
+
+
+# ----------------------------------------------------------------------------
 # Local volatility model
 # ----------------------------------------------------------------------------
 def calc_local_vol_model_implied_vol(
@@ -1130,7 +1177,10 @@ def sabr_payers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func):
+        alpha,
+        beta,
+        rho,
+        nu):
     """sabr_payers_swaption_value
     calculate european payer's swaption value.
     See
@@ -1143,14 +1193,16 @@ def sabr_payers_swaption_value(
     :param float option_strike:
     :param float swap_annuity:
     :param float option_maturity:
-    :param callable implied_vol_func: arguments are
-        underlying, strike, swap_annuity.
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
 
     :return: value.
     :rtype: float.
     """
-    vol = implied_vol_func(
-        init_swap_rate, option_strike, option_maturity)
+    vol = sabr_implied_vol_hagan(
+        init_swap_rate, option_strike, option_maturity, alpha, beta, rho, nu)
     return black_payers_swaption_value(
         init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
 
@@ -1160,7 +1212,10 @@ def sabr_receivers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func):
+        alpha,
+        beta,
+        rho,
+        nu):
     """sabr_receivers_swaption_value
     calculate european reciever's swaption value.
     This value is calculated by put-call parity.
@@ -1170,8 +1225,10 @@ def sabr_receivers_swaption_value(
     :param float option_strike:
     :param float swap_annuity:
     :param float option_maturity:
-    :param callable implied_vol_func: arguments are
-        underlying, strike, swap_annuity.
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
 
     :return: value.
     :rtype: float.
@@ -1181,11 +1238,17 @@ def sabr_receivers_swaption_value(
         option_strike,
         swap_annuity,
         option_maturity,
-        implied_vol_func)
+        alpha,
+        beta,
+        rho,
+        nu)
     forward_value = swap_annuity * (init_swap_rate - option_strike)
     return payers_value - forward_value
 
 
+# ----------------------------------------------------------------------------
+# SABR implied volatility
+# ----------------------------------------------------------------------------
 def sabr_implied_vol_hagan(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """sabr_implied_vol_hagan
@@ -1360,6 +1423,9 @@ def sabr_atm_implied_vol_hagan(
     return vol
 
 
+# ----------------------------------------------------------------------------
+# SABR implied vol derivative
+# ----------------------------------------------------------------------------
 def _sabr_implied_vol_hagan_A11(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """_sabr_implied_vol_hagan_A11
@@ -1430,6 +1496,47 @@ def _sabr_implied_vol_hagan_A11_fhess_by_strike(
                * (underlying ** one_minus_beta_half)
                * one_plus_beta_half)
     return factor * (strike ** (-three_plus_beta_half))
+
+
+def _sabr_implied_vol_hagan_A11_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A11_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A11`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+
+    return _sabr_implied_vol_hagan_A11_fprime_by_strike(
+        strike, underlying, maturity, alpha, beta, rho, nu)
+
+
+def _sabr_implied_vol_hagan_A11_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A11_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A11`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    return _sabr_implied_vol_hagan_A11_fhess_by_strike(
+        strike, underlying, maturity, alpha, beta, rho, nu)
 
 
 def _sabr_implied_vol_hagan_A12(
@@ -1538,6 +1645,71 @@ def _sabr_implied_vol_hagan_A12_fhess_by_strike(
     return term1 + term2
 
 
+def _sabr_implied_vol_hagan_A12_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A12_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A12`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    assert(underlying / strike > 0.0)
+    assert(not np.isclose(strike, 0.0))
+
+    one_minus_beta = 1.0 - beta
+    one_minus_beta2 = one_minus_beta ** 2
+    one_minus_beta4 = one_minus_beta ** 4
+    ln_moneyness = math.log(underlying / strike)
+    ln_moneyness3 = ln_moneyness ** 3
+
+    term1 = one_minus_beta2 * ln_moneyness / 12.0
+    term2 = one_minus_beta4 * ln_moneyness3 / 480.0
+    return (term1 + term2) / underlying
+
+
+def _sabr_implied_vol_hagan_A12_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A12_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A12`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    assert(underlying / strike > 0.0)
+    assert(not np.isclose(strike, 0.0))
+
+    one_minus_beta = 1.0 - beta
+    one_minus_beta2 = one_minus_beta ** 2
+    one_minus_beta4 = one_minus_beta ** 4
+    ln_moneyness = math.log(underlying / strike)
+    ln_moneyness2 = ln_moneyness ** 2
+    ln_moneyness3 = ln_moneyness ** 3
+
+    underlying2 = underlying ** 2
+    factor1 = one_minus_beta2 / (12.0 * underlying2)
+    term1 = factor1 * (-ln_moneyness + 1.0)
+    # term2
+    factor2 = one_minus_beta4 / (160.0 * underlying2)
+    term2 = factor2 * (-ln_moneyness3 + 3.0 * ln_moneyness2)
+    return term1 + term2
+
+
 def _sabr_implied_vol_hagan_A1(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """_sabr_implied_vol_hagan_A1
@@ -1633,6 +1805,66 @@ def _sabr_implied_vol_hagan_A1_fhess_by_strike(
     A12_fprime = _sabr_implied_vol_hagan_A12_fprime_by_strike(
         underlying, strike, maturity, alpha, beta, rho, nu)
     A12_fhess = _sabr_implied_vol_hagan_A12_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    return A11 * A12_fhess + 2.0 * A11_fprime * A12_fprime + A11_fhess * A12
+
+
+def _sabr_implied_vol_hagan_A1_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A1_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A1`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A11 = _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fprime = _sabr_implied_vol_hagan_A11_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    A12 = _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fprime = _sabr_implied_vol_hagan_A12_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    return A11 * A12_fprime + A11_fprime * A12
+
+
+def _sabr_implied_vol_hagan_A1_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A1_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A1`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within :math:`[0, 1]`.
+    :param float beta: must be greater than 0.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A11 = _sabr_implied_vol_hagan_A11(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fprime = _sabr_implied_vol_hagan_A11_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A11_fhess = _sabr_implied_vol_hagan_A11_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    A12 = _sabr_implied_vol_hagan_A12(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fprime = _sabr_implied_vol_hagan_A12_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A12_fhess = _sabr_implied_vol_hagan_A12_fhess_by_underlying(
         underlying, strike, maturity, alpha, beta, rho, nu)
     return A11 * A12_fhess + 2.0 * A11_fprime * A12_fprime + A11_fhess * A12
 
@@ -1734,6 +1966,65 @@ def _sabr_implied_vol_hagan_A2_fhess_by_strike(
     return factor1 * factor2 * (term1 + beta)
 
 
+def _sabr_implied_vol_hagan_A2_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A2_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A2`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    assert(alpha > 0.0)
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    one_plus_beta_half = (1.0 + beta) / 2.0
+    ln_moneyness = math.log(underlying / strike)
+
+    factor1 = (strike ** one_minus_beta_half) * nu / alpha
+    factor2 = underlying ** (-one_plus_beta_half)
+    factor3 = one_minus_beta_half * ln_moneyness + 1.0
+    return factor1 * factor2 * factor3
+
+
+def _sabr_implied_vol_hagan_A2_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A2_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A2`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    assert(alpha > 0.0)
+    assert(underlying / strike > 0.0)
+
+    one_minus_beta_half = (1.0 - beta) / 2.0
+    three_plus_beta_half = (3.0 + beta) / 2.0
+    ln_moneyness = math.log(underlying / strike)
+
+    factor1 = (strike ** one_minus_beta_half) * nu / alpha
+    factor2 = underlying ** (-three_plus_beta_half)
+
+    term1 = (beta ** 2 - 1.0) * ln_moneyness / 4.0
+    return factor1 * factor2 * (term1 - beta)
+
+
 def _sabr_implied_vol_hagan_A31(
         underlying, strike, maturity, alpha, beta, rho, nu):
     """_sabr_implied_vol_hagan_A31
@@ -1809,6 +2100,68 @@ def _sabr_implied_vol_hagan_A31_fhess_by_strike(
     A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_strike(
         underlying, strike, maturity, alpha, beta, rho, nu)
     A2_fhess = _sabr_implied_vol_hagan_A2_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    sqrt_inner = 1.0 - 2.0 * rho * A2 + A2 * A2
+    assert(sqrt_inner > 0.0)
+
+    factor1 = -rho * A2_fhess + A2_fprime ** 2 + A2 * A2_fhess
+    term1 = factor1 * sqrt_inner
+    term2 = (-rho * A2_fprime + A2 * A2_fprime) ** 2
+    numerator = term1 - term2
+    denominator = (sqrt_inner) ** 1.5
+    return numerator / denominator + A2_fhess
+
+
+def _sabr_implied_vol_hagan_A31_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A31_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A31`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    assert(1.0 - 2.0 * rho * A2 + A2 * A2 > 0.0)
+
+    numerator = (-rho + A2) * A2_fprime
+    denominator = math.sqrt(1.0 - 2.0 * rho * A2 + A2 * A2)
+    return numerator / denominator + A2_fprime
+
+
+def _sabr_implied_vol_hagan_A31_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A31_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A31`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fhess = _sabr_implied_vol_hagan_A2_fhess_by_underlying(
         underlying, strike, maturity, alpha, beta, rho, nu)
 
     sqrt_inner = 1.0 - 2.0 * rho * A2 + A2 * A2
@@ -1907,6 +2260,58 @@ def _sabr_implied_vol_hagan_A3_fhess_by_strike(
     A31_fprime = _sabr_implied_vol_hagan_A31_fprime_by_strike(
         underlying, strike, maturity, alpha, beta, rho, nu)
     A31_fhess = _sabr_implied_vol_hagan_A31_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    term1 = -((A31_fprime / A31) ** 2)
+    term2 = A31_fhess / A31
+    return term1 + term2
+
+
+def _sabr_implied_vol_hagan_A3_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A3_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A3`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A31 = _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fprime = _sabr_implied_vol_hagan_A31_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    assert(not np.isclose(A31, 0.0))
+    return A31_fprime / A31
+
+
+def _sabr_implied_vol_hagan_A3_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A3_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A3`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    A31 = _sabr_implied_vol_hagan_A31(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fprime = _sabr_implied_vol_hagan_A31_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A31_fhess = _sabr_implied_vol_hagan_A31_fhess_by_underlying(
         underlying, strike, maturity, alpha, beta, rho, nu)
     term1 = -((A31_fprime / A31) ** 2)
     term2 = A31_fhess / A31
@@ -2023,6 +2428,77 @@ def _sabr_implied_vol_hagan_A4_fhess_by_strike(
     factor2 = strike ** (-five_minus_beta_half)
     numerator2 = rho * beta * nu * alpha * (-three_minus_beta)
     denominator2 = 16.0 * (underlying ** one_minus_beta_half)
+    term2 = numerator2 * factor2 / denominator2
+
+    return -(term1 + term2) * maturity * one_minus_beta
+
+
+def _sabr_implied_vol_hagan_A4_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A4_fprime_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A4`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    one_minus_beta = 1.0 - beta
+    one_minus_beta_half = one_minus_beta / 2.0
+    one_minus_beta2 = one_minus_beta ** 2
+    two_minus_beta = 2.0 - beta
+    three_minus_beta_half = (3.0 - beta) / 2.0
+    alpha2 = alpha ** 2
+
+    numerator1 = one_minus_beta2 * alpha2 * (underlying ** (-two_minus_beta))
+    denominator1 = 24.0 * (strike ** one_minus_beta)
+    term1 = numerator1 / denominator1
+
+    numerator2 = (rho * beta * nu * alpha
+                  * (underlying ** (-three_minus_beta_half)))
+    denominator2 = 8.0 * (strike ** one_minus_beta_half)
+    term2 = numerator2 / denominator2
+
+    return -(term1 + term2) * maturity * one_minus_beta
+
+
+def _sabr_implied_vol_hagan_A4_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """_sabr_implied_vol_hagan_A4_fhess_by_underlying
+    See :py:func:`_sabr_implied_vol_hagan_A4`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be within [0, 1].
+    :param float beta: must be greater than 0.
+    :param float rho: must be within [-1, 1].
+    :param float nu: volatility of volatility. This must be positive.
+
+    :return: value of factor.
+    :rtype: float.
+    """
+    one_minus_beta = 1.0 - beta
+    one_minus_beta_half = one_minus_beta / 2.0
+    one_minus_beta2 = one_minus_beta ** 2
+    two_minus_beta = 2.0 - beta
+    three_minus_beta = 3.0 - beta
+    five_minus_beta_half = (5.0 - beta) / 2.0
+
+    factor1 = underlying ** (-three_minus_beta)
+    numerator1 = one_minus_beta2 * (alpha ** 2) * (-two_minus_beta)
+    denominator1 = 24.0 * (strike ** one_minus_beta)
+    term1 = numerator1 * factor1 / denominator1
+
+    factor2 = underlying ** (-five_minus_beta_half)
+    numerator2 = rho * beta * nu * alpha * (-three_minus_beta)
+    denominator2 = 16.0 * (strike ** one_minus_beta_half)
     term2 = numerator2 * factor2 / denominator2
 
     return -(term1 + term2) * maturity * one_minus_beta
@@ -2158,6 +2634,181 @@ def sabr_implied_vol_hagan_fhess_by_strike(
     term5 = 2.0 * fprime1 * factor2 * fprime3
     term6 = 2.0 * factor1 * fprime2 * fprime3
     return term1 + term2 + term3 + term4 + term5 + term6
+
+
+def sabr_implied_vol_hagan_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """sabr_implied_vol_hagan_fprime_by_underlying
+    first derivative of Hagan's SABR implied volatility formula
+    with respect to underlying.
+    See :py:func:`sabr_implied_vol_hagan`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be positve.
+    :param float beta: must be within [0, 1].
+    :param float rho: must be within [-1, 1].
+    :param float nu: must be positive.
+
+    :return: first derivative of hagan implied volatility formula
+        with respect to underlying.
+    :rtype: float
+    """
+    assert(alpha > 0)
+    assert(0 <= beta <= 1.0)
+    assert(-1.0 <= rho <= 1.0)
+    assert(nu > 0.0)
+
+    A1 = _sabr_implied_vol_hagan_A1(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fprime = _sabr_implied_vol_hagan_A1_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3 = _sabr_implied_vol_hagan_A3(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fprime = _sabr_implied_vol_hagan_A3_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4 = _sabr_implied_vol_hagan_A4(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fprime = _sabr_implied_vol_hagan_A4_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    factor1 = alpha / A1
+    factor2 = A2 / A3
+    factor3 = A4
+
+    factor11 = -alpha * A1_fprime / (A1 ** 2)
+    term1 = factor11 * factor2 * factor3
+
+    factor22 = A2_fprime / A3 - A2 * A3_fprime / (A3 ** 2)
+    term2 = factor1 * factor22 * factor3
+
+    factor33 = A4_fprime
+    term3 = factor1 * factor2 * factor33
+
+    return term1 + term2 + term3
+
+
+def sabr_implied_vol_hagan_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu):
+    """sabr_implied_vol_hagan_fhess_by_underlying
+    second derivative of Hagan's SABR implied volatility formula
+    with respect to underlying.
+    See :py:func:`sabr_implied_vol_hagan`.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha: must be positve.
+    :param float beta: must be within [0, 1].
+    :param float rho: must be within [-1, 1].
+    :param float nu: must be positive.
+
+    :return: second derivative of hagan implied volatility formula
+        with respect to underlying.
+    :rtype: float
+    """
+    assert(alpha > 0)
+    assert(0 <= beta <= 1.0)
+    assert(-1.0 <= rho <= 1.0)
+    assert(nu > 0.0)
+
+    A1 = _sabr_implied_vol_hagan_A1(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fprime = _sabr_implied_vol_hagan_A1_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A1_fhess = _sabr_implied_vol_hagan_A1_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2 = _sabr_implied_vol_hagan_A2(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fprime = _sabr_implied_vol_hagan_A2_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A2_fhess = _sabr_implied_vol_hagan_A2_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3 = _sabr_implied_vol_hagan_A3(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fprime = _sabr_implied_vol_hagan_A3_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A3_fhess = _sabr_implied_vol_hagan_A3_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4 = _sabr_implied_vol_hagan_A4(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fprime = _sabr_implied_vol_hagan_A4_fprime_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    A4_fhess = _sabr_implied_vol_hagan_A4_fhess_by_underlying(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    factor1 = alpha / A1
+    A1_2 = A1 ** 2
+    fprime1 = -alpha * A1_fprime / A1_2
+    fhess1 = -alpha * (-2.0 * (A1_fprime ** 2) / (A1 ** 3) + A1_fhess / A1_2)
+
+    factor2 = A2 / A3
+    A3_2 = A3 ** 2
+    fprime2 = A2_fprime / A3 - A2 * A3_fprime / A3_2
+    fhess2 = (A2_fhess / A3
+              - 2.0 * A2_fprime * A3_fprime / A3_2
+              - A2 * A3_fhess / A3_2
+              + 2.0 * A2 * (A3_fprime ** 2) / (A3 ** 3))
+
+    factor3 = A4
+    fprime3 = A4_fprime
+    fhess3 = A4_fhess
+
+    term1 = fhess1 * factor2 * factor3
+    term2 = factor1 * fhess2 * factor3
+    term3 = factor1 * factor2 * fhess3
+    term4 = 2.0 * fprime1 * fprime2 * factor3
+    term5 = 2.0 * fprime1 * factor2 * fprime3
+    term6 = 2.0 * factor1 * fprime2 * fprime3
+    return term1 + term2 + term3 + term4 + term5 + term6
+
+
+# ----------------------------------------------------------------------------
+# SABR greeks
+# ----------------------------------------------------------------------------
+def sabr_payers_swaption_delta(
+        init_swap_rate, option_strike, swap_annuity, option_maturity,
+        alpha, beta, rho, nu):
+    """sabr_payers_swaption_delta
+    calculate payer's swaption delta under SABR model.
+    See :py:func:`sabr_payers_swaption_value`.
+
+    :param float init_swap_rate:
+    :param float option_strike:
+    :param float swap_annuity:
+    :param float option_maturity:
+    :param float alpha: must be greater than 0.
+    :param float beta: must be within :math:`[0, 1]`.
+    :param float rho: must be within :math:`[-1, 1]`.
+    :param float nu: must be positive.
+
+    :return: payer's swaption delta.
+    :rtype: float.
+    """
+    assert(alpha > 0)
+    assert(0 <= beta <= 1.0)
+    assert(-1.0 <= rho <= 1.0)
+    assert(nu > 0.0)
+
+    if option_maturity <= 0.0:
+        return 0.0
+
+    vol = sabr_implied_vol_hagan(
+        init_swap_rate, option_strike, swap_annuity, alpha, beta, rho, nu)
+    bs_delta = black_payers_swaption_delta(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
+    bs_vega = black_payers_swaption_vega(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
+    backbone = sabr_implied_vol_hagan_fprime_by_underlying(
+        init_swap_rate, option_strike, option_maturity,
+        alpha, beta, rho, nu)
+
+    return bs_delta + bs_vega * backbone
 
 
 class BlackScholesPricerHelper(object):
