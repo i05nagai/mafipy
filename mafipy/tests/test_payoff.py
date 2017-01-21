@@ -224,7 +224,8 @@ class TestPayoff(object):
                                      gearing):
         expect = (target.payoff_call(underlying, spot_price - spread, gearing)
                   - 2.0 * target.payoff_call(underlying, spot_price, gearing)
-                  + target.payoff_call(underlying, spot_price + spread, gearing))
+                  + target.payoff_call(
+                      underlying, spot_price + spread, gearing))
         if spread < 0.0:
             return 0.0
         actual = target.payoff_butterfly_spread(

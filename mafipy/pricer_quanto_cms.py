@@ -1310,7 +1310,8 @@ def _replicate_denominator(init_swap_rate,
                 * forward_fx_diffusion_fhess(swap_rate))
 
     # put integrands
-    put_integrands = [alpha_fhess_chi, alpha_fprime_chi_fprime, alpha_chi_fhess]
+    put_integrands = [
+        alpha_fhess_chi, alpha_fprime_chi_fprime, alpha_chi_fhess]
     # call integrands
     call_integrands = put_integrands
 
