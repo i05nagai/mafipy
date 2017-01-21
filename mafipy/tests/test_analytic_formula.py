@@ -1527,13 +1527,14 @@ class TestBlackScholesPricerHelper:
     ])
     def test_make_call_wrt_strike(
             self, underlying, rate, maturity, vol, today):
-        expect_func = lambda strike: target.black_scholes_call_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
+        def expect_func(strike):
+            return target.black_scholes_call_value(
+                underlying=underlying,
+                strike=strike,
+                rate=rate,
+                maturity=maturity,
+                vol=vol,
+                today=today)
         actual_func = self.target_class.make_call_wrt_strike(
             underlying, rate, maturity, vol, today)
         assert type(expect_func) == type(actual_func)
@@ -1543,13 +1544,14 @@ class TestBlackScholesPricerHelper:
     ])
     def test_make_put_wrt_strike(
             self, underlying, rate, maturity, vol, today):
-        expect_func = lambda strike: target.black_scholes_put_value(
-            underlying=underlying,
-            strike=strike,
-            rate=rate,
-            maturity=maturity,
-            vol=vol,
-            today=today)
+        def expect_func(strike):
+            target.black_scholes_put_value(
+                underlying=underlying,
+                strike=strike,
+                rate=rate,
+                maturity=maturity,
+                vol=vol,
+                today=today)
         actual_func = self.target_class.make_put_wrt_strike(
             underlying, rate, maturity, vol, today)
         assert type(expect_func) == type(actual_func)

@@ -120,13 +120,14 @@ class TestPricerQuantoCms(object):
     # -------------------------------------------------------------------------
     # Black scholes model
     # -------------------------------------------------------------------------
-    @pytest.mark.parametrize("underlying, strike, rate, maturity, vol, expect", [
-        # maturity < 0 raise AssertionError
-        (2.0, 1.0, 1.0, -1.0, 1.0, 1.0),
-        # vol < 0 raise AssertionError
-        (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
-        (2.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-    ])
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol, expect", [
+            # maturity < 0 raise AssertionError
+            (2.0, 1.0, 1.0, -1.0, 1.0, 1.0),
+            # vol < 0 raise AssertionError
+            (2.0, 1.0, 1.0, 1.0, -1.0, 1.0),
+            (2.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+        ])
     def test_make_pdf_black_scholes(
             self, underlying, strike, rate, maturity, vol, expect):
         # raise AssertionError
@@ -994,8 +995,9 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             "alpha0": self.alpha0,
             "alpha1": self.alpha1
         }
-        self.annuity_mapping_helper = replication.LinearAnnuityMappingFuncHelper(
-            **self.annuity_mapping_params)
+        self.annuity_mapping_helper = (
+            replication.LinearAnnuityMappingFuncHelper(
+                **self.annuity_mapping_params))
         self.annuity_mapping_func = self.annuity_mapping_helper.make_func()
         self.annuity_mapping_fprime = self.annuity_mapping_helper.make_fprime()
         self.annuity_mapping_fhess = self.annuity_mapping_helper.make_fhess()
@@ -1021,7 +1023,8 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         }
         self.forward_fx_diffusion_helper = target._ForwardFxDiffusionHelper(
             **self.forward_fx_diffusion_params)
-        self.forward_fx_diffusion = self.forward_fx_diffusion_helper.make_func()
+        self.forward_fx_diffusion = (
+            self.forward_fx_diffusion_helper.make_func())
         self.forward_fx_diffusion_fprime = (
             self.forward_fx_diffusion_helper.make_fprime())
         self.forward_fx_diffusion_fhess = (

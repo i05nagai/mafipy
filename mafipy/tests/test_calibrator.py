@@ -126,15 +126,16 @@ class TestModelCalibrator:
 
         # beta 0.5
         expect_beta = 0.5
-        alpha, beta, rho, nu = target.sabr_caibration_simple(market_vols,
-                                                             market_strikes,
-                                                             option_maturity,
-                                                             expect_beta,
-                                                             init_alpha=1.0,
-                                                             init_rho=0.2,
-                                                             init_nu=1.0,
-                                                             nu_lower_bound=1e-8,
-                                                             tol=1e-32)
+        alpha, beta, rho, nu = target.sabr_caibration_simple(
+            market_vols,
+            market_strikes,
+            option_maturity,
+            expect_beta,
+            init_alpha=1.0,
+            init_rho=0.2,
+            init_nu=1.0,
+            nu_lower_bound=1e-8,
+            tol=1e-32)
         # for travis CI tests
         assert 0.0729991374 == approx(alpha, rel=1e-4)
         assert expect_beta == approx(beta)
