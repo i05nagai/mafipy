@@ -1,12 +1,11 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
-import scipy.integrate
+from __future__ import division, print_function, absolute_import
 import functools
+import scipy.integrate
 
-import util
+from . import util
 
 
 def linear_annuity_mapping_func(underlying, alpha0, alpha1):

@@ -2,17 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-
 from pytest import approx
 import math
 import numpy as np
 import pytest
 import scipy.stats
 
+from . import util
 import mafipy.function as function
-import mafipy.replication.pricer_quanto_cms as target
 import mafipy.replication as replication
-import util
+import mafipy.replication.pricer_quanto_cms as target
 
 
 class TestPricerQuantoCms(object):

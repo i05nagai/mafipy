@@ -1,12 +1,12 @@
 #!/bin/python
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from pytest import approx
 import pytest
 
-import mafipy.function as function
+from . import util
 import mafipy.calibrator as target
-import util
+import mafipy.function as function
 
 
 class TestModelCalibrator:

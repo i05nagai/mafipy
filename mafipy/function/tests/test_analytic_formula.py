@@ -1,17 +1,16 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from pytest import approx
 import math
 import numpy as np
 import pytest
 import scipy.stats
 
-import mafipy.function.analytic_formula as target
+from . import util
 import mafipy.function
-import util
+import mafipy.function.analytic_formula as target
 
 
 class TestAnalytic(object):

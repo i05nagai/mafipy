@@ -1,14 +1,13 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
+from __future__ import division, print_function, absolute_import
 from pytest import approx
 import pytest
 
-import util
-import mafipy.replication as target
+from . import util
 import mafipy.function.analytic_formula as analytic_formula
+import mafipy.replication as target
 
 
 class TestReplication:

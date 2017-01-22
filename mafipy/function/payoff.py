@@ -1,8 +1,10 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
+from __future__ import division, print_function, absolute_import
 import functools
-import util
+
+from .import util
 
 
 def payoff_call(underlying, strike, gearing=1.0):
