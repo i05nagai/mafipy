@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import functools
-from . import util
+import util
 
 
 def payoff_call(underlying, strike, gearing=1.0):

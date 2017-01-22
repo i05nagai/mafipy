@@ -7,7 +7,7 @@ import math
 import numpy as np
 import scipy.special
 
-import mafipy.math_formula
+import mafipy.function
 
 
 # ----------------------------------------------------------------------------

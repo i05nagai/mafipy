@@ -4,8 +4,9 @@
 
 from __future__ import division
 from pytest import approx
-import mafipy.math_formula as target
 import pytest
+
+import mafipy.function as target
 
 
 class TestMathFormula:

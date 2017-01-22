@@ -3,10 +3,11 @@
 
 from __future__ import division
 
-import mafipy.payoff as target
-import mafipy.tests.util as util
 import pytest
 from pytest import approx
+
+import mafipy.function as target
+import util
 
 
 class TestPayoff(object):
