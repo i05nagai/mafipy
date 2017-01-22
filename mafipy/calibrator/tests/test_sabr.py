@@ -1,12 +1,14 @@
 #!/bin/python
+# -*- coding: utf-8 -*-
 
 from __future__ import division, print_function, absolute_import
 from pytest import approx
 import pytest
 
 from . import util
-import mafipy.calibrator as target
-import mafipy.function as function
+import mafipy.calibrator as calibrator
+import mafipy.calibrator.sabr as target
+import mafipy.function
 
 
 class TestModelCalibrator:
@@ -28,22 +30,6 @@ class TestModelCalibrator:
     # after each test finish
     def teardown(self):
         pass
-
-    @pytest.mark.parametrize("underlying, strike, rate, maturity, vol", [
-        # at the money
-        (2.1, 2.1, util.get(), util.get(), util.get()),
-        # out of the money
-        (1.1, 2.2, util.get(), util.get(), util.get()),
-        # in the money
-        (2.1, 1.85, util.get(), util.get(), util.get()),
-    ])
-    def test_black_scholes_implied_vol(
-            self, underlying, strike, rate, maturity, vol):
-        option_value = function.black_scholes_call_formula(
-            underlying, strike, rate, maturity, vol)
-        implied_vol = target.black_scholes_implied_vol(
-            underlying, strike, rate, maturity, option_value)
-        assert implied_vol == approx(vol, rel=5e-4)
 
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol", [
@@ -96,13 +82,13 @@ class TestModelCalibrator:
                                         swap_annuity,
                                         option_maturity,
                                         vol):
-        option_value = function.black_payers_swaption_value(
+        option_value = mafipy.function.black_payers_swaption_value(
             init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
-        implied_vol = target.black_swaption_implied_vol(init_swap_rate,
-                                                        option_strike,
-                                                        swap_annuity,
-                                                        option_maturity,
-                                                        option_value)
+        implied_vol = calibrator.black_swaption_implied_vol(init_swap_rate,
+                                                            option_strike,
+                                                            swap_annuity,
+                                                            option_maturity,
+                                                            option_value)
         assert implied_vol == approx(vol, rel=1e-6)
 
     def test_sabr_calibration_simple(self):
