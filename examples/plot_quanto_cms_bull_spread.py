@@ -8,10 +8,10 @@ Andersen, Leif BG, and Vladimir V. Piterbarg.
 Interest rate modeling. Vol. 1.
 London: Atlantic Financial Press, 2010.
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
-from mafipy import analytic_formula
-from mafipy import pricer_quanto_cms
+from mafipy.function import analytic_formula
+from mafipy.replication import pricer_quanto_cms
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
