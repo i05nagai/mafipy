@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-from mafipy import analytic_formula
-import scipy.optimize
-import numpy as np
+
 import math
+import numpy as np
+import scipy.optimize
+
+import mafipy.function
 
 
 def black_scholes_implied_vol(underlying,
@@ -33,7 +35,7 @@ def black_scholes_implied_vol(underlying,
     """
 
     def objective_func(vol):
-        return (analytic_formula.black_scholes_call_formula(
+        return (mafipy.function.black_scholes_call_formula(
             underlying, strike, rate, maturity, vol) - option_value)
 
     result = scipy.optimize.brentq(
@@ -72,7 +74,7 @@ def black_swaption_implied_vol(init_swap_rate,
     """
 
     def objective_func(vol):
-        return (analytic_formula.black_payers_swaption_value(
+        return (mafipy.function.black_payers_swaption_value(
             init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
             - option_value)
 
@@ -177,7 +179,7 @@ def sabr_caibration_simple(market_vols,
     # 3-dim func
     # (alpha, rho, nu)
     def objective_func(alpha_rho_nu):
-        sabr_vols = [analytic_formula.sabr_implied_vol_hagan(
+        sabr_vols = [mafipy.function.sabr_implied_vol_hagan(
             underlying,
             strike,
             option_maturity,
@@ -340,7 +342,7 @@ def sabr_caibration_west(market_vols,
     # (rho, nu)
     def objective_func(rho_nu):
         alpha = find_alpha(rho_nu[0], rho_nu[1])
-        sabr_vols = [analytic_formula.sabr_implied_vol_hagan(
+        sabr_vols = [mafipy.function.sabr_implied_vol_hagan(
             underlying,
             strike,
             option_maturity,

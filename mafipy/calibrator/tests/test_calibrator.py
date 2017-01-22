@@ -3,9 +3,10 @@
 from __future__ import division
 from pytest import approx
 import pytest
+
+import mafipy.function as function
 import mafipy.calibrator as target
-import mafipy.analytic_formula as analytic_formula
-import mafipy.tests.util as util
+import util
 
 
 class TestModelCalibrator:
@@ -38,7 +39,7 @@ class TestModelCalibrator:
     ])
     def test_black_scholes_implied_vol(
             self, underlying, strike, rate, maturity, vol):
-        option_value = analytic_formula.black_scholes_call_formula(
+        option_value = function.black_scholes_call_formula(
             underlying, strike, rate, maturity, vol)
         implied_vol = target.black_scholes_implied_vol(
             underlying, strike, rate, maturity, option_value)
@@ -95,7 +96,7 @@ class TestModelCalibrator:
                                         swap_annuity,
                                         option_maturity,
                                         vol):
-        option_value = analytic_formula.black_payers_swaption_value(
+        option_value = function.black_payers_swaption_value(
             init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
         implied_vol = target.black_swaption_implied_vol(init_swap_rate,
                                                         option_strike,

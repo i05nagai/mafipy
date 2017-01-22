@@ -472,7 +472,7 @@ def black_scholes_call_value_third_by_strike(
     d_fprime = d_fprime_by_strike(underlying, strike, rate, maturity, vol)
     d_fhess = d_fhess_by_strike(underlying, strike, rate, maturity, vol)
     d2_density = norm.pdf(d2)
-    d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
+    d2_density_fprime = mafipy.function.norm_pdf_fprime(d2)
 
     term1 = d2_density_fprime * d_fprime * d_fprime
     term2 = d2_density * d_fhess
@@ -960,7 +960,7 @@ def black_scholes_call_volga(
     if maturity < 0.0:
         return 0.0
     d1 = func_d1(underlying, strike, rate, maturity, vol)
-    pdf_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+    pdf_fprime = mafipy.function.norm_pdf_fprime(d1)
     factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
 
     return underlying * pdf_fprime * factor

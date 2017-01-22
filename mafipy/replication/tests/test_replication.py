@@ -3,11 +3,12 @@
 
 from __future__ import division
 
-import mafipy.replication as target
-import mafipy.analytic_formula as analytic_formula
-import pytest
-from mafipy.tests import util
 from pytest import approx
+import pytest
+
+import util
+import mafipy.replication as target
+import mafipy.function.analytic_formula as analytic_formula
 
 
 class TestReplication:

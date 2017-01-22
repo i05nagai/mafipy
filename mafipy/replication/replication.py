@@ -5,7 +5,8 @@ from __future__ import division
 
 import scipy.integrate
 import functools
-from . import util
+
+import util
 
 
 def linear_annuity_mapping_func(underlying, alpha0, alpha1):

@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 import scipy.stats
 
-import mafipy.function as target
+import mafipy.function.analytic_formula as target
+import mafipy.function
 import util
 
 
