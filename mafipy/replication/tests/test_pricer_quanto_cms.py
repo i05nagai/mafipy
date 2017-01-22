@@ -2,18 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
-
 from pytest import approx
-import mafipy.analytic_formula as analytic_formula
-import mafipy.math_formula as math_formula
-import mafipy.payoff as payoff
-import mafipy.pricer_quanto_cms as target
-import mafipy.replication as replication
-import mafipy.tests.util as util
 import math
 import numpy as np
 import pytest
 import scipy.stats
+
+from . import util
+import mafipy.function as function
+import mafipy.replication as replication
+import mafipy.replication.pricer_quanto_cms as target
 
 
 class TestPricerQuantoCms(object):
@@ -58,8 +56,7 @@ class TestPricerQuantoCms(object):
                 actual = target.make_pdf_black_swaption(
                     init_swap_rate, swap_annuity, option_maturity, vol)
         else:
-            af = analytic_formula
-            expect = af.black_payers_swaption_value_fhess_by_strike(
+            expect = function.black_payers_swaption_value_fhess_by_strike(
                 init_swap_rate, strike, 1.0, option_maturity, vol)
             actual = target.make_pdf_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
@@ -84,8 +81,7 @@ class TestPricerQuantoCms(object):
                 actual = target.make_pdf_fprime_black_swaption(
                     init_swap_rate, swap_annuity, option_maturity, vol)
         else:
-            af = analytic_formula
-            expect = af.black_payers_swaption_value_third_by_strike(
+            expect = function.black_payers_swaption_value_third_by_strike(
                 init_swap_rate, strike, 1.0, option_maturity, vol)
             actual = target.make_pdf_fprime_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
@@ -110,9 +106,9 @@ class TestPricerQuantoCms(object):
                 actual = target.make_cdf_black_swaption(
                     init_swap_rate, swap_annuity, option_maturity, vol)
         else:
-            af = analytic_formula
-            expect = (1.0 + af.black_payers_swaption_value_fprime_by_strike(
-                init_swap_rate, strike, 1.0, option_maturity, vol))
+            expect = (1.0
+                      + function.black_payers_swaption_value_fprime_by_strike(
+                          init_swap_rate, strike, 1.0, option_maturity, vol))
             actual = target.make_cdf_black_swaption(
                 init_swap_rate, swap_annuity, option_maturity, vol)(strike)
             assert expect == approx(actual)
@@ -136,7 +132,7 @@ class TestPricerQuantoCms(object):
                 actual = target.make_pdf_black_scholes(
                     underlying, rate, maturity, vol)
         else:
-            expect = analytic_formula.black_scholes_call_value_fhess_by_strike(
+            expect = function.black_scholes_call_value_fhess_by_strike(
                 underlying, strike, rate, maturity, vol)
             actual = target.make_pdf_black_scholes(
                 underlying, rate, maturity, vol)(strike)
@@ -159,7 +155,7 @@ class TestPricerQuantoCms(object):
                 actual = target.make_pdf_fprime_black_scholes(
                     underlying, rate, maturity, vol)
         else:
-            expect = analytic_formula.black_scholes_call_value_third_by_strike(
+            expect = function.black_scholes_call_value_third_by_strike(
                 underlying, strike, rate, maturity, vol)
             actual = target.make_pdf_fprime_black_scholes(
                 underlying, rate, maturity, vol)(strike)
@@ -182,8 +178,7 @@ class TestPricerQuantoCms(object):
                 actual = target.make_cdf_black_scholes(
                     underlying, rate, maturity, vol)
         else:
-            af = analytic_formula
-            expect = (1.0 + af.black_scholes_call_value_fprime_by_strike(
+            expect = (1.0 + function.black_scholes_call_value_fprime_by_strike(
                 underlying, strike, rate, maturity, vol))
             actual = target.make_cdf_black_scholes(
                 underlying, rate, maturity, vol)(strike)
@@ -243,7 +238,7 @@ class TestPricerQuantoCms(object):
         # expect
         term1 = swap_rate_pdf_fprime(swap_rate) * norm.pdf(h)
         term2 = (swap_rate_pdf(swap_rate)
-                 * math_formula.norm_pdf_fprime(h) * h_fprime)
+                 * function.norm_pdf_fprime(h) * h_fprime)
         denominator = norm.pdf(h) ** 2
         expect = (term1 - term2) / denominator
         # actual
@@ -771,7 +766,7 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
             "strike": self.payoff_strike,
             "gearing": self.payoff_gearing,
         }
-        call_payoff_helper = payoff.CallUnderlyingPayoffHelper(
+        call_payoff_helper = function.CallUnderlyingPayoffHelper(
             **self.payoff_params)
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
@@ -793,7 +788,7 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
         self.forward_fx_diffusion_fhess = (
             forward_fx_diffusion_helper.make_fhess())
         # pricer
-        bs_pricer = analytic_formula.BlackScholesPricerHelper()
+        bs_pricer = function.BlackScholesPricerHelper()
         call_pricer_params = {
             "underlying": self.init_swap_rate,
             "rate": self.rate,
@@ -831,7 +826,7 @@ class Test_SimpleQuantoCmsLinearCallHelper(object):
         return scipy.stats.norm.pdf(swap_rate)
 
     def _swap_rate_pdf_fprime(self, swap_rate):
-        return math_formula.norm_pdf_fprime(swap_rate)
+        return function.norm_pdf_fprime(swap_rate)
 
     def _calc_func1(self, swap_rate):
         return (self.payoff_func(swap_rate)
@@ -1007,7 +1002,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             "upper_strike": self.payoff_upper_strike,
             "gearing": self.payoff_gearing,
         }
-        call_payoff_helper = payoff.BullSpreadUnderlyingPayoffHelper(
+        call_payoff_helper = function.BullSpreadUnderlyingPayoffHelper(
             **self.payoff_params)
         self.payoff_func = call_payoff_helper.make_func()
         self.payoff_fprime = call_payoff_helper.make_fprime()
@@ -1030,7 +1025,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         self.forward_fx_diffusion_fhess = (
             self.forward_fx_diffusion_helper.make_fhess())
         # pricer
-        bs_pricer = analytic_formula.BlackSwaptionPricerHelper()
+        bs_pricer = function.BlackSwaptionPricerHelper()
         call_pricer_params = {
             "init_swap_rate": self.init_swap_rate,
             "swap_annuity": 1.0,
@@ -1069,7 +1064,7 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
         return scipy.stats.norm.pdf(swap_rate)
 
     def _swap_rate_pdf_fprime(self, swap_rate):
-        return math_formula.norm_pdf_fprime(swap_rate)
+        return function.norm_pdf_fprime(swap_rate)
 
     def _calc_func1(self, swap_rate):
         return (self.payoff_func(swap_rate)
@@ -1263,13 +1258,13 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             forward_fx_factor = math.exp(0.5
                                          * (self.forward_fx_vol ** 2)
                                          * self.maturity)
-            call_value_lower = analytic_formula.black_payers_swaption_value(
+            call_value_lower = function.black_payers_swaption_value(
                 self.init_swap_rate,
                 self.payoff_lower_strike,
                 1.0,
                 self.maturity,
                 self.swap_rate_vol)
-            call_value_upper = analytic_formula.black_payers_swaption_value(
+            call_value_upper = function.black_payers_swaption_value(
                 self.init_swap_rate,
                 self.payoff_upper_strike,
                 1.0,
@@ -1346,13 +1341,13 @@ class Test_SimpleQuantoCmsLinearBullSpreadHelper(object):
             self.min_put_range,
             self.max_call_range)
         # expect
-        call_value_lower_strike = analytic_formula.black_payers_swaption_value(
+        call_value_lower_strike = function.black_payers_swaption_value(
             self.init_swap_rate,
             self.payoff_lower_strike,
             1.0,
             self.maturity,
             self.swap_rate_vol)
-        call_value_upper_strike = analytic_formula.black_payers_swaption_value(
+        call_value_upper_strike = function.black_payers_swaption_value(
             self.init_swap_rate,
             self.payoff_upper_strike,
             1.0,
@@ -1399,7 +1394,7 @@ class TestModelPricerQuantoCMS(object):
             return max(strike - payoff_strike, 0.0) * pdf(strike)
         call_value_integral = integrate.quad(
             call_integrand, payoff_strike, np.inf)[0]
-        call_value_analytic = analytic_formula.black_scholes_call_value(
+        call_value_analytic = function.black_scholes_call_value(
             underlying, payoff_strike, rate, maturity, vol)
         assert call_value_integral == approx(call_value_analytic)
 
@@ -1408,7 +1403,7 @@ class TestModelPricerQuantoCMS(object):
             return max(payoff_strike - strike, 0.0) * pdf(strike)
         put_value_integral = integrate.quad(
             put_integrand, 0.0, payoff_strike)[0]
-        put_value_analytic = analytic_formula.black_scholes_put_value(
+        put_value_analytic = function.black_scholes_put_value(
             underlying, payoff_strike, rate, maturity, vol)
         assert put_value_integral == approx(put_value_analytic)
 
@@ -1430,7 +1425,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(strike - payoff_strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, payoff_strike, np.inf)[0]
-            value_analytic = analytic_formula.black_scholes_call_value(
+            value_analytic = function.black_scholes_call_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_call()
@@ -1446,7 +1441,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(payoff_strike - strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, 0.0, payoff_strike)[0]
-            value_analytic = analytic_formula.black_scholes_put_value(
+            value_analytic = function.black_scholes_put_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_put()
@@ -1469,7 +1464,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(strike - payoff_strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, payoff_strike, np.inf)[0]
-            value_analytic = analytic_formula.black_scholes_call_value(
+            value_analytic = function.black_scholes_call_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_call()
@@ -1485,7 +1480,7 @@ class TestModelPricerQuantoCMS(object):
                 return max(payoff_strike - strike, 0.0) * pdf(strike)
             value_integral = integrate.quad(
                 integrand, 0.0, payoff_strike)[0]
-            value_analytic = analytic_formula.black_scholes_put_value(
+            value_analytic = function.black_scholes_put_value(
                 underlying, payoff_strike, rate, maturity, vol)
             assert value_integral == approx(value_analytic)
         case_put()

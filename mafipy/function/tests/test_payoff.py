@@ -1,12 +1,12 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
-import mafipy.payoff as target
-import mafipy.tests.util as util
-import pytest
+from __future__ import division, print_function, absolute_import
 from pytest import approx
+import pytest
+
+from . import util
+import mafipy.function as target
 
 
 class TestPayoff(object):

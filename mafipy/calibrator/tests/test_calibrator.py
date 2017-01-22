@@ -1,11 +1,12 @@
 #!/bin/python
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from pytest import approx
 import pytest
+
+from . import util
 import mafipy.calibrator as target
-import mafipy.analytic_formula as analytic_formula
-import mafipy.tests.util as util
+import mafipy.function as function
 
 
 class TestModelCalibrator:
@@ -34,15 +35,15 @@ class TestModelCalibrator:
         # out of the money
         (1.1, 2.2, util.get(), util.get(), util.get()),
         # in the money
-        (2.1, 1.9, util.get(), util.get(), util.get()),
+        (2.1, 1.85, util.get(), util.get(), util.get()),
     ])
     def test_black_scholes_implied_vol(
             self, underlying, strike, rate, maturity, vol):
-        option_value = analytic_formula.black_scholes_call_formula(
+        option_value = function.black_scholes_call_formula(
             underlying, strike, rate, maturity, vol)
         implied_vol = target.black_scholes_implied_vol(
             underlying, strike, rate, maturity, option_value)
-        assert implied_vol == approx(vol)
+        assert implied_vol == approx(vol, rel=5e-4)
 
     @pytest.mark.parametrize(
         "init_swap_rate, option_strike, swap_annuity, option_maturity, vol", [
@@ -63,31 +64,31 @@ class TestModelCalibrator:
             # out of the money
             (0.18, 0.22, util.get(), 1.0 / 12.0, util.get()),
             (0.08, 0.22, util.get(), 3.0 / 12.0, util.get()),
-            (0.08, 0.22, util.get(), 6.0 / 12.0, util.get()),
+            (0.12, 0.22, util.get(), 6.0 / 12.0, util.get()),
             (0.08, 0.22, util.get(), 1.0, util.get()),
             (0.08, 0.22, util.get(), 2.0, util.get()),
             (0.08, 0.22, util.get(), 3.0, util.get()),
             (0.08, 0.22, util.get(), 4.0, util.get()),
             (0.08, 0.22, util.get(), 5.0, util.get()),
-            (0.08, 0.22, util.get(), 6.0, util.get()),
+            (0.12, 0.22, util.get(), 6.0, util.get()),
             (0.08, 0.22, util.get(), 7.0, util.get()),
             (0.08, 0.22, util.get(), 8.0, util.get()),
             (0.08, 0.22, util.get(), 9.0, util.get()),
             (0.08, 0.22, util.get(), 10.0, util.get()),
             # in the money
             (0.21, 0.18, util.get(), 1.0 / 12.0, util.get()),
-            (0.21, 0.08, util.get(), 3.0 / 12.0, util.get()),
+            (0.21, 0.10, util.get(), 3.0 / 12.0, util.get()),
             (0.21, 0.18, util.get(), 6.0 / 12.0, util.get()),
-            (0.21, 0.08, util.get(), 1.0, util.get()),
-            (0.21, 0.08, util.get(), 2.0, util.get()),
-            (0.21, 0.08, util.get(), 3.0, util.get()),
-            (0.21, 0.08, util.get(), 4.0, util.get()),
+            (0.21, 0.12, util.get(), 1.0, util.get()),
+            (0.21, 0.18, util.get(), 2.0, util.get()),
+            (0.21, 0.18, util.get(), 3.0, util.get()),
+            (0.21, 0.12, util.get(), 4.0, util.get()),
             (0.21, 0.08, util.get(), 5.0, util.get()),
-            (0.21, 0.08, util.get(), 6.0, util.get()),
+            (0.21, 0.10, util.get(), 6.0, util.get()),
             (0.21, 0.08, util.get(), 7.0, util.get()),
             (0.21, 0.08, util.get(), 8.0, util.get()),
             (0.21, 0.08, util.get(), 9.0, util.get()),
-            (0.21, 0.08, util.get(), 10., util.get()),
+            (0.21, 0.08, util.get(), 10.0, util.get()),
         ])
     def test_black_swaption_implied_vol(self,
                                         init_swap_rate,
@@ -95,14 +96,14 @@ class TestModelCalibrator:
                                         swap_annuity,
                                         option_maturity,
                                         vol):
-        option_value = analytic_formula.black_payers_swaption_value(
+        option_value = function.black_payers_swaption_value(
             init_swap_rate, option_strike, swap_annuity, option_maturity, vol)
         implied_vol = target.black_swaption_implied_vol(init_swap_rate,
                                                         option_strike,
                                                         swap_annuity,
                                                         option_maturity,
                                                         option_value)
-        assert implied_vol == approx(vol)
+        assert implied_vol == approx(vol, rel=1e-6)
 
     def test_sabr_calibration_simple(self):
         market_vols = [45.6, 41.6, 37.9, 36.6, 37.8, 39.2, 40.0]

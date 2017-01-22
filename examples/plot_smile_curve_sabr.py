@@ -4,9 +4,9 @@ Smile curve under SABR model
 =============================
 This example plots smile curve under SABR model.
 """
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
-from mafipy import analytic_formula as af
+from mafipy.function import analytic_formula as af
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 

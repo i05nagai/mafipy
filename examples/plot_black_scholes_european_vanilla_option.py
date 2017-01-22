@@ -6,11 +6,11 @@ This example calculates call and put options under black scholes model.
 p.d.f. and c.d.f. of the unerlying are also drawn.
 """
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 
-from mafipy import analytic_formula as af
-from mafipy import payoff
-from mafipy import pricer_quanto_cms
+from mafipy.function import analytic_formula as af
+from mafipy.function import payoff
+from mafipy.replication import pricer_quanto_cms
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 

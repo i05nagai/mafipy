@@ -1,15 +1,13 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
+from __future__ import division, print_function, absolute_import
 import math
 import numpy as np
 import scipy
-from . import analytic_formula
-from . import math_formula
-from . import payoff
+
 from . import replication
+from mafipy import function
 
 
 # -----------------------------------------------------------------------------
@@ -49,7 +47,7 @@ def make_pdf_black_swaption(
     assert(vol > 0.0)
 
     def pdf(option_strike):
-        return analytic_formula.black_payers_swaption_value_fhess_by_strike(
+        return function.black_payers_swaption_value_fhess_by_strike(
             init_swap_rate=init_swap_rate,
             option_strike=option_strike,
             swap_annuity=1.0,
@@ -95,7 +93,7 @@ def make_pdf_fprime_black_swaption(
     assert(vol > 0.0)
 
     def pdf_fprime(option_strike):
-        return analytic_formula.black_payers_swaption_value_third_by_strike(
+        return function.black_payers_swaption_value_third_by_strike(
             init_swap_rate=init_swap_rate,
             option_strike=option_strike,
             swap_annuity=1.0,
@@ -126,7 +124,7 @@ def make_cdf_black_swaption(
     assert(vol > 0.0)
 
     return lambda option_strike: (
-        1.0 + analytic_formula.black_payers_swaption_value_fprime_by_strike(
+        1.0 + function.black_payers_swaption_value_fprime_by_strike(
             init_swap_rate, option_strike, 1.0, option_maturity, vol))
 
 
@@ -164,7 +162,7 @@ def make_pdf_black_scholes(
     assert(vol >= 0.0)
 
     def pdf(strike):
-        return analytic_formula.black_scholes_call_value_fhess_by_strike(
+        return function.black_scholes_call_value_fhess_by_strike(
             underlying=underlying,
             strike=strike,
             rate=rate,
@@ -207,7 +205,7 @@ def make_pdf_fprime_black_scholes(
     assert(vol >= 0.0)
 
     def pdf_fprime(strike):
-        return analytic_formula.black_scholes_call_value_third_by_strike(
+        return function.black_scholes_call_value_third_by_strike(
             underlying=underlying,
             strike=strike,
             rate=rate,
@@ -236,7 +234,7 @@ def make_cdf_black_scholes(
     assert(maturity >= 0.0)
     assert(vol >= 0.0)
     return lambda strike: (
-        1.0 + analytic_formula.black_scholes_call_value_fprime_by_strike(
+        1.0 + function.black_scholes_call_value_fprime_by_strike(
             underlying, strike, rate, maturity, vol))
 
 
@@ -332,7 +330,7 @@ def _calc_h_fhess(swap_rate_pdf_fprime, swap_rate_pdf, swap_rate, h, h_fprime):
     norm = scipy.stats.norm
     h_term1 = swap_rate_pdf_fprime(swap_rate) * norm.pdf(h)
     h_term2 = (swap_rate_pdf(swap_rate)
-               * math_formula.norm_pdf_fprime(h) * h_fprime)
+               * function.norm_pdf_fprime(h) * h_fprime)
     denominator = norm.pdf(h) ** 2
     return (h_term1 - h_term2) / denominator
 
@@ -1402,9 +1400,9 @@ def replicate(init_swap_rate,
             **annuity_mapping_params)
     # payoff
     if payoff_type == 1:
-        payoff_helper = payoff.CallUnderlyingPayoffHelper(**payoff_params)
+        payoff_helper = function.CallUnderlyingPayoffHelper(**payoff_params)
     elif payoff_type == 3:
-        payoff_helper = payoff.BullSpreadUnderlyingPayoffHelper(
+        payoff_helper = function.BullSpreadUnderlyingPayoffHelper(
             **payoff_params)
     # pricer
     # quanto cms helper

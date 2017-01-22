@@ -1,16 +1,16 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from pytest import approx
-import numpy as np
-import mafipy.analytic_formula as target
-import mafipy.math_formula
-import mafipy.tests.util as util
 import math
+import numpy as np
 import pytest
 import scipy.stats
+
+from . import util
+import mafipy.function
+import mafipy.function.analytic_formula as target
 
 
 class TestAnalytic(object):
@@ -365,7 +365,7 @@ class TestAnalytic(object):
             # because it is a bit complicated to generate test cases
             d2 = target.func_d2(underlying, strike, rate, maturity, vol)
             d2_density = norm.pdf(d2)
-            d2_density_fprime = mafipy.math_formula.norm_pdf_fprime(d2)
+            d2_density_fprime = mafipy.function.norm_pdf_fprime(d2)
             d_fprime = target.d_fprime_by_strike(
                 underlying, strike, rate, maturity, vol)
             d_fhess = target.d_fhess_by_strike(
@@ -844,7 +844,7 @@ class TestAnalytic(object):
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
             d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            pdf_fprime = mafipy.math_formula.norm_pdf_fprime(d1)
+            pdf_fprime = mafipy.function.norm_pdf_fprime(d1)
             factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
             expect = underlying * pdf_fprime * factor
 

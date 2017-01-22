@@ -1,11 +1,11 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 from pytest import approx
-import mafipy.math_formula as target
 import pytest
+
+import mafipy.function as target
 
 
 class TestMathFormula:

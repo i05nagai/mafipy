@@ -1,10 +1,10 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
-import scipy.integrate
+from __future__ import division, print_function, absolute_import
 import functools
+import scipy.integrate
+
 from . import util
 
 

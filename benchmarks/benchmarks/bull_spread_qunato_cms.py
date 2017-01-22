@@ -2,8 +2,8 @@
 
 # for asv
 try:
-    from mafipy import pricer_quanto_cms
-    from mafipy import analytic_formula
+    from mafipy.function import analytic_formula
+    from mafipy.replication import pricer_quanto_cms
 except ImportError as err:
     print("Import error:{0}".format(err))
     pass
