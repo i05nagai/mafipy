@@ -1,6 +1,7 @@
 
 #python
 *.pyc
+*.pyo
 /.cache
 *.egg-info
 /build
