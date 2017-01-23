@@ -7,7 +7,7 @@ import pytest
 
 from . import util
 import mafipy.function.analytic_formula as analytic_formula
-import mafipy.replication as target
+import mafipy.replication.replication_method as target
 
 
 class TestReplication:
