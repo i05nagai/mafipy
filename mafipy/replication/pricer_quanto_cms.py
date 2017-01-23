@@ -5,8 +5,8 @@ from __future__ import division, print_function, absolute_import
 import numpy as np
 
 from mafipy import function
-import mafipy.replication._quanto_cms_forward_fx as _fx
-import mafipy.replication.replication_method as replication_method
+from mafipy.replication import _quanto_cms_forward_fx as _fx
+from mafipy.replication import replication_method as replication_method
 
 
 # -----------------------------------------------------------------------------

@@ -9,7 +9,7 @@ import scipy.stats
 
 from . import util
 import mafipy.function as function
-import mafipy.replication._quanto_cms_forward_fx as target
+from mafipy.replication import _quanto_cms_forward_fx as target
 
 
 class Test_QuantoCmsForwardFx(object):

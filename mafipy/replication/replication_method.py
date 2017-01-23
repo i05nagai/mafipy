@@ -8,6 +8,9 @@ import scipy.integrate
 from . import util
 
 
+# ----------------------------------------------------------------------------
+# Annuity mapping function
+# ----------------------------------------------------------------------------
 def linear_annuity_mapping_func(underlying, alpha0, alpha1):
     """linear_annuity_mapping_func
     calculate linear annuity mapping function.
@@ -133,6 +136,9 @@ class LinearAnnuityMappingFuncHelper(AnnuityMappingFuncHelper):
         return functools.partial(linear_annuity_mapping_fhess, **self.params)
 
 
+# ----------------------------------------------------------------------------
+# Replication
+# ----------------------------------------------------------------------------
 class Replication(object):
     """Replication
     Interface class to the class which uses replication method.
