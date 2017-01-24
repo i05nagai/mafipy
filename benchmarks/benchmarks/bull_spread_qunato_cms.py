@@ -1,12 +1,8 @@
 #!/bin/python
-
 # for asv
-try:
-    from mafipy.function import analytic_formula
-    from mafipy.replication import pricer_quanto_cms
-except ImportError as err:
-    print("Import error:{0}".format(err))
-    pass
+from mafipy.function import analytic_formula
+from mafipy.replication import pricer_quanto_cms
+
 
 # swap rate
 INIT_SWAP_RATE = 0.018654
