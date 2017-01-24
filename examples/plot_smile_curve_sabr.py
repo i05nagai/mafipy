@@ -6,7 +6,7 @@ This example plots smile curve under SABR model.
 """
 from __future__ import division, print_function, absolute_import
 
-from mafipy.function import analytic_formula as af
+from mafipy.function import sabr as sabr
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
@@ -121,7 +121,7 @@ def calc_smile(strikes, **param):
     r = param["rho"]
     n = param["nu"]
     return [
-        af.sabr_implied_vol_hagan(
+        sabr.sabr_implied_vol_hagan(
             u, strike, m, a, b, r, n) for strike in strikes
     ]
 

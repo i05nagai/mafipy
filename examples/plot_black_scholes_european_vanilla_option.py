@@ -8,7 +8,7 @@ p.d.f. and c.d.f. of the unerlying are also drawn.
 
 from __future__ import division, print_function, absolute_import
 
-from mafipy.function import analytic_formula as af
+from mafipy.function import black_scholes as bs
 from mafipy.function import payoff
 from mafipy.replication import pricer_quanto_cms
 import matplotlib.pyplot as plt
@@ -97,9 +97,9 @@ def main():
     strike = STRIKE
 
     # price
-    prices_call = [af.black_scholes_call_value(
+    prices_call = [bs.black_scholes_call_value(
         underlying, strike, rate, maturity, vol) for underlying in underlyings]
-    prices_put = [af.black_scholes_put_value(
+    prices_put = [bs.black_scholes_put_value(
         underlying, strike, rate, maturity, vol) for underlying in underlyings]
     payoffs_call = [payoff.payoff_call(
         underlying, strike) for underlying in underlyings]

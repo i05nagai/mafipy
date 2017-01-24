@@ -36,12 +36,39 @@ Installation
    cd mafipy
    pip install -r requirements.txt
 
+
+Test
+======
+
 To run tests, you additionally need to install `pytest`.
 
 .. code:: shell
 
    pip install pytest
    python setup.py test
+
+
+Benchmarks
+==========
+
+`asv` is required to execute benchmarks.
+You can install `asv` by `pip`.
+
+.. code:: shell
+
+   pip install asv
+
+Then 
+
+.. code:: shell
+
+   # execute benchmarks
+   python setup.py benchmark
+   # generate html file from the results
+   python setup.py benchmark_publish
+   # preview the generated html through local server
+   python setup.py benchmark_preview
+
 
 Related Projects
 ================
