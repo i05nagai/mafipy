@@ -79,7 +79,8 @@ class PyTest(TestCommand):
             self.test_args += ["--verbose"]
         if self.doctest_modules:
             self.test_args += ["--doctest-modules"]
-        # errno = pytest.main(shlex.split(self.test_args))
+
+        print("executing 'pytest {0}'".format(" ".join(self.test_args)))
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
@@ -146,6 +147,7 @@ class Benchmark(Command):
         env["PYTHONPATH"] = cwd
 
         try:
+            print("executing '{0}'".format(" ".join(cmd)))
             return subprocess.call(cmd, env=env, cwd=cwd)
         except OSError as err:
             if err.errno == 2:
@@ -185,6 +187,7 @@ class BenchmarkPublish(Command):
         env = dict(os.environ)
 
         try:
+            print("executing '{0}'".format(" ".join(cmd)))
             return subprocess.call(cmd, env=env, cwd=cwd)
         except OSError as err:
             if err.errno == 2:
@@ -224,6 +227,7 @@ class BenchmarkPreview(Command):
         env = dict(os.environ)
 
         try:
+            print("executing '{0}'".format(" ".join(cmd)))
             return subprocess.call(cmd, env=env, cwd=cwd)
         except OSError as err:
             if err.errno == 2:
