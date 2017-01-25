@@ -1,8 +1,9 @@
-mafipy.replication module
+mafipy.function module
 =========================
 
-.. automodule:: mafipy.replication
+.. automodule:: mafipy.function
     :show-inheritance:
 
 .. toctree::
     :hidden:
+

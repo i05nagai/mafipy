@@ -19,6 +19,7 @@
 #
 import os
 import sys
+import sphinx
 import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath('../..'))
 
@@ -33,11 +34,22 @@ sys.path.insert(0, os.path.abspath('../..'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
 ]
+
+# -----------------------------------------------------------------------------
+# Autosummary
+# -----------------------------------------------------------------------------
+
+# generate stub files for autosummary extension
+# See http://www.sphinx-doc.org/en/1.5.1/ext/autosummary.html
+if sphinx.__version__ >= "0.7":
+    import glob
+    autosummary_generate = glob.glob("*.rst")
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

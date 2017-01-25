@@ -159,12 +159,11 @@ class Replication(object):
 
         where
         :math:`S(t)` is value of underlying at time :math:`t`,
-        :math:`f(\cdot)` is payoff function
-            as a function of underlying,
+        :math:`f(\cdot)` is payoff function as a function of underlying,
         :math:`p(K; S(0), T, \sigma)` is value of put pricer
-            with strike :math:`K`.
+        with strike :math:`K`.
         :math:`c(K; S(0), T, \sigma)` is value of call pricer
-            with strike :math:`K`.
+        with strike :math:`K`.
         """
         raise NotImplementedError
 
