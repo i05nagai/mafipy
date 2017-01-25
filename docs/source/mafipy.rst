@@ -6,12 +6,8 @@ Submodules
 
 .. toctree::
 
-   mafipy.analytic_formula
    mafipy.calibrator
-   mafipy.error
-   mafipy.math_formula
-   mafipy.payoff
-   mafipy.pricer_quanto_cms
+   mafipy.function
    mafipy.replication
    mafipy.util
 
