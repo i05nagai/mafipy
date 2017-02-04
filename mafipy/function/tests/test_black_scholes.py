@@ -1,14 +1,16 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 from pytest import approx
 import math
 import numpy as np
 import pytest
 import scipy.stats
 
-import mafipy.function
+import mafipy.function as function
 import mafipy.function.black_scholes as target
 
 
@@ -364,7 +366,7 @@ class TestBlackScholes(object):
             # because it is a bit complicated to generate test cases
             d2 = target.func_d2(underlying, strike, rate, maturity, vol)
             d2_density = norm.pdf(d2)
-            d2_density_fprime = mafipy.function.norm_pdf_fprime(d2)
+            d2_density_fprime = function.norm_pdf_fprime(d2)
             d_fprime = target.d_fprime_by_strike(
                 underlying, strike, rate, maturity, vol)
             d_fhess = target.d_fhess_by_strike(
@@ -495,7 +497,7 @@ class TestBlackScholes(object):
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
             d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            pdf_fprime = mafipy.function.norm_pdf_fprime(d1)
+            pdf_fprime = function.norm_pdf_fprime(d1)
             factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
             expect = underlying * pdf_fprime * factor
 
@@ -564,4 +566,38 @@ class TestBlackScholes(object):
 
             actual = target.black_scholes_call_rho(
                 underlying, strike, rate, maturity, vol, today)
+            assert expect == approx(actual)
+
+    # -------------------------------------------------------------------------
+    # Black scholes distributions
+    # -------------------------------------------------------------------------
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.1, 2.2, 1.3, 1.4, -0.1),
+            # otherwise
+            (1.1, 2.2, 1.3, 1.4, 0.1),
+        ])
+    def test_black_scholes_cdf(
+            self, underlying, strike, rate, maturity, vol):
+
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_cdf(
+                    underlying, strike, rate, maturity, vol)
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            expect = (1.0
+                      + function.black_scholes_call_value_fprime_by_strike(
+                          underlying,
+                          strike,
+                          rate,
+                          maturity,
+                          vol) * math.exp(rate * maturity))
+
+            actual = target.black_scholes_cdf(
+                underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)

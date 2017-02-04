@@ -692,3 +692,51 @@ def black_scholes_call_rho(underlying, strike, rate, maturity, vol, today):
     time = maturity - today
     d2 = func_d2(underlying, strike, rate, time, vol)
     return time * math.exp(-rate * time) * strike * norm.cdf(d2)
+
+
+# ----------------------------------------------------------------------------
+# Black scholes distributions
+# ----------------------------------------------------------------------------
+def black_scholes_cdf(underlying, strike, rate, maturity, vol):
+    """black_scholes_cdf
+    calculates value of c.d.f. of black scholes model.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity:
+    :param float vol:
+
+    :return: value of p.d.f. of black scholes model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (1.0
+            + black_scholes_call_value_fprime_by_strike(
+                underlying,
+                strike,
+                rate,
+                maturity,
+                vol) * math.exp(rate * maturity))
+
+
+def black_scholes_pdf(underlying, strike, rate, maturity, vol):
+    """black_scholes_pdf
+    calculates value of p.d.f. of black scholes model.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity:
+    :param float vol:
+
+    :return: value of p.d.f. of black scholes model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (black_scholes_call_value_fhess_by_strike(
+        underlying,
+        strike,
+        rate,
+        maturity,
+        vol) * math.exp(rate * maturity))
