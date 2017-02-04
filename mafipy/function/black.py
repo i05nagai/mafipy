@@ -306,3 +306,55 @@ def black_payers_swaption_vega(
     bs_vega = mafipy.function.black_scholes_call_vega(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * bs_vega
+
+
+# ----------------------------------------------------------------------------
+# black payer's/reciever's swaption distribution
+# ----------------------------------------------------------------------------
+def black_swaption_cdf(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_swaption_cdf
+    calculates value of c.d.f. of black swaption.
+    :py:func:`black_payers_swaption_value_fprime_by_strike`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: option strike.
+    :param float swap_annuity: swap annuity.
+    :param float option_maturity: maturity of swaption.
+    :param float vol: volatility. non-negative.
+
+    :return: value of c.d.f. of black swaption model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (1.0
+            + black_payers_swaption_value_fprime_by_strike(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol) / swap_annuity)
+
+
+def black_swaption_pdf(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_swaption_pdf
+    calculates value of p.d.f. of black swaption.
+    :py:func:`black_payers_swaption_value_fhess_by_strike`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: option strike.
+    :param float swap_annuity: swap annuity.
+    :param float option_maturity: maturity of swaption.
+    :param float vol: volatility. non-negative.
+
+    :return: value of p.d.f. of black swaption model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (black_payers_swaption_value_fhess_by_strike(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        vol) / swap_annuity)

@@ -1,13 +1,14 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 from pytest import approx
-import numpy as np
-import pytest
-
 import mafipy.function as function
 import mafipy.function.black as target
+import numpy as np
+import pytest
 
 
 class TestBlack(object):
@@ -303,3 +304,91 @@ class TestBlack(object):
             option_maturity,
             vol)
         assert expect == approx(actual)
+
+    # -------------------------------------------------------------------------
+    # black payer's/reciever's swaption distribution
+    # -------------------------------------------------------------------------
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.1, 2.1, 1.2, 1.3, -0.1),
+            # otherwise
+            (1.1, 2.1, 1.2, 1.3, 0.1),
+        ])
+    def test_black_payers_swaption_cdf(self,
+                                       init_swap_rate,
+                                       option_strike,
+                                       swap_annuity,
+                                       option_maturity,
+                                       vol):
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_swaption_cdf(
+                    init_swap_rate,
+                    option_strike,
+                    swap_annuity,
+                    option_maturity,
+                    vol)
+            return
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            expect = (1.0
+                      + function.black_payers_swaption_value_fprime_by_strike(
+                          init_swap_rate,
+                          option_strike,
+                          swap_annuity,
+                          option_maturity,
+                          vol) / swap_annuity)
+
+            actual = target.black_swaption_cdf(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol)
+            assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.1, 2.1, 1.2, 1.3, -0.1),
+            # otherwise
+            (1.1, 2.1, 1.2, 1.3, 0.1),
+        ])
+    def test_black_payers_swaption_pdf(self,
+                                       init_swap_rate,
+                                       option_strike,
+                                       swap_annuity,
+                                       option_maturity,
+                                       vol):
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_swaption_pdf(
+                    init_swap_rate,
+                    option_strike,
+                    swap_annuity,
+                    option_maturity,
+                    vol)
+            return
+        else:
+            # double checking implimentation of formula
+            # because it is a bit complicated to generate test cases
+            expect = (function.black_payers_swaption_value_fhess_by_strike(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol) / swap_annuity)
+
+            actual = target.black_swaption_pdf(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol)
+            assert expect == approx(actual)
