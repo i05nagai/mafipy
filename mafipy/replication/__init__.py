@@ -37,7 +37,9 @@ Pricer
     replicate
 """
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from .pricer_quanto_cms import *
 from .replication_method import *

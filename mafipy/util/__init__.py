@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 __all__ = [s for s in dir() if not s.startswith('_')]
