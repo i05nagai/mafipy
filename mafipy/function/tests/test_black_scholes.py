@@ -387,10 +387,10 @@ class TestBlackScholes(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
             # vol < 0 raise AssertionError
             (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            # maturity < 0, returns 0
+            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
             # otherwise
             (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
         ])
@@ -398,10 +398,15 @@ class TestBlackScholes(object):
             self, underlying, strike, rate, maturity, vol, today):
 
         # raise AssertionError
-        if maturity < 0.0 or vol < 0.0:
+        if vol < 0.0:
             with pytest.raises(AssertionError):
                 actual = target.black_scholes_call_delta(
                     underlying, strike, rate, maturity, vol)
+            return
+        elif maturity < 0.0:
+            actual = target.black_scholes_call_delta(
+                underlying, strike, rate, maturity, vol)
+            assert 0.0 == approx(actual)
         else:
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases
@@ -444,10 +449,10 @@ class TestBlackScholes(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            # maturity < 0 raise AssertionError
-            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
             # vol < 0 raise AssertionError
             (1.1, 2.2, 1.3, 1.4, -0.1, 0.0),
+            # maturity < 0 returns 0
+            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
             # otherwise
             (1.1, 2.2, 1.3, 1.4, 0.1, 0.0),
         ])
@@ -455,10 +460,14 @@ class TestBlackScholes(object):
             self, underlying, strike, rate, maturity, vol, today):
 
         # raise AssertionError
-        if maturity < 0.0 or vol < 0.0:
+        if vol < 0.0:
             with pytest.raises(AssertionError):
                 actual = target.black_scholes_call_vega(
                     underlying, strike, rate, maturity, vol)
+        elif maturity < 0.0:
+            actual = target.black_scholes_call_vega(
+                underlying, strike, rate, maturity, vol)
+            assert 0.0 == approx(actual)
         else:
             # double checking implimentation of formula
             # because it is a bit complicated to generate test cases

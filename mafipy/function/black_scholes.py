@@ -487,13 +487,15 @@ def black_scholes_call_delta(underlying, strike, rate, maturity, vol):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float maturity: must be non-negative.
+    :param float maturity: if maturity <= 0, this function returns 0.
     :param float vol: volatility. This must be positive.
+
     :return: value of delta.
     :rtype: float.
     """
-    assert(maturity >= 0.0)
     assert(vol >= 0.0)
+    if maturity <= 0.0:
+        return 0.0
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     return scipy.stats.norm.cdf(d1)
 
@@ -557,13 +559,15 @@ def black_scholes_call_vega(underlying, strike, rate, maturity, vol):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float maturity: must be non-negative.
+    :param float maturity: if maturity <= 0.0, this function returns 0.
     :param float vol: volatility. This must be positive.
+
     :return: value of vega.
     :rtype: float.
     """
-    assert(maturity >= 0.0)
     assert(vol >= 0.0)
+    if maturity <= 0.0:
+        return 0.0
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     return math.sqrt(maturity) * underlying * scipy.stats.norm.pdf(d1)
 
