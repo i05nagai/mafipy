@@ -612,7 +612,9 @@ def black_scholes_call_volga(underlying, strike, rate, maturity, vol):
         return 0.0
     d1 = func_d1(underlying, strike, rate, maturity, vol)
     pdf_fprime = mafipy.function.norm_pdf_fprime(d1)
-    factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
+    ln_moneyness = math.log(underlying / strike)
+    numerator = -ln_moneyness + (0.5 * vol * vol - rate) * maturity
+    factor = numerator / (vol * vol)
 
     return underlying * pdf_fprime * factor
 

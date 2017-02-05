@@ -450,11 +450,11 @@ class TestBlackScholes(object):
         "underlying, strike, rate, maturity, vol, today",
         [
             # vol < 0 raise AssertionError
-            (1.1, 2.2, 1.3, 1.4, -0.1, 0.0),
+            (1.1, 1.2, 0.3, 1.4, -0.1, 0.0),
             # maturity < 0 returns 0
-            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
+            (1.1, 1.1, 0.2, -1.3, 0.1, 0.0),
             # otherwise
-            (1.1, 2.2, 1.3, 1.4, 0.1, 0.0),
+            (1.1, 1.2, 0.3, 1.4, 0.1, 0.0),
         ])
     def test_black_scholes_call_vega(
             self, underlying, strike, rate, maturity, vol, today):
@@ -469,28 +469,29 @@ class TestBlackScholes(object):
                 underlying, strike, rate, maturity, vol)
             assert 0.0 == approx(actual)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            expect = (math.sqrt(maturity)
-                      * underlying * scipy.stats.norm.pdf(d1))
+            shock = 1e-6
+            value_plus = function.black_scholes_call_value(
+                underlying, strike, rate, maturity, vol + shock)
+            value_minus = function.black_scholes_call_value(
+                underlying, strike, rate, maturity, vol - shock)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_vega(
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
     @pytest.mark.parametrize(
-        "underlying, strike, rate, maturity, vol, today",
+        "underlying, strike, rate, maturity, vol",
         [
             # vol < 0 raise AssertionError
-            (1.1, 2.2, 1.3, 1.4, -0.1, 0.0),
+            (1.1, 1.2, 0.3, 1.4, -0.1),
             # maturity <= 0 return 0
-            (1.1, 2.1, 1.2, -1.3, 0.1, 0.0),
+            (1.1, 1.2, 0.2, -1.3, 0.1),
             # otherwise
-            (1.1, 2.2, 1.3, 1.4, 0.1, 0.0),
+            (1.1, 1.2, 0.3, 1.4, 0.1),
         ])
     def test_black_scholes_call_volga(
-            self, underlying, strike, rate, maturity, vol, today):
+            self, underlying, strike, rate, maturity, vol):
 
         # raise AssertionError
         if vol < 0.0:
@@ -503,12 +504,12 @@ class TestBlackScholes(object):
                 underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            pdf_fprime = function.norm_pdf_fprime(d1)
-            factor = (0.5 * vol * vol - rate) * maturity / (vol * vol)
-            expect = underlying * pdf_fprime * factor
+            shock = 1e-6
+            value_plus = function.black_scholes_call_vega(
+                underlying, strike, rate, maturity, vol + shock)
+            value_minus = function.black_scholes_call_vega(
+                underlying, strike, rate, maturity, vol - shock)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_volga(
                 underlying, strike, rate, maturity, vol)
