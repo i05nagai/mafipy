@@ -330,6 +330,29 @@ def black_payers_swaption_volga(
     return swap_annuity * bs_volga
 
 
+def black_payers_swaption_vega_fprime_by_strike(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_vega_fprime_by_strike
+    calculates derivative of vega with respect to strike under black model.
+    This is required for :py:func:`sabr_pdf`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: derivative of vega w.r.t. strike.
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_vega_fprime = mafipy.function.black_scholes_call_vega_fprime_by_strike(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_vega_fprime
+
+
 # ----------------------------------------------------------------------------
 # black payer's/reciever's swaption distribution
 # ----------------------------------------------------------------------------

@@ -388,11 +388,11 @@ class TestBlackScholes(object):
         "underlying, strike, rate, maturity, vol, today",
         [
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, -0.1, 0.0),
             # maturity < 0, returns 0
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, -1.3, 0.1, 0.0),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, 0.1, 0.0),
         ])
     def test_black_scholes_call_delta(
             self, underlying, strike, rate, maturity, vol, today):
@@ -408,10 +408,12 @@ class TestBlackScholes(object):
                 underlying, strike, rate, maturity, vol)
             assert 0.0 == approx(actual)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            expect = scipy.stats.norm.cdf(d1)
+            shock = 1e-6
+            value_plus = function.black_scholes_call_value(
+                underlying + shock, strike, rate, maturity, vol)
+            value_minus = function.black_scholes_call_value(
+                underlying - shock, strike, rate, maturity, vol)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_delta(
                 underlying, strike, rate, maturity, vol)
@@ -420,27 +422,28 @@ class TestBlackScholes(object):
     @pytest.mark.parametrize(
         "underlying, strike, rate, maturity, vol, today",
         [
-            # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, -0.1, 0.0),
+            # maturity < 0 returns 0
+            (1.1, 1.2, 0.2, -1.3, 0.1, 0.0),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, 0.1, 0.0),
         ])
     def test_black_scholes_call_gamma(
             self, underlying, strike, rate, maturity, vol, today):
 
         # raise AssertionError
-        if maturity < 0.0 or vol < 0.0:
+        if vol < 0.0:
             with pytest.raises(AssertionError):
                 actual = target.black_scholes_call_gamma(
                     underlying, strike, rate, maturity, vol)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            d1 = target.func_d1(underlying, strike, rate, maturity, vol)
-            denominator = (underlying ** 2) * vol * math.sqrt(maturity)
-            expect = -scipy.stats.norm.pdf(d1) / denominator
+            shock = 1e-6
+            value_plus = function.black_scholes_call_delta(
+                underlying + shock, strike, rate, maturity, vol)
+            value_minus = function.black_scholes_call_delta(
+                underlying - shock, strike, rate, maturity, vol)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_gamma(
                 underlying, strike, rate, maturity, vol)
@@ -519,11 +522,11 @@ class TestBlackScholes(object):
         "underlying, strike, rate, maturity, vol, today",
         [
             # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, -1.3, 0.1, 0.0),
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, -0.1, 0.0),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, 0.1, 0.0),
         ])
     def test_black_scholes_call_theta(
             self, underlying, strike, rate, maturity, vol, today):
@@ -534,15 +537,12 @@ class TestBlackScholes(object):
                 actual = target.black_scholes_call_theta(
                     underlying, strike, rate, maturity, vol, today)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            norm = scipy.stats.norm
-            time = maturity - today
-            d1 = target.func_d1(underlying, strike, rate, time, vol)
-            term1 = underlying * norm.pdf(d1) * vol / (2.0 * math.sqrt(time))
-            d2 = target.func_d2(underlying, strike, rate, time, vol)
-            term2 = rate * math.exp(-rate * time) * strike * norm.cdf(d2)
-            expect = -term1 - term2
+            shock = 1e-6
+            value_plus = function.black_scholes_call_value(
+                underlying, strike, rate, maturity, vol, today + shock)
+            value_minus = function.black_scholes_call_value(
+                underlying, strike, rate, maturity, vol, today - shock)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_theta(
                 underlying, strike, rate, maturity, vol, today)
@@ -552,11 +552,11 @@ class TestBlackScholes(object):
         "underlying, strike, rate, maturity, vol, today",
         [
             # maturity < 0 raise AssertionError
-            (1.0, 2.0, 1.0, -1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, -1.3, 0.1, 0.0),
             # vol < 0 raise AssertionError
-            (1.0, 2.0, 1.0, 1.0, -0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, -0.1, 0.0),
             # otherwise
-            (1.0, 2.0, 1.0, 1.0, 0.1, 0.0),
+            (1.1, 1.2, 0.2, 1.3, 0.1, 0.0),
         ])
     def test_black_scholes_call_rho(
             self, underlying, strike, rate, maturity, vol, today):
@@ -567,15 +567,50 @@ class TestBlackScholes(object):
                 actual = target.black_scholes_call_rho(
                     underlying, strike, rate, maturity, vol, today)
         else:
-            # double checking implimentation of formula
-            # because it is a bit complicated to generate test cases
-            norm = scipy.stats.norm
-            time = maturity - today
-            d2 = target.func_d2(underlying, strike, rate, time, vol)
-            expect = time * math.exp(-rate * time) * strike * norm.cdf(d2)
+            shock = 1e-6
+            value_plus = function.black_scholes_call_value(
+                underlying, strike, rate + shock, maturity, vol, today)
+            value_minus = function.black_scholes_call_value(
+                underlying, strike, rate - shock, maturity, vol, today)
+            expect = (value_plus - value_minus) / (2.0 * shock)
 
             actual = target.black_scholes_call_rho(
                 underlying, strike, rate, maturity, vol, today)
+            assert expect == approx(actual)
+
+    @pytest.mark.parametrize(
+        "underlying, strike, rate, maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.1, 1.2, 0.3, 1.4, -0.1),
+            # maturity <= 0 return 0
+            (1.1, 1.2, 0.2, -1.3, 0.1),
+            # otherwise
+            (1.1, 1.2, 0.3, 1.4, 0.1),
+        ])
+    def test_black_scholes_call_vega_fprime_by_strike(
+            self, underlying, strike, rate, maturity, vol):
+
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_scholes_call_vega_fprime_by_strike(
+                    underlying, strike, rate, maturity, vol)
+        elif maturity <= 0.0:
+            expect = 0
+            actual = target.black_scholes_call_vega_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
+            assert expect == approx(actual)
+        else:
+            shock = 1e-6
+            value_plus = function.black_scholes_call_vega(
+                underlying, strike + shock, rate, maturity, vol)
+            value_minus = function.black_scholes_call_vega(
+                underlying, strike - shock, rate, maturity, vol)
+            expect = (value_plus - value_minus) / (2.0 * shock)
+
+            actual = target.black_scholes_call_vega_fprime_by_strike(
+                underlying, strike, rate, maturity, vol)
             assert expect == approx(actual)
 
     # -------------------------------------------------------------------------

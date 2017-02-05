@@ -575,3 +575,54 @@ class TestSabr(object):
             alpha, beta, rho, nu)
 
         assert delta_analytic == approx(delta_diff, rel=5e-3)
+
+    # -------------------------------------------------------------------------
+    # SABR distribution
+    # -------------------------------------------------------------------------
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, option_maturity,\
+        alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2.0, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model_sabr_cdf(
+            self, init_swap_rate, option_strike, option_maturity,
+            alpha, beta, rho, nu):
+        shock = 1e-6
+        value_plus = target.sabr_payers_swaption_value(
+            init_swap_rate, option_strike + shock, 1.0,
+            option_maturity, alpha, beta, rho, nu)
+        value_minus = target.sabr_payers_swaption_value(
+            init_swap_rate, option_strike - shock, 1.0,
+            option_maturity, alpha, beta, rho, nu)
+        value_diff = (value_plus - value_minus) / (2.0 * shock)
+        cdf_diff = 1.0 + value_diff
+
+        cdf_analytic = target.sabr_cdf(
+            init_swap_rate, option_strike, option_maturity,
+            alpha, beta, rho, nu)
+
+        assert cdf_analytic == approx(cdf_diff)
+
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, option_maturity,\
+        alpha, beta, rho, nu", [
+            (0.0357, 0.03, 2.0, 0.036, 0.5, -0.25, 0.35)
+        ])
+    def test_model_sabr_pdf(
+            self, init_swap_rate, option_strike, option_maturity,
+            alpha, beta, rho, nu):
+        shock = 1e-6
+        value_plus = target.sabr_cdf(
+            init_swap_rate, option_strike + shock, option_maturity,
+            alpha, beta, rho, nu)
+        value_minus = target.sabr_cdf(
+            init_swap_rate, option_strike - shock, option_maturity,
+            alpha, beta, rho, nu)
+        value_diff = (value_plus - value_minus) / (2.0 * shock)
+        pdf_diff = value_diff
+
+        pdf_analytic = target.sabr_pdf(
+            init_swap_rate, option_strike, option_maturity,
+            alpha, beta, rho, nu)
+
+        assert pdf_analytic == approx(pdf_diff, rel=5e-5)

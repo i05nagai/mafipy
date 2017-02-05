@@ -467,6 +467,56 @@ class TestBlack(object):
                 vol)
             assert volga_diff == approx(volga_analytic)
 
+    @pytest.mark.parametrize(
+        "init_swap_rate, option_strike, swap_annuity, option_maturity, vol",
+        [
+            # vol < 0 raise AssertionError
+            (1.0, 2.0, 1.0, 1.0, -0.1),
+            # maturity < 0
+            (1.0, 2.0, 1.0, -1.0, 0.1),
+            # otherwise
+            (1.1, 1.2, 1.3, 1.4, 0.1),
+        ])
+    def test_model_black_payers_swaption_vega_fprime_by_strike(
+            self, init_swap_rate, option_strike, swap_annuity,
+            option_maturity, vol):
+        # raise AssertionError
+        if vol < 0.0:
+            with pytest.raises(AssertionError):
+                actual = target.black_payers_swaption_vega_fprime_by_strike(
+                    init_swap_rate,
+                    option_strike,
+                    swap_annuity,
+                    option_maturity,
+                    vol)
+            return
+        elif option_maturity < 0.0 or np.isclose(option_maturity, 0.0):
+            expect = 0.0
+            actual = target.black_payers_swaption_vega_fprime_by_strike(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol)
+            assert expect == approx(actual)
+        else:
+            shock = 1e-6
+            value_plus = target.black_payers_swaption_vega(
+                init_swap_rate, option_strike + shock, swap_annuity,
+                option_maturity, vol)
+            value_minus = target.black_payers_swaption_vega(
+                init_swap_rate, option_strike - shock, swap_annuity,
+                option_maturity, vol)
+            diff = (value_plus - value_minus) / (2.0 * shock)
+
+            analytic = target.black_payers_swaption_vega_fprime_by_strike(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol)
+            assert diff == approx(analytic)
+
     # -------------------------------------------------------------------------
     # black payer's/reciever's swaption distribution
     # -------------------------------------------------------------------------

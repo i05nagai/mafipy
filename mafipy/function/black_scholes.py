@@ -524,16 +524,19 @@ def black_scholes_call_gamma(underlying, strike, rate, maturity, vol):
     :param float underlying:
     :param float strike:
     :param float rate:
-    :param float maturity: must be non-negative.
+    :param float maturity:
+    if maturity is not positive, this function returns 0.0.
     :param float vol: volatility. This must be positive.
+
     :return: value of gamma.
     :rtype: float.
     """
-    assert(maturity >= 0.0)
     assert(vol >= 0.0)
+    if maturity <= 0.0:
+        return 0.0
     d1 = func_d1(underlying, strike, rate, maturity, vol)
-    denominator = (underlying ** 2) * vol * math.sqrt(maturity)
-    return -scipy.stats.norm.pdf(d1) / denominator
+    denominator = underlying * vol * math.sqrt(maturity)
+    return scipy.stats.norm.pdf(d1) / denominator
 
 
 def black_scholes_call_vega(underlying, strike, rate, maturity, vol):
@@ -698,6 +701,48 @@ def black_scholes_call_rho(underlying, strike, rate, maturity, vol, today):
     time = maturity - today
     d2 = func_d2(underlying, strike, rate, time, vol)
     return time * math.exp(-rate * time) * strike * norm.cdf(d2)
+
+
+def black_scholes_call_vega_fprime_by_strike(
+        underlying, strike, rate, maturity, vol):
+    """black_scholes_call_vega_fprime_by_strike
+    calculates derivative of black scholes vega with respect to strike.
+    This is required for :py:func:`sabr_pdf`.
+
+    .. math::
+        \\frac{\partial}{\partial K}
+        \mathrm{Vega}{\mathrm{BSCall}}(S, K, r, T, \sigma)
+        =
+        S\phi^{\prime}(d_{1}(S, K, r, T, \sigma))
+        \\frac{1}{\sigma K}
+
+    where
+    :math:`S` is underlying,
+    :math:`K` is strike,
+    :math:`r` is rate,
+    :math:`T` is maturity,
+    :math:`\sigma` is volatility,
+    :math:`\phi` is standard normal p.d.f,
+    :math:`d_{1}` is defined in
+    :py:func:`func_d1`.
+
+    See :py:func:`black_scholes_call_value`.
+
+    :param float underlying:
+    :param float strike:
+    :param float rate:
+    :param float maturity: if maturity <= 0.0, this function returns 0.
+    :param float vol: volatility. This must be positive.
+
+    :return: derivative of vega with respect to strike.
+    :rtype: float.
+    """
+    assert(vol >= 0.0)
+    if maturity <= 0.0:
+        return 0.0
+    d1 = func_d1(underlying, strike, rate, maturity, vol)
+    density_fprime = mafipy.function.norm_pdf_fprime(d1)
+    return -underlying * density_fprime / (vol * strike)
 
 
 # ----------------------------------------------------------------------------
