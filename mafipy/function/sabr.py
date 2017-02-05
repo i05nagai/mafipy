@@ -1654,6 +1654,20 @@ def sabr_payers_swaption_delta(
 # SABR distribution
 # ----------------------------------------------------------------------------
 def sabr_cdf(underlying, strike, maturity, alpha, beta, rho, nu):
+    """sabr_cdf
+    calculates value of c.d.f. when underlying follows SABR model.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha:
+    :param float beta:
+    :param float rho:
+    :param float nu:
+
+    :return: value of c.d.f. under SABR model.
+    :rtype: float.
+    """
     vol = sabr_implied_vol_hagan(
         underlying, strike, maturity, alpha, beta, rho, nu)
     bs_cdf = mafipy.function.black_swaption_cdf(
@@ -1667,6 +1681,20 @@ def sabr_cdf(underlying, strike, maturity, alpha, beta, rho, nu):
 
 
 def sabr_pdf(underlying, strike, maturity, alpha, beta, rho, nu):
+    """sabr_pdf
+    calculates value of p.d.f. when underlying follows SABR model.
+
+    :param float underlying:
+    :param float strike:
+    :param float maturity:
+    :param float alpha:
+    :param float beta:
+    :param float rho:
+    :param float nu:
+
+    :return: value of c.d.f. under SABR model.
+    :rtype: float.
+    """
     mf = mafipy.function
     vol = sabr_implied_vol_hagan(
         underlying, strike, maturity, alpha, beta, rho, nu)
