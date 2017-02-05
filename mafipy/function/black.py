@@ -308,6 +308,28 @@ def black_payers_swaption_vega(
     return swap_annuity * bs_vega
 
 
+def black_payers_swaption_volga(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_volga
+    calculates volga of payer's swaption under black model.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: volga.
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_volga = mafipy.function.black_scholes_call_volga(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_volga
+
+
 # ----------------------------------------------------------------------------
 # black payer's/reciever's swaption distribution
 # ----------------------------------------------------------------------------
