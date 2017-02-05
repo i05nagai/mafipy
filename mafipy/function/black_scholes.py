@@ -525,7 +525,7 @@ def black_scholes_call_gamma(underlying, strike, rate, maturity, vol):
     :param float strike:
     :param float rate:
     :param float maturity:
-    if maturity is not positive, this function returns 0.0.
+        if maturity is not positive, this function returns 0.0.
     :param float vol: volatility. This must be positive.
 
     :return: value of gamma.
@@ -756,7 +756,7 @@ def black_scholes_cdf(underlying, strike, rate, maturity, vol):
     :param float strike:
     :param float rate:
     :param float maturity:
-    :param float vol:
+    :param float vol: must be positive.
 
     :return: value of p.d.f. of black scholes model.
     :rtype: float.
@@ -779,7 +779,7 @@ def black_scholes_pdf(underlying, strike, rate, maturity, vol):
     :param float strike:
     :param float rate:
     :param float maturity:
-    :param float vol:
+    :param float vol: must be positive.
 
     :return: value of p.d.f. of black scholes model.
     :rtype: float.
