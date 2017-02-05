@@ -2,8 +2,6 @@
 mafipy: A mathematical finance in python
 =========================================
 
-.. currentmodule:: mafipy.function
-
 """
 
 from __future__ import absolute_import
