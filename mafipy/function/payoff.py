@@ -1,7 +1,9 @@
 #!/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import functools
 
 from . import util

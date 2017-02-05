@@ -14,7 +14,7 @@ Basics
 .. autosummary::
     :toctree: generated/
 
-    black_payers_swaption_value - black payer's swaption formula.
+    black_payers_swaption_value
     black_receivers_swaption_value
     black_payers_swaption_value_fprime_by_strike
     black_payers_swaption_value_fhess_by_strike
@@ -28,6 +28,17 @@ Greeks
 
     black_payers_swaption_delta
     black_payers_swaption_vega
+    black_payers_swaption_volga
+    black_payers_swaption_vega_fprime_by_strike
+
+Distribution
+------------
+
+.. autosummary::
+    :toctree: generated/
+
+    black_swaption_cdf
+    black_swaption_pdf
 
 Black Scholes Model
 ===================
@@ -67,10 +78,38 @@ Greeks
     black_scholes_call_volga
     black_scholes_call_theta
     black_scholes_call_rho
+    black_scholes_call_vega_fprime_by_strike
+
+Distribution
+------------
+
+.. autosummary::
+    :toctree: generated/
+
+    black_scholes_cdf
+    black_scholes_pdf
 
 Local Volatility model
 ======================
 To be displayed.
+
+
+Payoff functions
+================
+
+.. autosummary::
+    :toctree: generated/
+
+    payoff_call
+    payoff_call_fprime
+    payoff_put
+    payoff_put_fprime
+    payoff_bull_spread
+    payoff_bull_spread_fprime
+    payoff_straddle
+    payoff_strangle
+    payoff_butterfly_spread
+    payoff_risk_reversal
 
 SABR model
 ==========
@@ -97,9 +136,21 @@ Greeks
     sabr_implied_vol_hagan_fprime_by_underlying
     sabr_implied_vol_hagan_fhess_by_underlying
     sabr_payers_swaption_delta
+
+Distribution
+------------
+
+.. autosummary::
+    :toctree: generated/
+
+    sabr_cdf
+    sabr_pdf
+
 """
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from .analytic_formula import *
 from .black import *
