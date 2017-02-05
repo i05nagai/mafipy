@@ -1648,3 +1648,42 @@ def sabr_payers_swaption_delta(
         alpha, beta, rho, nu)
 
     return bs_delta + bs_vega * backbone
+
+
+# ----------------------------------------------------------------------------
+# SABR distribution
+# ----------------------------------------------------------------------------
+def sabr_cdf(underlying, strike, maturity, alpha, beta, rho, nu):
+    vol = sabr_implied_vol_hagan(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    bs_cdf = mafipy.function.black_swaption_cdf(
+        underlying, strike, 1.0, maturity, vol)
+    bs_vega = mafipy.function.black_payers_swaption_vega(
+        underlying, strike, 1.0, maturity, vol)
+    vol_fprime = sabr_implied_vol_hagan_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    return bs_cdf + bs_vega * vol_fprime
+
+
+def sabr_pdf(underlying, strike, maturity, alpha, beta, rho, nu):
+    mf = mafipy.function
+    vol = sabr_implied_vol_hagan(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    bs_pdf = mf.black_swaption_pdf(
+        underlying, strike, 1.0, maturity, vol)
+    bs_vega = mf.black_payers_swaption_vega(
+        underlying, strike, 1.0, maturity, vol)
+    bs_volga = mf.black_payers_swaption_volga(
+        underlying, strike, 1.0, maturity, vol)
+    bs_vega_fprime = mf.black_payers_swaption_vega_fprime_by_strike(
+        underlying, strike, 1.0, maturity, vol)
+    vol_fprime = sabr_implied_vol_hagan_fprime_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+    vol_fhess = sabr_implied_vol_hagan_fhess_by_strike(
+        underlying, strike, maturity, alpha, beta, rho, nu)
+
+    return (bs_pdf
+            + 2.0 * bs_vega_fprime * vol_fprime
+            + bs_volga * vol_fprime * vol_fprime
+            + bs_vega * vol_fhess)

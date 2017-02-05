@@ -306,3 +306,100 @@ def black_payers_swaption_vega(
     bs_vega = mafipy.function.black_scholes_call_vega(
         init_swap_rate, option_strike, 0.0, option_maturity, vol)
     return swap_annuity * bs_vega
+
+
+def black_payers_swaption_volga(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_volga
+    calculates volga of payer's swaption under black model.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: volga.
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_volga = mafipy.function.black_scholes_call_volga(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_volga
+
+
+def black_payers_swaption_vega_fprime_by_strike(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_payers_swaption_vega_fprime_by_strike
+    calculates derivative of vega with respect to strike under black model.
+    This is required for :py:func:`sabr_pdf`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: swaption strike.
+    :param float swap_annuity: annuity of referencing swap
+    :param float option_maturity: swaption maturity.
+    :param float vol: volatilty. this must be positive.
+
+    :return: derivative of vega w.r.t. strike.
+    :rtype: float.
+
+    :raises AssertionError: if volatility is not positive.
+    """
+    assert(vol > 0.0)
+    bs_vega_fprime = mafipy.function.black_scholes_call_vega_fprime_by_strike(
+        init_swap_rate, option_strike, 0.0, option_maturity, vol)
+    return swap_annuity * bs_vega_fprime
+
+
+# ----------------------------------------------------------------------------
+# black payer's/reciever's swaption distribution
+# ----------------------------------------------------------------------------
+def black_swaption_cdf(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_swaption_cdf
+    calculates value of c.d.f. of black swaption.
+    :py:func:`black_payers_swaption_value_fprime_by_strike`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: option strike.
+    :param float swap_annuity: swap annuity.
+    :param float option_maturity: maturity of swaption.
+    :param float vol: volatility. non-negative.
+
+    :return: value of c.d.f. of black swaption model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (1.0
+            + black_payers_swaption_value_fprime_by_strike(
+                init_swap_rate,
+                option_strike,
+                swap_annuity,
+                option_maturity,
+                vol) / swap_annuity)
+
+
+def black_swaption_pdf(
+        init_swap_rate, option_strike, swap_annuity, option_maturity, vol):
+    """black_swaption_pdf
+    calculates value of p.d.f. of black swaption.
+    :py:func:`black_payers_swaption_value_fhess_by_strike`.
+
+    :param float init_swap_rate: initial swap rate.
+    :param float option_strike: option strike.
+    :param float swap_annuity: swap annuity.
+    :param float option_maturity: maturity of swaption.
+    :param float vol: volatility. non-negative.
+
+    :return: value of p.d.f. of black swaption model.
+    :rtype: float.
+    """
+    assert(vol > 0.0)
+    return (black_payers_swaption_value_fhess_by_strike(
+        init_swap_rate,
+        option_strike,
+        swap_annuity,
+        option_maturity,
+        vol) / swap_annuity)
