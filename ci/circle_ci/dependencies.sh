@@ -8,6 +8,8 @@ echo 'pip:'
 ls $HOME/.cache/pip
 ls -la
 
+git submodule init
+git submodule update
 # Set up our own virtualenv environment to avoid travis' numpy.
 # This venv points to the python interpreter of the travis build
 # matrix.

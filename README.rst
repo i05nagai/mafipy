@@ -46,7 +46,10 @@ Installation
 
    git clone https://github.com/i05nagai/mafipy.git
    cd mafipy
+   git submodule init
+   git submodule update
    pip install -r requirements.txt
+
 
 
 Test
@@ -56,7 +59,7 @@ To run tests, you additionally need to install `pytest`.
 
 .. code:: shell
 
-   pip install pytest
+   pip install -r requirements-dev.txt
    python setup.py test
 
 

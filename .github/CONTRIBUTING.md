@@ -1,3 +1,13 @@
+## Builds
+
+```
+git clone https://github.com/i05nagai/mafipy.git
+cd mafipy
+git submodule init
+git submodule update
+pip install -r requirements.txt
+```
+
 ## Tests
 
 ```
