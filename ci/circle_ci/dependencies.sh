@@ -21,7 +21,7 @@ python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
-	pip install asv
-	pip install virtualenv
-	cp ~/mafipy/ci/circle_ci/.asv-machine.json ~/.asv-machine.json
+  pip install asv
+  pip install virtualenv
+  cp ~/mafipy/ci/circle_ci/.asv-machine.json ~/.asv-machine.json
 fi
