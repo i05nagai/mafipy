@@ -4,6 +4,7 @@ set -e
 set -x
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
+  # move to git submodule
   pushd benchmarks/asv_files
   # for detached HEAD
   git checkout master
