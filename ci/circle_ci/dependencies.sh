@@ -12,8 +12,7 @@ ls -la
 # This venv points to the python interpreter of the travis build
 # matrix.
 pip install --upgrade pip setuptools
-pip install numpy
-pip install scipy
+pip install -r requirements.txt
 # Build mafipy in the install.sh script to collapse the verbose
 # build output in the travis output when it succeeds.
 python --version
@@ -21,7 +20,6 @@ python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
-  pip install asv
-  pip install virtualenv
+  pip install -r requirements-dev.txt
   cp ~/mafipy/ci/circle_ci/.asv-machine.json ~/.asv-machine.json
 fi
