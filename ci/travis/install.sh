@@ -15,8 +15,8 @@ else
   # This venv points to the python interpreter of the travis build
   # matrix.
   pip install --upgrade pip==9.0.3 setuptools
-  pip install requirements.txt
-  pip install requirements-dev.txt
+  pip install -r requirements.txt
+  pip install -r requirements-dev.txt
   # Build mafipy in the install.sh script to collapse the verbose
   # build output in the travis output when it succeeds.
   python --version
