@@ -91,7 +91,7 @@ class Benchmark(Command):
     """
 
     user_options = [
-        ('NEW', '-', "execcute asv run NEW"),
+        ('run-type=', '-', "execcute asv run <run-type>. One of NEW, ALL."),
         #
         ('bench=', 'b', "Regular expression(s) for benchmark to run. When not\
                         provided, all benchmarks are run."),
@@ -106,7 +106,7 @@ class Benchmark(Command):
     ]
 
     def initialize_options(self):
-        self.NEW = None
+        self.run_type = None
         self.bench = None
         self.config = None
         self.dry_run = None
@@ -119,12 +119,12 @@ class Benchmark(Command):
         pass
 
     def run(self):
-        if self.NEW is not None:
-            self.args += ["NEW"]
+        if self.run_type is not None:
+            self.args += ["{0}".format(self.run_type)]
         if self.bench is not None:
-            self.args += ["--bench={0}"]
+            self.args += ["--bench={0}".format(self.bench)]
         if self.config is not None:
-            self.args += ["--config={0}"]
+            self.args += ["--config={0}".format(self.config)]
         else:
             self.args += ["--config=benchmarks/asv.conf.json"]
         if self.dry_run is not None:
