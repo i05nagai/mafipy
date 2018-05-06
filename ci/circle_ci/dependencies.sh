@@ -13,7 +13,7 @@ git submodule update
 # Set up our own virtualenv environment to avoid travis' numpy.
 # This venv points to the python interpreter of the travis build
 # matrix.
-pip install --upgrade pip setuptools
+pip install --upgrade pip==9.0.3 setuptools
 pip install -r requirements.txt
 # Build mafipy in the install.sh script to collapse the verbose
 # build output in the travis output when it succeeds.
