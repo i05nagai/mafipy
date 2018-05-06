@@ -11,6 +11,6 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
   popd
 
   # run benchmarks test
-  python setup.py benchmark --NEW
+  python setup.py benchmark --run-type=NEW
   python setup.py benchmark_publish
 fi
