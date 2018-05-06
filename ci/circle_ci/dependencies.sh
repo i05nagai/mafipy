@@ -23,5 +23,4 @@ python -c "import scipy; print('scipy %s' % scipy.__version__)"
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
   pip install -r requirements-dev.txt
-  cp ~/mafipy/ci/circle_ci/.asv-machine.json ~/.asv-machine.json
 fi

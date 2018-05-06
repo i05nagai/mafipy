@@ -4,6 +4,8 @@ set -e
 set -x
 
 if [ "${BENCHMARK_TEST}" = "true" ]; then
+  cp ci/circle_ci/.asv-machine.json ~/.asv-machine.json
+
   # move to git submodule
   pushd benchmarks/asv_files
   # for detached HEAD
