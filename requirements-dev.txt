@@ -1,0 +1,9 @@
+asv==0.2.1
+pudb==2017.1.4
+pytest-cov==2.5.1
+pytest-faker==2.0.0
+pytest-mock==1.10.0
+pytest-pep8==1.0.6
+pytest-pudb==0.6
+pytest==3.5.1
+virtualenv==15.2.0
