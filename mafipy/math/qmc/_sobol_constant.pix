@@ -1,0 +1,5 @@
+# up to 21202
+DEF SOBOL_MAX_DIM = 21202
+# calculate degree up to MAX_BIT
+DEF MAX_BIT = 30
+DEF NORMALIZE_FACTOR = 0.5 / (1UL << (MAX_BIT - 1))

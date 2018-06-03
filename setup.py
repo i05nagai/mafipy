@@ -4,9 +4,11 @@
 from distutils.core import setup
 from setuptools import Command
 from setuptools.command.test import test as TestCommand
+import distutils.core as core
 import os
 import subprocess
 import sys
+import Cython.Build
 
 
 NAME = "mafipy"
@@ -246,6 +248,16 @@ def main():
         'benchmark_publish': BenchmarkPublish,
         'benchmark_preview': BenchmarkPreview,
     }
+
+    ext_sobol = core.Extension(
+        'mafipy.math.qmc._sobol',
+       ['mafipy/math/qmc/*.pyx']
+    )
+    extensions = [
+        ext_sobol,
+    ]
+    ext_modules = Cython.Build.cythonize(extensions)
+
     metadata = dict(
         name=NAME,
         packages=[NAME],
@@ -258,6 +270,7 @@ def main():
         license=LICENSE,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         long_description=LONG_DESCRIPTION,
+        ext_modules=ext_modules,
         tests_require=['pytest', 'pytest-cov'],
         cmdclass=cmdclass
     )
