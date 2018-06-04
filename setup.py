@@ -8,7 +8,7 @@ import distutils.core as core
 import os
 import subprocess
 import sys
-import Cython.Build
+import textwrap
 
 
 NAME = "mafipy"
@@ -241,6 +241,87 @@ class BenchmarkPreview(Command):
             raise err
 
 
+def parse_setuppy_commands(args):
+    """Check the commands and respond appropriately.  Disable broken commands.
+    Return a boolean value for whether or not to run the build or not (avoid
+    parsing Cython and template files if False).
+    """
+    if not args:
+        # User forgot to give an argument probably, let setuptools handle that.
+        return True
+
+    info_commands = ['--help-commands', '--name', '--version', '-V',
+                     '--fullname', '--author', '--author-email',
+                     '--maintainer', '--maintainer-email', '--contact',
+                     '--contact-email', '--url', '--license', '--description',
+                     '--long-description', '--platforms', '--classifiers',
+                     '--keywords', '--provides', '--requires', '--obsoletes']
+
+    for command in info_commands:
+        if command in args:
+            return False
+
+    # Note that 'alias', 'saveopts' and 'setopt' commands also seem to work
+    # fine as they are, but are usually used together with one of the commands
+    # below and not standalone.  Hence they're not added to good_commands.
+    good_commands = ('develop', 'sdist', 'build', 'build_ext', 'build_py',
+                     'build_clib', 'build_scripts', 'bdist_wheel', 'bdist_rpm',
+                     'bdist_wininst', 'bdist_msi', 'bdist_mpkg', 'build_sphinx',
+                     'test')
+
+    for command in good_commands:
+        if command in args:
+            return True
+
+    bad_commands = dict(
+        upload="""
+            `setup.py upload` is not supported, because it's insecure.
+            Instead, build what you want to upload and upload those files
+            with `twine upload -s <filenames>` instead.
+            """,
+        clean="""
+            `setup.py clean` is not supported, use one of the following instead:
+              - `git clean -xdf` (cleans all files)
+              - `git clean -Xdf` (cleans all versioned files, doesn't touch
+                                  files that aren't checked into the git repo)
+            """,
+    )
+    not_supported_commands = [
+        'upload_docs',
+        'easy_install',
+        'bdist',
+        'bdist_dumb',
+        'register',
+        'check',
+        'install_data',
+        'install_headers',
+        'install_lib',
+        'install_scripts',
+        'flake8',
+    ]
+    for command in not_supported_commands:
+        bad_commands[command] = "`setup.py %s` is not supported" % command
+    for command in bad_commands.keys():
+        if command in args:
+            print(textwrap.dedent(bad_commands[command]) +
+                  "\nAdd `--force` to your command to use it anyway if you "
+                  "must (unsupported).\n")
+            sys.exit(1)
+
+
+def get_ext_modules():
+    import Cython.Build
+    ext_sobol = core.Extension(
+        'mafipy.math.qmc._sobol',
+        ['mafipy/math/qmc/*.pyx'],
+    )
+    extensions = [
+        ext_sobol,
+    ]
+    ext_modules = Cython.Build.cythonize(extensions)
+    return ext_modules
+
+
 def main():
     cmdclass = {
         'test': PyTest,
@@ -248,15 +329,6 @@ def main():
         'benchmark_publish': BenchmarkPublish,
         'benchmark_preview': BenchmarkPreview,
     }
-
-    ext_sobol = core.Extension(
-        'mafipy.math.qmc._sobol',
-       ['mafipy/math/qmc/*.pyx']
-    )
-    extensions = [
-        ext_sobol,
-    ]
-    ext_modules = Cython.Build.cythonize(extensions)
 
     metadata = dict(
         name=NAME,
@@ -270,10 +342,15 @@ def main():
         license=LICENSE,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         long_description=LONG_DESCRIPTION,
-        ext_modules=ext_modules,
         tests_require=['pytest', 'pytest-cov'],
         cmdclass=cmdclass
     )
+    args = sys.argv[1:]
+    build_required = parse_setuppy_commands(args)
+
+    if build_required:
+        ext_modules = get_ext_modules()
+        metadata['ext_modules'] = ext_modules
 
     setup(**metadata)
 
