@@ -27,3 +27,6 @@
 
 # travis cli
 .rbenv-gemsets
+
+# OSX
+.DS_Store
