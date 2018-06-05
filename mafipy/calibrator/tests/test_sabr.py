@@ -153,7 +153,7 @@ class TestModelCalibrator:
                                                            market_strikes,
                                                            option_maturity,
                                                            expect_beta)
-        assert 0.01120946664130403 == approx(alpha)
+        assert 0.01120946664130403 == approx(alpha, rel=5e-4)
         assert expect_beta == approx(beta)
         assert 0.42567236979991263 == approx(rho)
         assert 0.84491343183536094 == approx(nu)

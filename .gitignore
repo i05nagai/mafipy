@@ -20,3 +20,9 @@
 #coverage
 /.coverage
 
+
+# cython
+*.so
+
+# travis cli
+.rbenv-gemsets
