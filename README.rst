@@ -35,9 +35,13 @@ Supported methods are belows:
 
   * Black Scholes
 
-  * Black 
+  * Black
 
   * SABR
+
+* Quasi Monte Carlo
+
+  * sobol sequence (cython) up to 21202
 
 Installation
 ============
@@ -50,6 +54,15 @@ Installation
    git submodule update
    pip install -r requirements.txt
 
+
+Builds
+=======
+
+To generate c files,
+
+.. code:: shell
+
+   python setup.py build_ext
 
 
 Test

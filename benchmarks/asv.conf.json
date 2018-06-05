@@ -65,6 +65,7 @@
     "matrix": {
          "numpy": ["1.14.3"],
          "scipy": ["1.1.0"],
+         "Cython": ["0.28.2"],
     //     "numpy": ["1.6", "1.7"],
     //     "six": ["", null],        // test with and without six installed
     //     "pip+emcee": [""],   // emcee is only available for install with pip.
