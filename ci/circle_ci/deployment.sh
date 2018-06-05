@@ -3,6 +3,27 @@
 set -e
 set -x
 
+usage() {
+  cat <<EOF
+deployment.sh is a tool for ...
+
+Usage:
+    deployment.sh <path-to-repository>
+
+Environment variables
+  BENCHMARK_TEST    true/false
+EOF
+}
+
+#
+# validate arugments
+#
+PATH_TO_REPOSITORY=$1
+if [ -z ${PATH_TO_REPOSITORY+x} ]; then
+  usage
+  exit 1
+fi
+
 # mafipy/master
 TEST_BRANCH="master"
 # mafipy_benchmarks/master
@@ -22,7 +43,7 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
   BENCHMARKED_SHA1="$CIRCLE_SHA1"
 
   # move to submodule
-  cd ~/mafipy/benchmarks/asv_files
+  cd ${PATH_TO_REPOSITORY}/benchmarks/asv_files
   git config user.name "Circle CI"
   git config user.email "circle_ci@i05nagai.me"
 
