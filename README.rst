@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/i05nagai/mafipy.svg?branch=master
    :target: https://travis-ci.org/i05nagai/mafipy
 
+.. image:: https://circleci.com/gh/i05nagai/mafipy.svg?style=svg
+    :target: https://circleci.com/gh/i05nagai/mafipy
+
 .. image:: https://codeclimate.com/github/i05nagai/mafipy/badges/gpa.svg
    :target: https://codeclimate.com/github/i05nagai/mafipy
    :alt: Code Climate
