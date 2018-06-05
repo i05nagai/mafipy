@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/i05nagai/mafipy.svg?branch=master
    :target: https://travis-ci.org/i05nagai/mafipy
 
+.. image:: https://circleci.com/gh/i05nagai/mafipy.svg?style=svg
+    :target: https://circleci.com/gh/i05nagai/mafipy
+
 .. image:: https://codeclimate.com/github/i05nagai/mafipy/badges/gpa.svg
    :target: https://codeclimate.com/github/i05nagai/mafipy
    :alt: Code Climate
@@ -41,10 +44,35 @@ Supported methods are belows:
 
 * Quasi Monte Carlo
 
-  * sobol sequence (cython) up to 21202
+  * sobol sequence (cython) up to 21202 dimension
 
 Installation
 ============
+
+.. code:: shell
+
+   pip install mafipy
+
+Run examples
+
+.. code:: shell
+
+   git clone https://github.com/i05nagai/mafipy.git
+   cd mafipy
+   python examples/plot_smile_curve_sabr.py
+
+You will see the following drawing.
+
+.. image:: ./docs/images/examples/plot_simle_curve_sabr.png
+   :target: ./docs/images/examples/plot_simle_curve_sabr.png
+   :height: 400px
+   :width: 500 px
+   :align: center
+
+
+Contributing
+============
+Set up development environment.
 
 .. code:: shell
 
@@ -56,7 +84,7 @@ Installation
 
 
 Builds
-=======
+------
 
 To generate c files,
 
@@ -66,7 +94,7 @@ To generate c files,
 
 
 Test
-======
+-----
 
 To run tests, you additionally need to install `pytest`.
 
@@ -77,7 +105,7 @@ To run tests, you additionally need to install `pytest`.
 
 
 Benchmarks
-==========
+----------
 
 `asv` is required to execute benchmarks.
 You can install `asv` by `pip`.

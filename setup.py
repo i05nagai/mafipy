@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
 from setuptools import Command
 from setuptools.command.test import test as TestCommand
 import distutils.core as core
 import os
+import setuptools
 import subprocess
 import sys
 import textwrap
 
 
+import mafipy
+
+VERSION = mafipy.__version__
 NAME = "mafipy"
 MAINTAINER = "i05nagai"
 MAINTAINER_EMAIL = ""
@@ -19,7 +22,6 @@ with open("README.rst") as f:
     LONG_DESCRIPTION = f.read()
 LICENSE = ""
 URL = ""
-VERSION = "0.0.1"
 DOWNLOAD_URL = ""
 CLASSIFIERS = """ \
 Development Status :: 1 - Planning
@@ -322,6 +324,18 @@ def get_ext_modules():
     return ext_modules
 
 
+def get_packages():
+    packages = setuptools.find_packages()
+    return packages
+
+
+def get_install_requires():
+    return [
+        'numpy==1.14.3',
+        'scipy==1.1.0',
+    ]
+
+
 def main():
     cmdclass = {
         'test': PyTest,
@@ -332,18 +346,19 @@ def main():
 
     metadata = dict(
         name=NAME,
-        packages=[NAME],
+        packages=get_packages(),
         version=VERSION,
         description=DESCRIPTION,
         maintainer=MAINTAINER,
         maintainer_email=MAINTAINER_EMAIL,
         url=URL,
         download_url=DOWNLOAD_URL,
+        install_requires=get_install_requires(),
         license=LICENSE,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         long_description=LONG_DESCRIPTION,
         tests_require=['pytest', 'pytest-cov'],
-        cmdclass=cmdclass
+        cmdclass=cmdclass,
     )
     args = sys.argv[1:]
     build_required = parse_setuppy_commands(args)
@@ -352,7 +367,7 @@ def main():
         ext_modules = get_ext_modules()
         metadata['ext_modules'] = ext_modules
 
-    setup(**metadata)
+    core.setup(**metadata)
 
 
 if __name__ == '__main__':

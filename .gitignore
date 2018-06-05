@@ -1,23 +1,25 @@
 
-#python
+# python
 *.pyc
 *.pyo
 /.cache
 *.egg-info
 /build
 /*.eggs
+/.pytest_cache
+/dist
 
-#asv
+# asv
 /benchmarks/env
 /benchmarks/results
 
-#docs
+# docs
 /docs/_build
 
-#pyenv
+# pyenv
 /.python-version
 
-#coverage
+# coverage
 /.coverage
 
 
@@ -26,3 +28,6 @@
 
 # travis cli
 .rbenv-gemsets
+
+# OSX
+.DS_Store

@@ -33,7 +33,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /root/project
+          at: /root
       - run:
           command: |
               pwd
