@@ -33,10 +33,13 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: /root/project
+          at: /root
       - run:
           command: |
-              bash ci/circle_ci/deployment.sh
+              pwd
+              ls -la
+              ls -la /root/project
+              bash ci/circle_ci/deployment.sh /root/project
 workflows:
   version: 2
   default:
