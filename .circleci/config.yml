@@ -40,6 +40,9 @@ jobs:
               ls -la
               ls -la /root/project
               bash ci/circle_ci/deployment.sh /root/project
+      - add_ssh_keys:
+          fingerprints:
+            - "bd:66:6a:e6:b5:9b:69:80:7e:b2:b6:91:3e:69:75:8b"
 workflows:
   version: 2
   default:
