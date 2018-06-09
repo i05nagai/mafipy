@@ -69,6 +69,15 @@ You will see the following drawing.
    :width: 500 px
    :align: center
 
+Documentation
+=============
+* `API document`_ 
+
+  .. _API document: https://i05nagai.github.io/mafipy_docs/html/
+
+* `Benchmarks`_
+
+  .. _`Benchmarks`: https://i05nagai.github.io/mafipy_benchmarks/html/
 
 Contributing
 ============
@@ -125,6 +134,32 @@ Then
    # preview the generated html through local server
    python setup.py benchmark_preview
 
+Release
+--------
+Suppose that we create the version `v.X.Y.Z`.
+We follow `PEP0440`_ compatible versioning rule.
+
+.. _`PEP0440`: https://www.python.org/dev/peps/pep-0440/
+
+In Circle CI, every built creates release files in `master` brnach.
+Make sure that the release files are properly created before releasing.
+
+
+1. Create git tag locally
+
+.. code-block:: shell
+
+    git tag -a vX.Y.Z master
+    # for testing purpose, in this case, the package will be uploaded to test.pypi.org
+    git tag -a vX.Y.Zdev master
+
+2. Push git tag to remote
+
+.. code-block:: shell
+
+    git push origin vX.Y.Z
+
+3. Circle CI build and run tests. After all tests passed, Circle CI make a release to GitHub and upload wheels to PyPI.
 
 Related Projects
 ================
@@ -137,14 +172,3 @@ Related Projects
 
   * Mathematical Finance Library: Algorithms and methodologies related to mathematical finance.
     The library is written in Java.
-
-
-Documentation
-=============
-* `API document`_ 
-
-  .. _API document: https://i05nagai.github.io/mafipy_docs/html/
-
-* `Benchmarks`_
-
-  .. _`Benchmarks`: https://i05nagai.github.io/mafipy_benchmarks/html/
