@@ -1,22 +1,20 @@
 #!/bin/bash
 
 set -e
-set -x
 
 usage() {
   cat <<EOF
 release.sh is a tool for executing release scripts in Circle CI.
 
 Usage:
-    deployment.sh <path-to-repository>
+    release.sh <path-to-repository>
 
 Environment variables
-              true/false
-  ENVIRONMENT_RELEASE     dev/prod
-  MAFIPY_USERNAME_DEV    true/false
-  MAFIPY_PASSWORD_DEV    true/false
-  MAFIPY_USERNAME_PROD    true/false
-  MAFIPY_PASSWORD_PROD    true/false
+  ENVIRONMENT_RELEASE    Valid values are dev/prod
+  MAFIPY_USERNAME_DEV    Username for test pypi.org
+  MAFIPY_PASSWORD_DEV    Password for test pypi.org
+  MAFIPY_USERNAME_PROD    Username for pypi.org
+  MAFIPY_PASSWORD_PROD    Password for pypi.org
   MAFIPY_GITHUB_API_TOKEN    GitHub API token.
 EOF
 }
@@ -49,6 +47,6 @@ cd ${PATH_TO_REPOSITORY}
 # required MAFIPY_USERNAME and MAFIPY_PASSWORD, MAFIPY_GITHUB_API_TOKEN
 export MAFIPY_USERNAME
 export MAFIPY_PASSWORD
-bash ${PATH_TO_REPOSITORY}/scripts/packaging.sh \
+bash ${PATH_TO_REPOSITORY}/scripts/release.sh \
   ${ARGS} \
   --upload

@@ -13,7 +13,10 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
   git pull origin master
   popd
 
+  #
   # run benchmarks test
+  # You need to delete all results files named `commithash-....json` and push to GitHub
+  # if KeyError occurs when benchmark_publish is executed.
   python setup.py benchmark --run-type=NEW
   python setup.py benchmark_publish
 fi
