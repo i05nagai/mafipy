@@ -28,6 +28,7 @@ else
     pip install coverage
   fi
 
+  # executing only in python 3.5
   if [ "${CODECLIMATE_COVERAGE_REPORT}" = "true" ]; then
     pip install codeclimate-test-reporter
   fi

@@ -53,7 +53,9 @@ if [ "${BENCHMARK_TEST}" = "true" ]; then
     exit 0
   fi
 
+  # push benchmark results to mafipy_benchmarks
+  git remote set-url origin git@github.com:i05nagai/mafipy_benchmarks.git
   git add .
   git commit -m "Deploy to GitHub Pages: ${BENCHMARKED_SHA1}"
-  git push $TARGET_REPOSITORY $TARGET_BRANCH
+  GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git push $TARGET_REPOSITORY $TARGET_BRANCH
 fi

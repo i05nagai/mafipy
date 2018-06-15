@@ -1,48 +1,89 @@
 defaults: &defaults
   working_directory: /root/project
-  environment:
-    - BENCHMARK_TEST: "true"
   docker:
     - image: "i05nagai/mafipy-python36:latest"
+environment_default: &environment_default
+  environment:
+    - BENCHMARK_TEST: "true"
+environment_dev: &environment_dev
+  environment:
+    - ENVIRONMENT_RELEASE: "dev"
+environment_prod: &environment_prod
+  environment:
+    - ENVIRONMENT_RELEASE: "prod"
+# Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job.
+step_persist_to_workspace_default: &step_persist_to_workspace_default
+  # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is taken to be the root directory of the workspace.
+  root: /root
+  # Must be relative path from root
+  paths:
+    - project
+step_run_print_info: &step_run_print_info
+  command: |
+      pwd
+      ls -la
+      ls -la /root/project
+      echo ${PATH}
+      python --version
 
 version: 2
 jobs:
   test:
     <<: *defaults
+    <<: *environment_default
     steps:
       - checkout
+      - run: *step_run_print_info
       - run:
           command: |
-              pwd
-              ls -la
-              echo ${PATH}
-              python --version
               git submodule sync
               git submodule update --init
               bash ci/circle_ci/dependencies.sh
               bash ci/circle_ci/test.sh
-      # Persist the specified paths (workspace/echo-output) into the workspace for use in downstream job. 
-      - persist_to_workspace:
-          # Must be an absolute path, or relative path from working_directory. This is a directory on the container which is taken to be the root directory of the workspace.
-          root: /root
-          # Must be relative path from root
-          paths:
-            - project
+      - persist_to_workspace: *step_persist_to_workspace_default
 
   deployment:
     <<: *defaults
+    <<: *environment_default
     steps:
       - attach_workspace:
           at: /root
-      - run:
-          command: |
-              pwd
-              ls -la
-              ls -la /root/project
-              bash ci/circle_ci/deployment.sh /root/project
       - add_ssh_keys:
           fingerprints:
             - "bd:66:6a:e6:b5:9b:69:80:7e:b2:b6:91:3e:69:75:8b"
+      - run: *step_run_print_info
+      - run:
+          command: |
+              cd /root/project
+              bash ci/circle_ci/deployment.sh /root/project
+      - persist_to_workspace: *step_persist_to_workspace_default
+      - store_artifacts:
+          path: /root/project/dist
+
+  release_dev:
+    <<: *defaults
+    <<: *environment_dev
+    steps:
+      - attach_workspace:
+          at: /root
+      - run: *step_run_print_info
+      - run:
+          command: |
+              cd /root/project
+              bash ci/circle_ci/release.sh /root/project
+
+  release_prod:
+    <<: *defaults
+    <<: *environment_prod
+    steps:
+      - attach_workspace:
+          at: /root
+      - run: *step_run_print_info
+      - run:
+          command: |
+              cd /root/project
+              bash ci/circle_ci/release.sh /root/project
+
 workflows:
   version: 2
   default:
@@ -53,5 +94,26 @@ workflows:
             branches:
               only:
                 - master
+          requires:
+            - test
+      # upload the package to test PyPI.org
+      # if tag named `v.???dev` is pushed
+      - release_dev:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*dev/
+          requires:
+            - test
+      # upload the package to PyPI.org and GitHub
+      # if tag named `v.???` is pushed
+      - release_prod:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+              ignore: /^v.*dev/
           requires:
             - test
