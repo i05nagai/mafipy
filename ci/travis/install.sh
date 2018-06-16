@@ -30,7 +30,15 @@ else
 
   # executing only in python 3.5
   if [ "${CODECLIMATE_COVERAGE_REPORT}" = "true" ]; then
-    pip install codeclimate-test-reporter
+    #
+    # install cc-test-reporter
+    #
+    mkdir -p $HOME/.cache/codeclimate
+    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > $HOME/.cache/codeclimate/cc-test-reporter
+    chmod +x $HOME/.cache/codeclimate/cc-test-reporter
+    ln -s $HOME/.cache/codeclimate/cc-test-reporter /usr/bin/cc-test-reporter
+    # run
+    /usr/bin/cc-test-reporter before-build
   fi
 
 fi

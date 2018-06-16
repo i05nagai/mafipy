@@ -7,6 +7,8 @@ env:
   global:
   # CODECLIMATE_REPO_TOKEN=<token>
   - secure: E94zYUHEXpRwHTqv/mq4C+i8GrrY2xFWIfkvLgWEYZ10Abw6PtJDssS3E1hrk3pD1t0YxsN5UrO9nSSFLNZNwC24VJKhC2h7+PItgsxH8PLRkumyVjBQftLqjO5Cgqknxy8Jtm8k7d8v0C5bUPzETK8kG8f0JofKMOJ/Y2CgAdxntkIu7OkzxZpsakJPUckUWhB/WMR6CGf681Tsa6ntEbsJnbm+sEyuPLGZeFOymY0UfS5zaLhBpXeSNfxDO53ewDHDJ9tGZ2H/WNaNs6FDyPLzOOUSCVgPX+v7LPi+h2aqV+2qWT3MhChZQyBomGen5NpWRuBunDKHNho6TEQL/HRTmPXOieYbRutjcdgCrCbCC5JQ7DL674virjemMw/k0mVCHycvX6AE99R2Gd8yeIG1pBnBMWpWlcKXnzA9EAkDkoxcoUStLwF3np1xjqNYxfegZYzBSzyL/Iyam7ltesOh3bQ8uzuxt90jI8dik3oOILmXAT+mxc04yoHjuO/DIqEMX8T9tofgk37/rnYaiuFM1ToRVG1ozuhVlDFRIKnLidbwDUFb4fqYC7RSvElC5Iz51Pe35bZHNDIikk4Drm4lBZ7CmyJFCfspDaMdBJJTBfNW1q2OSKdRC2YnmQ+qyJApZlyCFlIrxH6Ewk/hF002H7cxD59hmdSWnivsZMM=
+  # CC_TEST_REPORTER_ID=<token>
+  - secure: "iomMx3XJ60WKz9LKGk6J4ZYe8H1xxkQ8AxrWeRtYuSmR1ylBsIbAg5aPd5bnkDFjXwetPOwKBng4K+e5jbMtfO7447KUB7rWPZnbfTPotZyx3aYZnZXdXphSXzUNhWmSjWQQoOM93gK3wcht/gdhdcCrAYv4td+HY4KLVxtswLCiFWzPsW5el8saEh3mR1tD7wBvESzTWDNxtCv7yDhmp6U/8Irvv8nFR5v5P+71Har8T+eh3cI+uEtRxuX8T0+MKGWOpH0GjFWjiqAaIsZhdV/b7zCEP369ojtgaFjXYEIZroYKftJ2swHG00Za7jeKFiY+/+8Vaa1kG+6IJ01TXbr/0Aw+OIscn3zeapq9/B9eCkqXfc2pmOa8QHR8XPQwGdykgUijRuvfKFconD6FrWSKEG/lkk+zSsDjZBHePcIbcCZ0yqzu+yutyHqsS2BXTsRWOq4TQzgv/PDzAvflsW5TWPH3TDE/R8/StLdr36+6CbQC3LB2aqk5dPbsoAfon/oJRve3DYwkQS3Y2t4sR1OvZoh39fhv389sHuDhvA7Hni04y7D0GkgsQVItb/iUCMoV7H7cTzr26mC2bBklCOQkzNIuwj7OdH+U53hvOw8nm2xbslvVIiXNlATMpbE0iS7ZrcGOtK35Ip6SnlZO3uZvk91znUYMIbukOxyT2tE="
 matrix:
   include:
   - python: '2.7'
@@ -25,7 +27,7 @@ before_install:
 - echo ${PATH}
 - python --version
 install: bash ci/travis/install.sh
-script: python setup.py test
+script: bash ci/travis/test.sh
 after_success: bash ci/travis/after_success.sh
 notifications:
   slack:

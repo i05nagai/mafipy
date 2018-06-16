@@ -1,9 +1,10 @@
 #!/bin/bash
 
 set -e
-set -x
 
 if [ "${CODECLIMATE_COVERAGE_REPORT}" == "true" ]; then
-  set +x
-  codeclimate-test-reporter --token ${CODECLIMATE_REPO_TOKEN}
+  echo "Executing /usr/bin/cc-test-reporter after-build"
+  /usr/bin/cc-test-reporter after-build \
+      --coverage-input-type coverage.py \
+      --id ${CC_TEST_REPORTER_ID}
 fi
