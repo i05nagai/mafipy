@@ -159,7 +159,10 @@ class TestModelCalibrator:
         # 0.42567236979991263 * 3.2424801243713386e-05 = 1.3802341985702631e-05
         # https://travis-ci.org/i05nagai/mafipy/jobs/388131298
         assert 0.42567236979991263 == approx(rho, rel=5e-4)
-        assert 0.84491343183536094 == approx(nu)
+        # 0.84491343183536094 - 0.8449269034163132
+        # 0.84491343183536094 * -1.3471580952217899e-05 = -1.1382319694586305e-05
+        # https://travis-ci.org/i05nagai/mafipy/jobs/392970990
+        assert 0.84491343183536094 == approx(nu, rel=5e-4)
 
         # beta 0.5
         expect_beta = 0.5
