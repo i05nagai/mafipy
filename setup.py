@@ -39,8 +39,16 @@ Operating System :: MacOS
 class PyTest(TestCommand):
     """
     """
+    cov_report_desc = """type of report to generate:
+    term, term-missing, annotate, html, xml.
+    Comma separated multiple types is allowed (e.g. --cov-report=xml,html).
+    term, term missing may be followed by ':skip-covered'.
+    annotate, html and xml may be followed by ':DEST'
+    where DEST specifies the output location.
+    """
     user_options = [
         ('cov=', '-', "coverage target."),
+        ('cov-report=', '-', textwrap.dedent(cov_report_desc)),
         ('pdb', '-', "start the interactive Python debugger on errors."),
         ('pudb', '-', "start the PuDB debugger on errors."),
         ('quiet', 'q', "decrease verbosity."),
@@ -52,6 +60,7 @@ class PyTest(TestCommand):
     def initialize_options(self):
         TestCommand.initialize_options(self)
         self.cov = ''
+        self.cov_report = ''
         self.pdb = ''
         self.pudb = ''
         self.quiet = ''
@@ -65,14 +74,16 @@ class PyTest(TestCommand):
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
-
-    def run_tests(self):
-        import pytest
         # if cov option is specified, option is replaced.
         if self.cov:
             self.test_args += ["--cov={0}".format(self.cov)]
         else:
             self.test_args += ["--cov=mafipy"]
+        # user_options doesn't support multiple valued options
+        if self.cov_report is not None:
+            options = self.cov_report.split(',')
+            template = '--cov-report={0}'
+            self.test_args += [template.format(op) for op in options]
         if self.pdb:
             self.test_args += ["--pdb"]
         if self.pudb:
@@ -83,6 +94,9 @@ class PyTest(TestCommand):
             self.test_args += ["--verbose"]
         if self.doctest_modules:
             self.test_args += ["--doctest-modules"]
+
+    def run_tests(self):
+        import pytest
 
         print("executing 'pytest {0}'".format(" ".join(self.test_args)))
         errno = pytest.main(self.test_args)

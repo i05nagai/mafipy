@@ -21,6 +21,7 @@
 
 # coverage
 /.coverage
+/coverage.xml
 
 
 # cython
@@ -28,6 +29,10 @@
 
 # travis cli
 .rbenv-gemsets
+Gemfile
+Gemfile.lock
+/vendor
+/.bundle
 
 # OSX
 .DS_Store
