@@ -88,12 +88,19 @@ workflows:
   version: 2
   default:
     jobs:
-      - test
+      # to run build tags, tags need to tags.only is required
+      # https://circleci.com/docs/2.0/configuration-reference/#tags
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
       - deployment:
           filters:
             branches:
               only:
                 - master
+            tags:
+              only: /^v.*/
           requires:
             - test
       # upload the package to test PyPI.org
