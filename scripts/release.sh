@@ -76,6 +76,8 @@ pip install -r scripts/release/requirements.txt
 # create packages
 #
 cd ${PATH_TO_REPOSITORY}
+# delete old packages if exists
+rm -rf dist/*
 python setup.py sdist
 python setup.py bdist_wheel
 
@@ -86,12 +88,7 @@ if [ $upload ]; then
   if [ ! $is_no_test ]; then
     args="${args} --repository-url https://test.pypi.org/legacy/"
   fi
-  twine upload  \
-    ${args} \
-    --username ${MAFIPY_USERNAME} \
-    --password ${MAFIPY_PASSWORD} \
-    dist/*
-  if [ ! $is_no_test ]; then
+  if [ $is_no_test ]; then
     # validate enviornment variables
     if [ -z ${MAFIPY_GITHUB_API_TOKEN+x} ]; then
       echo "You need to export environment variable MAFIPY_GITHUB_API_TOKEN"
@@ -100,10 +97,16 @@ if [ $upload ]; then
       exit 1
     fi
     VERSION=`python -c 'import setup; print(setup.VERSION)' | tr -d '\n'`
-    python scripts/reelase/release.py release \
+    python scripts/release/release.py release \
+      --token ${MAFIPY_GITHUB_API_TOKEN} \
       --commitish master \
-      --path dist \
+      --path dist/ \
       --tag ${VERSION} \
       --repository mafipy
   fi
+  twine upload  \
+    ${args} \
+    --username ${MAFIPY_USERNAME} \
+    --password ${MAFIPY_PASSWORD} \
+    dist/*
 fi

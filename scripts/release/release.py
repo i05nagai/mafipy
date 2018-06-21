@@ -28,6 +28,8 @@ except ImportError:
 def guess_type(path):
     url = pathname2url(path)
     content_type, encoding = mimetypes.guess_type(url)
+    if content_type is None:
+        content_type = 'application/octet-stream'
     return content_type
 
 
@@ -35,10 +37,42 @@ def get_filename(path):
     return os.path.basename(path)
 
 
+def _is_dir(path):
+    return os.path.isdir(path)
+
+
+def _to_abspath(path):
+    cwd = os.getcwd()
+    # relative path
+    if not os.path.isabs(path):
+            path = os.path.join(cwd, path)
+    return path
+
+
+def _get_path_from_dir(path):
+    for root, subdirs, files in os.walk(path):
+        for f in files:
+            path_to_file = os.path.join(root, f)
+            yield path_to_file
+
+
+def dir_to_path(path):
+    path = _to_abspath(path)
+    # if directory return files in the directory
+    # otherwise return path
+    if _is_dir(path):
+        for p in _get_path_from_dir(path):
+            yield p
+    else:
+        yield path
+
+
 class Github(object):
 
+    TIMEOUT = 60
+
     def __init__(self, api_key, repository_name='', repository_type='public'):
-        self.github = github.Github(api_key)
+        self.github = github.Github(api_key, timeout=self.TIMEOUT)
         self.repository = self.get_repository(repository_name, repository_type)
 
     def get_repository(self, repository_name, repository_type='public'):
@@ -78,11 +112,13 @@ class Github(object):
 
     def upload_asset(self, release, paths):
         git_assets = []
-        for path in paths:
-            content_type = guess_type(path)
-            label = get_filename(path)
-            git_asset = release.upload_asset(path, label, content_type)
-            git_assets.append(git_asset)
+        for _path in paths:
+            for path in dir_to_path(_path):
+                print('Uploading: {0}'.format(path))
+                content_type = guess_type(path)
+                label = get_filename(path)
+                git_asset = release.upload_asset(path, label, content_type)
+                git_assets.append(git_asset)
         return git_assets
 
 
@@ -96,7 +132,7 @@ def release(args):
         msg = '--token <token> or GITHUB_API_KEY environment variable required'
         raise ValueError(msg)
 
-    github = Github(token, repository_name=args.repository_name)
+    github = Github(token, repository_name=args.repository)
     release = github.create_release(args.tag)
     git_assets = github.upload_asset(release, args.path)
     print(git_assets)
@@ -124,7 +160,6 @@ def add_subparser_release(subparsers):
     subparser.add_argument(
         '--tag',
         required=True,
-        nargs=1,
         type=str,
         help='Name of tag and release. e.g. v0.1')
     # not requiredd
@@ -146,7 +181,6 @@ def add_subparser_release(subparsers):
     subparser.add_argument(
         '--token',
         type=str,
-        nargs=1,
         help='Github API token. Required to set thid option or set GITHUB_API_KEY environ variables.')
 
 
