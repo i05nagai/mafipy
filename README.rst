@@ -63,10 +63,10 @@ Run examples
 
 You will see the following drawing.
 
-.. image:: ./docs/images/examples/plot_simle_curve_sabr.png
-   :target: ./docs/images/examples/plot_simle_curve_sabr.png
+.. image:: https://github.com/i05nagai/mafipy/raw/master/docs/images/examples/plot_simle_curve_sabr.png
+   :target: https://github.com/i05nagai/mafipy/raw/master/docs/images/examples/plot_simle_curve_sabr.png
    :height: 400px
-   :width: 500 px
+   :width: 400px
    :align: center
 
 Documentation
