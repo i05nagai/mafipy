@@ -24,6 +24,7 @@ EOF
 #
 readonly PATH_TO_REPOSITORY=$1
 if [ -z ${PATH_TO_REPOSITORY+x} ]; then
+  echo "Arguments are required."
   usage
   exit 1
 fi
@@ -39,6 +40,7 @@ elif [ "${ENVIRONMENT_RELEASE}" = "prod" ]; then
   readonly MAFIPY_PASSWORD=$MAFIPY_PASSWORD_PROD
   ARGS="${ARGS} --no-test "
 else
+  echo "Invalid value of ENVIRONMENT_RELEASE=${ENVIRONMENT_RELEASE}."
   usage
   exit 1
 fi
