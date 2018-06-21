@@ -60,6 +60,7 @@ jobs:
       - store_artifacts:
           path: /root/project/dist
 
+  # Currently, do nothing
   release_dev:
     <<: *defaults
     <<: *environment_dev
@@ -72,6 +73,7 @@ jobs:
               cd /root/project
               bash ci/circle_ci/release.sh /root/project
 
+  # Currently, do nothing
   release_prod:
     <<: *defaults
     <<: *environment_prod
