@@ -136,7 +136,7 @@ Then
 
 Release
 --------
-Suppose that we create the version `v.X.Y.Z`.
+Suppose that we create the version `X.Y.Z`.
 We follow `PEP0440`_ compatible versioning rule.
 
 .. _`PEP0440`: https://www.python.org/dev/peps/pep-0440/
@@ -144,22 +144,37 @@ We follow `PEP0440`_ compatible versioning rule.
 In Circle CI, every built creates release files in `master` brnach.
 Make sure that the release files are properly created before releasing.
 
-
-1. Create git tag locally
+1. Create branch for releasing
 
 .. code-block:: shell
 
-    git tag -a vX.Y.Z master
+    git checkout master
+    git checkout -b release/X.Y.Z
+
+2. Update version number in `scipy/__init__.py` and change (if you need)
+
+3. Create git tag of release candidate locally
+
+.. code-block:: shell
+
+    git tag -a X.Y.Zrc1 release/X.Y.Z
     # for testing purpose, in this case, the package will be uploaded to test.pypi.org
-    git tag -a vX.Y.Zdev master
+    git tag -a X.Y.Zdev release/X.Y.Z
 
-2. Push git tag to remote
+4. Push git tag to remote
 
 .. code-block:: shell
 
-    git push origin vX.Y.Z
+    git push origin X.Y.Zrc1
 
-3. Circle CI build and run tests. After all tests passed, Circle CI make a release to GitHub and upload wheels to PyPI.
+5. Circle CI build and run tests. After all tests passed, Circle CI make a release to GitHub and upload wheels to PyPI.
+
+6. Confirm that `X.Y.Zrc1` is ready to relase. Otherwise fix issues. Then create git tag of release.
+
+.. code-block:: shell
+
+    git tag -a X.Y.Z release/X.Y.Z
+    git push origin X.Y.Z
 
 Related Projects
 ================
