@@ -93,34 +93,33 @@ workflows:
       - test:
           filters:
             tags:
-              only: /^v.*/
+              only: /^.*/
       - deployment:
           filters:
             branches:
               only:
                 - master
             tags:
-              only: /^v.*/
+              only: /^.*/
           requires:
             - test
       # upload the package to test PyPI.org
-      # if tag named `v.???dev` is pushed
+      # if tag named `.???dev?` is pushed
       - release_dev:
           filters:
             branches:
               ignore: /.*/
             tags:
-              only: /^v.*dev/
+              only: /^.*dev[0-9]+/
           requires:
             - test
       # upload the package to PyPI.org and GitHub
-      # if tag named `v.???` is pushed
+      # if tag named `.???` is pushed
       - release_prod:
           filters:
             branches:
               ignore: /.*/
             tags:
-              only: /^v.*/
-              ignore: /^v.*dev/
+              only: /^(\d+\.)?(\d+\.)?(\*|\d+)$/
           requires:
             - test
