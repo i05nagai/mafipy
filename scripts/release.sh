@@ -4,13 +4,13 @@ set -e
 
 usage() {
   cat <<EOF
-packaging.sh is a tool for packaging mafipy and uploading the package to PYPI.
+This is a tool for packaging mafipy and uploading the package to PYPI.
 Version is retrieved from VERSION constant in setup.py.
 
 Usage:
-  packaging.sh <options>
+  release.sh <options>
   # upload and release
-  packaging.sh --no-test --upload
+  release.sh --no-test --upload
 
 Options:
   --no-test     upload to PyPI.org if the flag is set. Otherwise, test.PyPI.org
