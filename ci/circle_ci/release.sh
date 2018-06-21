@@ -47,6 +47,7 @@ cd ${PATH_TO_REPOSITORY}
 # required MAFIPY_USERNAME and MAFIPY_PASSWORD, MAFIPY_GITHUB_API_TOKEN
 export MAFIPY_USERNAME
 export MAFIPY_PASSWORD
+echo "${PATH_TO_REPOSITORY}/scripts/release.sh ${ARGS} --upload"
 bash ${PATH_TO_REPOSITORY}/scripts/release.sh \
   ${ARGS} \
   --upload
