@@ -5,3 +5,5 @@ mafipy.util module
     :members:
     :undoc-members:
     :show-inheritance:
+
+.. toctree::
