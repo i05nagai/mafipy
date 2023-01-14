@@ -12,3 +12,6 @@ python27: core
 
 python36: core
 	make --directory python36
+
+python38: core
+	make --directory python38

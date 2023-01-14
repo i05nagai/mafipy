@@ -14,7 +14,7 @@ else
   # Set up our own virtualenv environment to avoid travis' numpy.
   # This venv points to the python interpreter of the travis build
   # matrix.
-  pip install --upgrade pip==9.0.3 setuptools
+  pip install --upgrade pip==22.3.1 setuptools
   pip install -r requirements.txt
   pip install -r requirements-dev.txt
   # Build mafipy in the install.sh script to collapse the verbose

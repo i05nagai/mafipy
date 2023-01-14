@@ -1,20 +1,15 @@
 ARG DOCKER_PREFIX
 FROM ${DOCKER_PREFIX}mafipy-core:latest
 
-ENV PYTHON_VERSION=3.6.5
+ENV PYTHON_VERSION=3.8.0
 RUN \
-    apt-get update \
-    && apt-get install -y \
+    apt update \
+    && apt install -y \
         build-essential \
-        checkinstall \
-        libreadline-gplv2-dev \
         libncursesw5-dev \
         libssl-dev \
         libsqlite3-dev \
-        tk-dev \
-        libgdbm-dev \
-        libc6-dev \
-        libbz2-dev \
+        zlib1g-dev \
         curl \
     && cd /usr/src \
     && curl -L -O https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz \

@@ -24,7 +24,7 @@ RUN \
     && make install \
     # pip
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
-    && python get-pip.py pip==9.0.3 \
+    && python get-pip.py pip==22.3.1 \
     # cleanup
     && /opt/mafipy/core/build_cleanup.sh
 RUN \

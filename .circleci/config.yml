@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: /root/project
   docker:
-    - image: "i05nagai/mafipy-python36:latest"
+    - image: "i05nagai/mafipy-python38:latest"
 environment_default: &environment_default
   environment:
     - BENCHMARK_TEST: "true"
