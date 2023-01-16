@@ -34,3 +34,6 @@ RUN \
     && ln -s /usr/local/bin/python3 /usr/local/bin/python \
     # cleanup
     && /opt/mafipy/core/build_cleanup.sh
+
+RUN \
+    ln -s gfortran-9 /usr/bin/gfortran
