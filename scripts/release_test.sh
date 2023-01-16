@@ -14,7 +14,7 @@ pip install \
   --index-url https://test.pypi.org/simple/ \
   --extra-index-url https://testpypi.python.org/pypi \
   --extra-index-url https://pypi.org/simple/ \
-  mafipy==0.1.dev2
+  mafipy==0.1.dev12
 pip install \
   matplotlib==2.2.2
 
