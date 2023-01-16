@@ -793,7 +793,7 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_6mafipy_4math_3qmc_6_sobol_Sobol;
 
-/* "mafipy/math/qmc/_sobol.pyx":51
+/* "mafipy/math/qmc/_sobol.pyx":49
  * 
  * 
  * cdef class Sobol():             # <<<<<<<<<<<<<<
@@ -1175,7 +1175,7 @@ static PyObject *__pyx_tuple__4;
 static PyObject *__pyx_codeobj__5;
 /* Late includes */
 
-/* "mafipy/math/qmc/_sobol.pyx":18
+/* "mafipy/math/qmc/_sobol.pyx":16
  * 
  * 
  * cdef int _calculate_degree(int polynomial):             # <<<<<<<<<<<<<<
@@ -1188,7 +1188,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__calculate_degree(int __pyx_v_poly
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_calculate_degree", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":19
+  /* "mafipy/math/qmc/_sobol.pyx":17
  * 
  * cdef int _calculate_degree(int polynomial):
  *     return int(math.log2(polynomial))             # <<<<<<<<<<<<<<
@@ -1198,7 +1198,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__calculate_degree(int __pyx_v_poly
   __pyx_r = ((int)log2(__pyx_v_polynomial));
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":18
+  /* "mafipy/math/qmc/_sobol.pyx":16
  * 
  * 
  * cdef int _calculate_degree(int polynomial):             # <<<<<<<<<<<<<<
@@ -1212,7 +1212,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__calculate_degree(int __pyx_v_poly
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":22
+/* "mafipy/math/qmc/_sobol.pyx":20
  * 
  * 
  * cdef int _get_length(int* initial_numbers):             # <<<<<<<<<<<<<<
@@ -1228,7 +1228,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("_get_length", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":23
+  /* "mafipy/math/qmc/_sobol.pyx":21
  * 
  * cdef int _get_length(int* initial_numbers):
  *     for i in range(MAX_BIT):             # <<<<<<<<<<<<<<
@@ -1238,7 +1238,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
   for (__pyx_t_1 = 0; __pyx_t_1 < 30; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "mafipy/math/qmc/_sobol.pyx":24
+    /* "mafipy/math/qmc/_sobol.pyx":22
  * cdef int _get_length(int* initial_numbers):
  *     for i in range(MAX_BIT):
  *         if initial_numbers[i] == 0:             # <<<<<<<<<<<<<<
@@ -1248,7 +1248,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
     __pyx_t_2 = (((__pyx_v_initial_numbers[__pyx_v_i]) == 0) != 0);
     if (__pyx_t_2) {
 
-      /* "mafipy/math/qmc/_sobol.pyx":25
+      /* "mafipy/math/qmc/_sobol.pyx":23
  *     for i in range(MAX_BIT):
  *         if initial_numbers[i] == 0:
  *             return i             # <<<<<<<<<<<<<<
@@ -1258,7 +1258,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
       __pyx_r = __pyx_v_i;
       goto __pyx_L0;
 
-      /* "mafipy/math/qmc/_sobol.pyx":24
+      /* "mafipy/math/qmc/_sobol.pyx":22
  * cdef int _get_length(int* initial_numbers):
  *     for i in range(MAX_BIT):
  *         if initial_numbers[i] == 0:             # <<<<<<<<<<<<<<
@@ -1268,7 +1268,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
     }
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":26
+  /* "mafipy/math/qmc/_sobol.pyx":24
  *         if initial_numbers[i] == 0:
  *             return i
  *     return MAX_BIT             # <<<<<<<<<<<<<<
@@ -1278,7 +1278,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
   __pyx_r = 30;
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":22
+  /* "mafipy/math/qmc/_sobol.pyx":20
  * 
  * 
  * cdef int _get_length(int* initial_numbers):             # <<<<<<<<<<<<<<
@@ -1292,7 +1292,7 @@ static int __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length(int *__pyx_v_initial_n
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":29
+/* "mafipy/math/qmc/_sobol.pyx":27
  * 
  * 
  * cdef int* allocate_int(size_t size, str name):             # <<<<<<<<<<<<<<
@@ -1316,7 +1316,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
   size_t __pyx_t_8;
   __Pyx_RefNannySetupContext("allocate_int", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":30
+  /* "mafipy/math/qmc/_sobol.pyx":28
  * 
  * cdef int* allocate_int(size_t size, str name):
  *     mem = <int*>PyMem_Malloc(size * sizeof(int))             # <<<<<<<<<<<<<<
@@ -1325,7 +1325,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
  */
   __pyx_v_mem = ((int *)PyMem_Malloc((__pyx_v_size * (sizeof(int)))));
 
-  /* "mafipy/math/qmc/_sobol.pyx":31
+  /* "mafipy/math/qmc/_sobol.pyx":29
  * cdef int* allocate_int(size_t size, str name):
  *     mem = <int*>PyMem_Malloc(size * sizeof(int))
  *     if not mem:             # <<<<<<<<<<<<<<
@@ -1335,14 +1335,14 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
   __pyx_t_1 = ((!(__pyx_v_mem != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mafipy/math/qmc/_sobol.pyx":32
+    /* "mafipy/math/qmc/_sobol.pyx":30
  *     mem = <int*>PyMem_Malloc(size * sizeof(int))
  *     if not mem:
  *         msg = "cannot allocate memory for {0}".format(name)             # <<<<<<<<<<<<<<
  *         raise MemoryError(msg)
  *     # zero padding
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_cannot_allocate_memory_for_0, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_cannot_allocate_memory_for_0, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -1355,13 +1355,13 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     } else {
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_name};
-        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
@@ -1369,19 +1369,19 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_name};
-        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
       #endif
       {
-        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
         __Pyx_INCREF(__pyx_v_name);
         __Pyx_GIVEREF(__pyx_v_name);
         PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_name);
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
@@ -1390,20 +1390,20 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
     __pyx_v_msg = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "mafipy/math/qmc/_sobol.pyx":33
+    /* "mafipy/math/qmc/_sobol.pyx":31
  *     if not mem:
  *         msg = "cannot allocate memory for {0}".format(name)
  *         raise MemoryError(msg)             # <<<<<<<<<<<<<<
  *     # zero padding
  *     for i in range(size):
  */
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 33, __pyx_L1_error)
+    __PYX_ERR(0, 31, __pyx_L1_error)
 
-    /* "mafipy/math/qmc/_sobol.pyx":31
+    /* "mafipy/math/qmc/_sobol.pyx":29
  * cdef int* allocate_int(size_t size, str name):
  *     mem = <int*>PyMem_Malloc(size * sizeof(int))
  *     if not mem:             # <<<<<<<<<<<<<<
@@ -1412,7 +1412,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
  */
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":35
+  /* "mafipy/math/qmc/_sobol.pyx":33
  *         raise MemoryError(msg)
  *     # zero padding
  *     for i in range(size):             # <<<<<<<<<<<<<<
@@ -1424,7 +1424,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "mafipy/math/qmc/_sobol.pyx":36
+    /* "mafipy/math/qmc/_sobol.pyx":34
  *     # zero padding
  *     for i in range(size):
  *         mem[i] = 0             # <<<<<<<<<<<<<<
@@ -1434,7 +1434,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
     (__pyx_v_mem[__pyx_v_i]) = 0;
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":37
+  /* "mafipy/math/qmc/_sobol.pyx":35
  *     for i in range(size):
  *         mem[i] = 0
  *     return mem             # <<<<<<<<<<<<<<
@@ -1444,7 +1444,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
   __pyx_r = __pyx_v_mem;
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":29
+  /* "mafipy/math/qmc/_sobol.pyx":27
  * 
  * 
  * cdef int* allocate_int(size_t size, str name):             # <<<<<<<<<<<<<<
@@ -1466,7 +1466,7 @@ static int *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(size_t __pyx_v_size,
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":40
+/* "mafipy/math/qmc/_sobol.pyx":38
  * 
  * 
  * cdef size_t* allocate_size_t(size_t size, str name):             # <<<<<<<<<<<<<<
@@ -1490,7 +1490,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
   size_t __pyx_t_8;
   __Pyx_RefNannySetupContext("allocate_size_t", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":41
+  /* "mafipy/math/qmc/_sobol.pyx":39
  * 
  * cdef size_t* allocate_size_t(size_t size, str name):
  *     mem = <size_t*>PyMem_Malloc(size * sizeof(size_t))             # <<<<<<<<<<<<<<
@@ -1499,7 +1499,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
  */
   __pyx_v_mem = ((size_t *)PyMem_Malloc((__pyx_v_size * (sizeof(size_t)))));
 
-  /* "mafipy/math/qmc/_sobol.pyx":42
+  /* "mafipy/math/qmc/_sobol.pyx":40
  * cdef size_t* allocate_size_t(size_t size, str name):
  *     mem = <size_t*>PyMem_Malloc(size * sizeof(size_t))
  *     if not mem:             # <<<<<<<<<<<<<<
@@ -1509,14 +1509,14 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
   __pyx_t_1 = ((!(__pyx_v_mem != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mafipy/math/qmc/_sobol.pyx":43
+    /* "mafipy/math/qmc/_sobol.pyx":41
  *     mem = <size_t*>PyMem_Malloc(size * sizeof(size_t))
  *     if not mem:
  *         msg = "cannot allocate memory for {0}".format(name)             # <<<<<<<<<<<<<<
  *         raise MemoryError(msg)
  *     # zero padding
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_cannot_allocate_memory_for_0, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_cannot_allocate_memory_for_0, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 41, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -1529,13 +1529,13 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     } else {
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_name};
-        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
@@ -1543,19 +1543,19 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[2] = {__pyx_t_4, __pyx_v_name};
-        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else
       #endif
       {
-        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 43, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 41, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
         __Pyx_INCREF(__pyx_v_name);
         __Pyx_GIVEREF(__pyx_v_name);
         PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_name);
-        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 43, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 41, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
@@ -1564,20 +1564,20 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
     __pyx_v_msg = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "mafipy/math/qmc/_sobol.pyx":44
+    /* "mafipy/math/qmc/_sobol.pyx":42
  *     if not mem:
  *         msg = "cannot allocate memory for {0}".format(name)
  *         raise MemoryError(msg)             # <<<<<<<<<<<<<<
  *     # zero padding
  *     for i in range(size):
  */
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 44, __pyx_L1_error)
+    __PYX_ERR(0, 42, __pyx_L1_error)
 
-    /* "mafipy/math/qmc/_sobol.pyx":42
+    /* "mafipy/math/qmc/_sobol.pyx":40
  * cdef size_t* allocate_size_t(size_t size, str name):
  *     mem = <size_t*>PyMem_Malloc(size * sizeof(size_t))
  *     if not mem:             # <<<<<<<<<<<<<<
@@ -1586,7 +1586,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
  */
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":46
+  /* "mafipy/math/qmc/_sobol.pyx":44
  *         raise MemoryError(msg)
  *     # zero padding
  *     for i in range(size):             # <<<<<<<<<<<<<<
@@ -1598,7 +1598,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_i = __pyx_t_8;
 
-    /* "mafipy/math/qmc/_sobol.pyx":47
+    /* "mafipy/math/qmc/_sobol.pyx":45
  *     # zero padding
  *     for i in range(size):
  *         mem[i] = 0             # <<<<<<<<<<<<<<
@@ -1608,7 +1608,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
     (__pyx_v_mem[__pyx_v_i]) = 0;
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":48
+  /* "mafipy/math/qmc/_sobol.pyx":46
  *     for i in range(size):
  *         mem[i] = 0
  *     return mem             # <<<<<<<<<<<<<<
@@ -1618,7 +1618,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
   __pyx_r = __pyx_v_mem;
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":40
+  /* "mafipy/math/qmc/_sobol.pyx":38
  * 
  * 
  * cdef size_t* allocate_size_t(size_t size, str name):             # <<<<<<<<<<<<<<
@@ -1640,7 +1640,7 @@ static size_t *__pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(size_t __pyx_v
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":61
+/* "mafipy/math/qmc/_sobol.pyx":59
  *     cdef size_t dim
  * 
  *     def __cinit__(self, size_t dim):             # <<<<<<<<<<<<<<
@@ -1674,18 +1674,18 @@ static int __pyx_pw_6mafipy_4math_3qmc_6_sobol_5Sobol_1__cinit__(PyObject *__pyx
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 61, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 59, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_dim = __Pyx_PyInt_As_size_t(values[0]); if (unlikely((__pyx_v_dim == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 61, __pyx_L3_error)
+    __pyx_v_dim = __Pyx_PyInt_As_size_t(values[0]); if (unlikely((__pyx_v_dim == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 61, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 59, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mafipy.math.qmc._sobol.Sobol.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1727,7 +1727,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   int __pyx_t_15;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":62
+  /* "mafipy/math/qmc/_sobol.pyx":60
  * 
  *     def __cinit__(self, size_t dim):
  *         self.dim = dim             # <<<<<<<<<<<<<<
@@ -1736,7 +1736,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->dim = __pyx_v_dim;
 
-  /* "mafipy/math/qmc/_sobol.pyx":69
+  /* "mafipy/math/qmc/_sobol.pyx":67
  *         cdef int k
  *         # degrees
  *         cdef size_t* degrees = allocate_size_t(dim, 'degrees')             # <<<<<<<<<<<<<<
@@ -1745,7 +1745,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_degrees = __pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(__pyx_v_dim, __pyx_n_s_degrees);
 
-  /* "mafipy/math/qmc/_sobol.pyx":70
+  /* "mafipy/math/qmc/_sobol.pyx":68
  *         # degrees
  *         cdef size_t* degrees = allocate_size_t(dim, 'degrees')
  *         self.is_first = True             # <<<<<<<<<<<<<<
@@ -1754,7 +1754,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->is_first = 1;
 
-  /* "mafipy/math/qmc/_sobol.pyx":71
+  /* "mafipy/math/qmc/_sobol.pyx":69
  *         cdef size_t* degrees = allocate_size_t(dim, 'degrees')
  *         self.is_first = True
  *         self.counter = 0             # <<<<<<<<<<<<<<
@@ -1763,7 +1763,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->counter = 0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":74
+  /* "mafipy/math/qmc/_sobol.pyx":72
  * 
  *         # initialize numbers
  *         self.numbers = allocate_int(dim , 'numbers')             # <<<<<<<<<<<<<<
@@ -1772,7 +1772,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->numbers = __pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(__pyx_v_dim, __pyx_n_s_numbers);
 
-  /* "mafipy/math/qmc/_sobol.pyx":77
+  /* "mafipy/math/qmc/_sobol.pyx":75
  * 
  *         # initialize primitive_polynomial up to dimension
  *         self.primitive_polynomials = allocate_int(dim, 'primitive_polynomial')             # <<<<<<<<<<<<<<
@@ -1781,7 +1781,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->primitive_polynomials = __pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(__pyx_v_dim, __pyx_n_s_primitive_polynomial);
 
-  /* "mafipy/math/qmc/_sobol.pyx":78
+  /* "mafipy/math/qmc/_sobol.pyx":76
  *         # initialize primitive_polynomial up to dimension
  *         self.primitive_polynomials = allocate_int(dim, 'primitive_polynomial')
  *         for d in range(dim):             # <<<<<<<<<<<<<<
@@ -1793,7 +1793,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_d = __pyx_t_3;
 
-    /* "mafipy/math/qmc/_sobol.pyx":79
+    /* "mafipy/math/qmc/_sobol.pyx":77
  *         self.primitive_polynomials = allocate_int(dim, 'primitive_polynomial')
  *         for d in range(dim):
  *             self.primitive_polynomials[d] = joe_kuo_d6_irreducibles[d]             # <<<<<<<<<<<<<<
@@ -1802,7 +1802,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
     (__pyx_v_self->primitive_polynomials[__pyx_v_d]) = (joe_kuo_d6_irreducibles[__pyx_v_d]);
 
-    /* "mafipy/math/qmc/_sobol.pyx":80
+    /* "mafipy/math/qmc/_sobol.pyx":78
  *         for d in range(dim):
  *             self.primitive_polynomials[d] = joe_kuo_d6_irreducibles[d]
  *             degrees[d] = _calculate_degree(self.primitive_polynomials[d])             # <<<<<<<<<<<<<<
@@ -1812,7 +1812,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     (__pyx_v_degrees[__pyx_v_d]) = __pyx_f_6mafipy_4math_3qmc_6_sobol__calculate_degree((__pyx_v_self->primitive_polynomials[__pyx_v_d]));
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":83
+  /* "mafipy/math/qmc/_sobol.pyx":81
  * 
  *         # allocate direction_numbers
  *         self.direction_numbers = <int**>PyMem_Malloc(dim * sizeof(int*))             # <<<<<<<<<<<<<<
@@ -1821,7 +1821,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_self->direction_numbers = ((int **)PyMem_Malloc((__pyx_v_dim * (sizeof(int *)))));
 
-  /* "mafipy/math/qmc/_sobol.pyx":84
+  /* "mafipy/math/qmc/_sobol.pyx":82
  *         # allocate direction_numbers
  *         self.direction_numbers = <int**>PyMem_Malloc(dim * sizeof(int*))
  *         if not self.direction_numbers:             # <<<<<<<<<<<<<<
@@ -1831,7 +1831,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   __pyx_t_4 = ((!(__pyx_v_self->direction_numbers != 0)) != 0);
   if (unlikely(__pyx_t_4)) {
 
-    /* "mafipy/math/qmc/_sobol.pyx":85
+    /* "mafipy/math/qmc/_sobol.pyx":83
  *         self.direction_numbers = <int**>PyMem_Malloc(dim * sizeof(int*))
  *         if not self.direction_numbers:
  *             msg = "cannot allocate memory for direction_numbers"             # <<<<<<<<<<<<<<
@@ -1841,20 +1841,20 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     __Pyx_INCREF(__pyx_kp_s_cannot_allocate_memory_for_direc);
     __pyx_v_msg = __pyx_kp_s_cannot_allocate_memory_for_direc;
 
-    /* "mafipy/math/qmc/_sobol.pyx":86
+    /* "mafipy/math/qmc/_sobol.pyx":84
  *         if not self.direction_numbers:
  *             msg = "cannot allocate memory for direction_numbers"
  *             raise MemoryError(msg)             # <<<<<<<<<<<<<<
  *         cdef size_t* initial_number_sizes = allocate_size_t(dim, 'initial_number_sizes')
  *         # load direction_numbers
  */
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 86, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_MemoryError, __pyx_v_msg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 84, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __PYX_ERR(0, 86, __pyx_L1_error)
+    __PYX_ERR(0, 84, __pyx_L1_error)
 
-    /* "mafipy/math/qmc/_sobol.pyx":84
+    /* "mafipy/math/qmc/_sobol.pyx":82
  *         # allocate direction_numbers
  *         self.direction_numbers = <int**>PyMem_Malloc(dim * sizeof(int*))
  *         if not self.direction_numbers:             # <<<<<<<<<<<<<<
@@ -1863,7 +1863,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":87
+  /* "mafipy/math/qmc/_sobol.pyx":85
  *             msg = "cannot allocate memory for direction_numbers"
  *             raise MemoryError(msg)
  *         cdef size_t* initial_number_sizes = allocate_size_t(dim, 'initial_number_sizes')             # <<<<<<<<<<<<<<
@@ -1872,7 +1872,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   __pyx_v_initial_number_sizes = __pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_size_t(__pyx_v_dim, __pyx_n_s_initial_number_sizes);
 
-  /* "mafipy/math/qmc/_sobol.pyx":89
+  /* "mafipy/math/qmc/_sobol.pyx":87
  *         cdef size_t* initial_number_sizes = allocate_size_t(dim, 'initial_number_sizes')
  *         # load direction_numbers
  *         for d in range(dim):             # <<<<<<<<<<<<<<
@@ -1884,7 +1884,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_d = __pyx_t_3;
 
-    /* "mafipy/math/qmc/_sobol.pyx":90
+    /* "mafipy/math/qmc/_sobol.pyx":88
  *         # load direction_numbers
  *         for d in range(dim):
  *             initial_number_sizes[d] = _get_length(joe_kuo_d6_initial_number[d])             # <<<<<<<<<<<<<<
@@ -1893,16 +1893,16 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
     (__pyx_v_initial_number_sizes[__pyx_v_d]) = __pyx_f_6mafipy_4math_3qmc_6_sobol__get_length((joe_kuo_d6_initial_number[__pyx_v_d]));
 
-    /* "mafipy/math/qmc/_sobol.pyx":91
+    /* "mafipy/math/qmc/_sobol.pyx":89
  *         for d in range(dim):
  *             initial_number_sizes[d] = _get_length(joe_kuo_d6_initial_number[d])
  *             self.direction_numbers[d] = allocate_int(MAX_BIT, 'direction_numbers[{0}]'.format(d))             # <<<<<<<<<<<<<<
  *             for k in range(initial_number_sizes[d]):
  *                 self.direction_numbers[d][k] = joe_kuo_d6_initial_number[d][k]
  */
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_direction_numbers_0, __pyx_n_s_format); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_direction_numbers_0, __pyx_n_s_format); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 89, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_d); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 91, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_d); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 89, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -1915,14 +1915,14 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
       }
     }
     if (!__pyx_t_8) {
-      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_GOTREF(__pyx_t_5);
     } else {
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_6)) {
         PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -1931,30 +1931,30 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
         PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       } else
       #endif
       {
-        __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 91, __pyx_L1_error)
+        __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8); __pyx_t_8 = NULL;
         __Pyx_GIVEREF(__pyx_t_7);
         PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_7);
         __pyx_t_7 = 0;
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       }
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (!(likely(PyString_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 91, __pyx_L1_error)
+    if (!(likely(PyString_CheckExact(__pyx_t_5))||((__pyx_t_5) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "str", Py_TYPE(__pyx_t_5)->tp_name), 0))) __PYX_ERR(0, 89, __pyx_L1_error)
     (__pyx_v_self->direction_numbers[__pyx_v_d]) = __pyx_f_6mafipy_4math_3qmc_6_sobol_allocate_int(30, ((PyObject*)__pyx_t_5));
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "mafipy/math/qmc/_sobol.pyx":92
+    /* "mafipy/math/qmc/_sobol.pyx":90
  *             initial_number_sizes[d] = _get_length(joe_kuo_d6_initial_number[d])
  *             self.direction_numbers[d] = allocate_int(MAX_BIT, 'direction_numbers[{0}]'.format(d))
  *             for k in range(initial_number_sizes[d]):             # <<<<<<<<<<<<<<
@@ -1966,7 +1966,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
       __pyx_v_k = __pyx_t_12;
 
-      /* "mafipy/math/qmc/_sobol.pyx":93
+      /* "mafipy/math/qmc/_sobol.pyx":91
  *             self.direction_numbers[d] = allocate_int(MAX_BIT, 'direction_numbers[{0}]'.format(d))
  *             for k in range(initial_number_sizes[d]):
  *                 self.direction_numbers[d][k] = joe_kuo_d6_initial_number[d][k]             # <<<<<<<<<<<<<<
@@ -1975,7 +1975,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
       ((__pyx_v_self->direction_numbers[__pyx_v_d])[__pyx_v_k]) = ((joe_kuo_d6_initial_number[__pyx_v_d])[__pyx_v_k]);
 
-      /* "mafipy/math/qmc/_sobol.pyx":94
+      /* "mafipy/math/qmc/_sobol.pyx":92
  *             for k in range(initial_number_sizes[d]):
  *                 self.direction_numbers[d][k] = joe_kuo_d6_initial_number[d][k]
  *                 self.direction_numbers[d][k] <<= (MAX_BIT - (k + 1))             # <<<<<<<<<<<<<<
@@ -1988,7 +1988,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     }
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":95
+  /* "mafipy/math/qmc/_sobol.pyx":93
  *                 self.direction_numbers[d][k] = joe_kuo_d6_initial_number[d][k]
  *                 self.direction_numbers[d][k] <<= (MAX_BIT - (k + 1))
  *         PyMem_Free(initial_number_sizes)             # <<<<<<<<<<<<<<
@@ -1997,7 +1997,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   PyMem_Free(__pyx_v_initial_number_sizes);
 
-  /* "mafipy/math/qmc/_sobol.pyx":102
+  /* "mafipy/math/qmc/_sobol.pyx":100
  *         cdef size_t coeff
  *         # calculate direction numbers
  *         for d in range(dim):             # <<<<<<<<<<<<<<
@@ -2009,7 +2009,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_d = __pyx_t_3;
 
-    /* "mafipy/math/qmc/_sobol.pyx":103
+    /* "mafipy/math/qmc/_sobol.pyx":101
  *         # calculate direction numbers
  *         for d in range(dim):
  *             degree = degrees[d]             # <<<<<<<<<<<<<<
@@ -2018,7 +2018,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
     __pyx_v_degree = (__pyx_v_degrees[__pyx_v_d]);
 
-    /* "mafipy/math/qmc/_sobol.pyx":104
+    /* "mafipy/math/qmc/_sobol.pyx":102
  *         for d in range(dim):
  *             degree = degrees[d]
  *             for k in range(degree, MAX_BIT):             # <<<<<<<<<<<<<<
@@ -2028,7 +2028,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     for (__pyx_t_12 = __pyx_v_degree; __pyx_t_12 < 30; __pyx_t_12+=1) {
       __pyx_v_k = __pyx_t_12;
 
-      /* "mafipy/math/qmc/_sobol.pyx":105
+      /* "mafipy/math/qmc/_sobol.pyx":103
  *             degree = degrees[d]
  *             for k in range(degree, MAX_BIT):
  *                 summand = self.direction_numbers[d][k - degree] >> degree             # <<<<<<<<<<<<<<
@@ -2037,7 +2037,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
       __pyx_v_summand = (((__pyx_v_self->direction_numbers[__pyx_v_d])[(__pyx_v_k - __pyx_v_degree)]) >> __pyx_v_degree);
 
-      /* "mafipy/math/qmc/_sobol.pyx":106
+      /* "mafipy/math/qmc/_sobol.pyx":104
  *             for k in range(degree, MAX_BIT):
  *                 summand = self.direction_numbers[d][k - degree] >> degree
  *                 for i in range(0, degree):             # <<<<<<<<<<<<<<
@@ -2049,7 +2049,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
       for (__pyx_t_15 = 0; __pyx_t_15 < __pyx_t_14; __pyx_t_15+=1) {
         __pyx_v_i = __pyx_t_15;
 
-        /* "mafipy/math/qmc/_sobol.pyx":107
+        /* "mafipy/math/qmc/_sobol.pyx":105
  *                 summand = self.direction_numbers[d][k - degree] >> degree
  *                 for i in range(0, degree):
  *                     coeff = (self.primitive_polynomials[d] >> (degree - i) & 1)             # <<<<<<<<<<<<<<
@@ -2058,7 +2058,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
         __pyx_v_coeff = (((__pyx_v_self->primitive_polynomials[__pyx_v_d]) >> (__pyx_v_degree - __pyx_v_i)) & 1);
 
-        /* "mafipy/math/qmc/_sobol.pyx":108
+        /* "mafipy/math/qmc/_sobol.pyx":106
  *                 for i in range(0, degree):
  *                     coeff = (self.primitive_polynomials[d] >> (degree - i) & 1)
  *                     if coeff == 1:             # <<<<<<<<<<<<<<
@@ -2068,7 +2068,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
         __pyx_t_4 = ((__pyx_v_coeff == 1) != 0);
         if (__pyx_t_4) {
 
-          /* "mafipy/math/qmc/_sobol.pyx":109
+          /* "mafipy/math/qmc/_sobol.pyx":107
  *                     coeff = (self.primitive_polynomials[d] >> (degree - i) & 1)
  *                     if coeff == 1:
  *                         summand ^= self.direction_numbers[d][k - i]             # <<<<<<<<<<<<<<
@@ -2077,7 +2077,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
           __pyx_v_summand = (__pyx_v_summand ^ ((__pyx_v_self->direction_numbers[__pyx_v_d])[(__pyx_v_k - __pyx_v_i)]));
 
-          /* "mafipy/math/qmc/_sobol.pyx":108
+          /* "mafipy/math/qmc/_sobol.pyx":106
  *                 for i in range(0, degree):
  *                     coeff = (self.primitive_polynomials[d] >> (degree - i) & 1)
  *                     if coeff == 1:             # <<<<<<<<<<<<<<
@@ -2087,7 +2087,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
         }
       }
 
-      /* "mafipy/math/qmc/_sobol.pyx":110
+      /* "mafipy/math/qmc/_sobol.pyx":108
  *                     if coeff == 1:
  *                         summand ^= self.direction_numbers[d][k - i]
  *                 self.direction_numbers[d][k] = summand             # <<<<<<<<<<<<<<
@@ -2098,20 +2098,20 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
     }
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":113
+  /* "mafipy/math/qmc/_sobol.pyx":111
  * 
  *         # initialize points
  *         self.points = [0.0 for d in range(dim)]             # <<<<<<<<<<<<<<
  * 
  *         # free
  */
-  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 113, __pyx_L1_error)
+  __pyx_t_5 = PyList_New(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_1 = __pyx_v_dim;
   __pyx_t_2 = __pyx_t_1;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_d = __pyx_t_3;
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_float_0_0))) __PYX_ERR(0, 113, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_5, (PyObject*)__pyx_float_0_0))) __PYX_ERR(0, 111, __pyx_L1_error)
   }
   __Pyx_GIVEREF(__pyx_t_5);
   __Pyx_GOTREF(__pyx_v_self->points);
@@ -2119,7 +2119,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   __pyx_v_self->points = ((PyObject*)__pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":116
+  /* "mafipy/math/qmc/_sobol.pyx":114
  * 
  *         # free
  *         PyMem_Free(degrees)             # <<<<<<<<<<<<<<
@@ -2128,7 +2128,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
  */
   PyMem_Free(__pyx_v_degrees);
 
-  /* "mafipy/math/qmc/_sobol.pyx":61
+  /* "mafipy/math/qmc/_sobol.pyx":59
  *     cdef size_t dim
  * 
  *     def __cinit__(self, size_t dim):             # <<<<<<<<<<<<<<
@@ -2153,7 +2153,7 @@ static int __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol___cinit__(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":118
+/* "mafipy/math/qmc/_sobol.pyx":116
  *         PyMem_Free(degrees)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2180,7 +2180,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
   size_t __pyx_t_3;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":120
+  /* "mafipy/math/qmc/_sobol.pyx":118
  *     def __dealloc__(self):
  *         # primitive_polynomial
  *         PyMem_Free(self.primitive_polynomials)             # <<<<<<<<<<<<<<
@@ -2189,7 +2189,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
  */
   PyMem_Free(__pyx_v_self->primitive_polynomials);
 
-  /* "mafipy/math/qmc/_sobol.pyx":123
+  /* "mafipy/math/qmc/_sobol.pyx":121
  * 
  *         # direction_numbers
  *         for d in range(self.dim):             # <<<<<<<<<<<<<<
@@ -2201,7 +2201,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_d = __pyx_t_3;
 
-    /* "mafipy/math/qmc/_sobol.pyx":124
+    /* "mafipy/math/qmc/_sobol.pyx":122
  *         # direction_numbers
  *         for d in range(self.dim):
  *             PyMem_Free(self.direction_numbers[d])             # <<<<<<<<<<<<<<
@@ -2211,7 +2211,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
     PyMem_Free((__pyx_v_self->direction_numbers[__pyx_v_d]));
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":125
+  /* "mafipy/math/qmc/_sobol.pyx":123
  *         for d in range(self.dim):
  *             PyMem_Free(self.direction_numbers[d])
  *         PyMem_Free(self.direction_numbers)             # <<<<<<<<<<<<<<
@@ -2220,7 +2220,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
  */
   PyMem_Free(__pyx_v_self->direction_numbers);
 
-  /* "mafipy/math/qmc/_sobol.pyx":128
+  /* "mafipy/math/qmc/_sobol.pyx":126
  * 
  *         # numbers
  *         PyMem_Free(self.numbers)             # <<<<<<<<<<<<<<
@@ -2229,7 +2229,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
  */
   PyMem_Free(__pyx_v_self->numbers);
 
-  /* "mafipy/math/qmc/_sobol.pyx":118
+  /* "mafipy/math/qmc/_sobol.pyx":116
  *         PyMem_Free(degrees)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2241,7 +2241,7 @@ static void __pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_2__dealloc__(struct __pyx
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":130
+/* "mafipy/math/qmc/_sobol.pyx":128
  *         PyMem_Free(self.numbers)
  * 
  *     def next(self):             # <<<<<<<<<<<<<<
@@ -2279,7 +2279,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
   size_t __pyx_t_9;
   __Pyx_RefNannySetupContext("next", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":131
+  /* "mafipy/math/qmc/_sobol.pyx":129
  * 
  *     def next(self):
  *         if self.is_first:             # <<<<<<<<<<<<<<
@@ -2289,7 +2289,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
   __pyx_t_1 = (__pyx_v_self->is_first != 0);
   if (__pyx_t_1) {
 
-    /* "mafipy/math/qmc/_sobol.pyx":132
+    /* "mafipy/math/qmc/_sobol.pyx":130
  *     def next(self):
  *         if self.is_first:
  *             self.is_first = False             # <<<<<<<<<<<<<<
@@ -2298,7 +2298,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  */
     __pyx_v_self->is_first = 0;
 
-    /* "mafipy/math/qmc/_sobol.pyx":133
+    /* "mafipy/math/qmc/_sobol.pyx":131
  *         if self.is_first:
  *             self.is_first = False
  *             return [x for x in self.points]             # <<<<<<<<<<<<<<
@@ -2306,31 +2306,31 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  *         # find right most zero bit
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
+    __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 131, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (unlikely(__pyx_v_self->points == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 133, __pyx_L1_error)
+      __PYX_ERR(0, 131, __pyx_L1_error)
     }
     __pyx_t_3 = __pyx_v_self->points; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
     for (;;) {
       if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 133, __pyx_L1_error)
+      __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 131, __pyx_L1_error)
       #else
-      __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 133, __pyx_L1_error)
+      __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 131, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       #endif
       __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_5);
       __pyx_t_5 = 0;
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 133, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 131, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_r = __pyx_t_2;
     __pyx_t_2 = 0;
     goto __pyx_L0;
 
-    /* "mafipy/math/qmc/_sobol.pyx":131
+    /* "mafipy/math/qmc/_sobol.pyx":129
  * 
  *     def next(self):
  *         if self.is_first:             # <<<<<<<<<<<<<<
@@ -2339,7 +2339,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  */
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":136
+  /* "mafipy/math/qmc/_sobol.pyx":134
  * 
  *         # find right most zero bit
  *         cdef size_t l = 0             # <<<<<<<<<<<<<<
@@ -2348,7 +2348,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  */
   __pyx_v_l = 0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":137
+  /* "mafipy/math/qmc/_sobol.pyx":135
  *         # find right most zero bit
  *         cdef size_t l = 0
  *         while ((self.counter >> l) & 1) == 1:             # <<<<<<<<<<<<<<
@@ -2359,7 +2359,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
     __pyx_t_1 = ((((__pyx_v_self->counter >> __pyx_v_l) & 1) == 1) != 0);
     if (!__pyx_t_1) break;
 
-    /* "mafipy/math/qmc/_sobol.pyx":138
+    /* "mafipy/math/qmc/_sobol.pyx":136
  *         cdef size_t l = 0
  *         while ((self.counter >> l) & 1) == 1:
  *             l += 1             # <<<<<<<<<<<<<<
@@ -2369,7 +2369,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
     __pyx_v_l = (__pyx_v_l + 1);
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":140
+  /* "mafipy/math/qmc/_sobol.pyx":138
  *             l += 1
  * 
  *         for d in range(self.dim):             # <<<<<<<<<<<<<<
@@ -2381,7 +2381,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_d = __pyx_t_8;
 
-    /* "mafipy/math/qmc/_sobol.pyx":141
+    /* "mafipy/math/qmc/_sobol.pyx":139
  * 
  *         for d in range(self.dim):
  *             self.numbers[d] ^= self.direction_numbers[d][l]             # <<<<<<<<<<<<<<
@@ -2391,24 +2391,24 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
     __pyx_t_9 = __pyx_v_d;
     (__pyx_v_self->numbers[__pyx_t_9]) = ((__pyx_v_self->numbers[__pyx_t_9]) ^ ((__pyx_v_self->direction_numbers[__pyx_v_d])[__pyx_v_l]));
 
-    /* "mafipy/math/qmc/_sobol.pyx":142
+    /* "mafipy/math/qmc/_sobol.pyx":140
  *         for d in range(self.dim):
  *             self.numbers[d] ^= self.direction_numbers[d][l]
  *             self.points[d] = self.numbers[d] * NORMALIZE_FACTOR             # <<<<<<<<<<<<<<
  * 
  *         self.counter += 1
  */
-    __pyx_t_2 = PyFloat_FromDouble(((__pyx_v_self->numbers[__pyx_v_d]) * 9.313225746154785e-10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_2 = PyFloat_FromDouble(((__pyx_v_self->numbers[__pyx_v_d]) * 9.313225746154785e-10)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (unlikely(__pyx_v_self->points == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 142, __pyx_L1_error)
+      __PYX_ERR(0, 140, __pyx_L1_error)
     }
-    if (unlikely(__Pyx_SetItemInt(__pyx_v_self->points, __pyx_v_d, __pyx_t_2, size_t, 0, __Pyx_PyInt_FromSize_t, 1, 0, 1) < 0)) __PYX_ERR(0, 142, __pyx_L1_error)
+    if (unlikely(__Pyx_SetItemInt(__pyx_v_self->points, __pyx_v_d, __pyx_t_2, size_t, 0, __Pyx_PyInt_FromSize_t, 1, 0, 1) < 0)) __PYX_ERR(0, 140, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":144
+  /* "mafipy/math/qmc/_sobol.pyx":142
  *             self.points[d] = self.numbers[d] * NORMALIZE_FACTOR
  * 
  *         self.counter += 1             # <<<<<<<<<<<<<<
@@ -2417,7 +2417,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  */
   __pyx_v_self->counter = (__pyx_v_self->counter + 1);
 
-  /* "mafipy/math/qmc/_sobol.pyx":145
+  /* "mafipy/math/qmc/_sobol.pyx":143
  * 
  *         self.counter += 1
  *         return [x for x in self.points]             # <<<<<<<<<<<<<<
@@ -2425,31 +2425,31 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_4next(struct __pyx_o
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (unlikely(__pyx_v_self->points == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 145, __pyx_L1_error)
+    __PYX_ERR(0, 143, __pyx_L1_error)
   }
   __pyx_t_3 = __pyx_v_self->points; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
   for (;;) {
     if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
+    __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 143, __pyx_L1_error)
     #else
-    __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 145, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_5);
     __pyx_t_5 = 0;
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 145, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_v_x))) __PYX_ERR(0, 143, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":130
+  /* "mafipy/math/qmc/_sobol.pyx":128
  *         PyMem_Free(self.numbers)
  * 
  *     def next(self):             # <<<<<<<<<<<<<<
@@ -2578,7 +2578,7 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_5Sobol_8__setstate_cython__
   return __pyx_r;
 }
 
-/* "mafipy/math/qmc/_sobol.pyx":148
+/* "mafipy/math/qmc/_sobol.pyx":146
  * 
  * 
  * def make_sobol(dimension):             # <<<<<<<<<<<<<<
@@ -2608,37 +2608,37 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_make_sobol(CYTHON_UNUSED Py
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("make_sobol", 0);
 
-  /* "mafipy/math/qmc/_sobol.pyx":149
+  /* "mafipy/math/qmc/_sobol.pyx":147
  * 
  * def make_sobol(dimension):
  *     if dimension > SOBOL_MAX_DIM:             # <<<<<<<<<<<<<<
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))
  *     return Sobol(dimension)
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_dimension, __pyx_int_21202, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_dimension, __pyx_int_21202, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (unlikely(__pyx_t_2)) {
 
-    /* "mafipy/math/qmc/_sobol.pyx":150
+    /* "mafipy/math/qmc/_sobol.pyx":148
  * def make_sobol(dimension):
  *     if dimension > SOBOL_MAX_DIM:
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))             # <<<<<<<<<<<<<<
  *     return Sobol(dimension)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_diemsion_0, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_s_diemsion_0, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 150, __pyx_L1_error)
+    __PYX_ERR(0, 148, __pyx_L1_error)
 
-    /* "mafipy/math/qmc/_sobol.pyx":149
+    /* "mafipy/math/qmc/_sobol.pyx":147
  * 
  * def make_sobol(dimension):
  *     if dimension > SOBOL_MAX_DIM:             # <<<<<<<<<<<<<<
@@ -2647,19 +2647,19 @@ static PyObject *__pyx_pf_6mafipy_4math_3qmc_6_sobol_make_sobol(CYTHON_UNUSED Py
  */
   }
 
-  /* "mafipy/math/qmc/_sobol.pyx":151
+  /* "mafipy/math/qmc/_sobol.pyx":149
  *     if dimension > SOBOL_MAX_DIM:
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))
  *     return Sobol(dimension)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_6mafipy_4math_3qmc_6_sobol_Sobol), __pyx_v_dimension); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 151, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(((PyObject *)__pyx_ptype_6mafipy_4math_3qmc_6_sobol_Sobol), __pyx_v_dimension); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mafipy/math/qmc/_sobol.pyx":148
+  /* "mafipy/math/qmc/_sobol.pyx":146
  * 
  * 
  * def make_sobol(dimension):             # <<<<<<<<<<<<<<
@@ -2869,10 +2869,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 23, __pyx_L1_error)
-  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(0, 31, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 148, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2901,27 +2901,27 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "mafipy/math/qmc/_sobol.pyx":150
+  /* "mafipy/math/qmc/_sobol.pyx":148
  * def make_sobol(dimension):
  *     if dimension > SOBOL_MAX_DIM:
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))             # <<<<<<<<<<<<<<
  *     return Sobol(dimension)
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_int_21202); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_int_21202); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "mafipy/math/qmc/_sobol.pyx":148
+  /* "mafipy/math/qmc/_sobol.pyx":146
  * 
  * 
  * def make_sobol(dimension):             # <<<<<<<<<<<<<<
  *     if dimension > SOBOL_MAX_DIM:
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_dimension); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_dimension); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mafipy_math_qmc__sobol_pyx, __pyx_n_s_make_sobol, 148, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mafipy_math_qmc__sobol_pyx, __pyx_n_s_make_sobol, 146, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2974,13 +2974,13 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
   __pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol.tp_print = 0;
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol.tp_dictoffset && __pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (PyObject_SetAttrString(__pyx_m, "Sobol", (PyObject *)&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "Sobol", (PyObject *)&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
   __pyx_ptype_6mafipy_4math_3qmc_6_sobol_Sobol = &__pyx_type_6mafipy_4math_3qmc_6_sobol_Sobol;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -3186,16 +3186,16 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "mafipy/math/qmc/_sobol.pyx":148
+  /* "mafipy/math/qmc/_sobol.pyx":146
  * 
  * 
  * def make_sobol(dimension):             # <<<<<<<<<<<<<<
  *     if dimension > SOBOL_MAX_DIM:
  *         raise ValueError('diemsion <= {0}'.format(SOBOL_MAX_DIM))
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6mafipy_4math_3qmc_6_sobol_1make_sobol, NULL, __pyx_n_s_mafipy_math_qmc__sobol); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6mafipy_4math_3qmc_6_sobol_1make_sobol, NULL, __pyx_n_s_mafipy_math_qmc__sobol); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_make_sobol, __pyx_t_1) < 0) __PYX_ERR(0, 148, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_make_sobol, __pyx_t_1) < 0) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mafipy/math/qmc/_sobol.pyx":1

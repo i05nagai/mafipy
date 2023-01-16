@@ -345,8 +345,8 @@ def get_packages():
 
 def get_install_requires():
     return [
-        'numpy==1.14.3',
-        'scipy==1.1.0',
+        'numpy==1.21.0',
+        'scipy==1.10.0',
     ]
 
 

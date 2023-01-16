@@ -11,12 +11,7 @@ env:
   - secure: "iomMx3XJ60WKz9LKGk6J4ZYe8H1xxkQ8AxrWeRtYuSmR1ylBsIbAg5aPd5bnkDFjXwetPOwKBng4K+e5jbMtfO7447KUB7rWPZnbfTPotZyx3aYZnZXdXphSXzUNhWmSjWQQoOM93gK3wcht/gdhdcCrAYv4td+HY4KLVxtswLCiFWzPsW5el8saEh3mR1tD7wBvESzTWDNxtCv7yDhmp6U/8Irvv8nFR5v5P+71Har8T+eh3cI+uEtRxuX8T0+MKGWOpH0GjFWjiqAaIsZhdV/b7zCEP369ojtgaFjXYEIZroYKftJ2swHG00Za7jeKFiY+/+8Vaa1kG+6IJ01TXbr/0Aw+OIscn3zeapq9/B9eCkqXfc2pmOa8QHR8XPQwGdykgUijRuvfKFconD6FrWSKEG/lkk+zSsDjZBHePcIbcCZ0yqzu+yutyHqsS2BXTsRWOq4TQzgv/PDzAvflsW5TWPH3TDE/R8/StLdr36+6CbQC3LB2aqk5dPbsoAfon/oJRve3DYwkQS3Y2t4sR1OvZoh39fhv389sHuDhvA7Hni04y7D0GkgsQVItb/iUCMoV7H7cTzr26mC2bBklCOQkzNIuwj7OdH+U53hvOw8nm2xbslvVIiXNlATMpbE0iS7ZrcGOtK35Ip6SnlZO3uZvk91znUYMIbukOxyT2tE="
 matrix:
   include:
-  - python: '2.7'
-    env:
-    - COVERAGE="true"
-    - SKIP_TESTS="false"
-    - CODECLIMATE_COVERAGE_REPORT="false"
-  - python: '3.5'
+  - python: '3.8'
     env:
     - COVERAGE="true"
     - SKIP_TESTS="false"

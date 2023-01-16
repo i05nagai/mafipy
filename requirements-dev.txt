@@ -12,7 +12,7 @@ pytest==3.5.1
 # packaging
 setuptools==39.2.0
 twine==1.11.0
-wheel==0.38.1
+wheel==0.38.4
 
 # benchmarking
 asv==0.2.1

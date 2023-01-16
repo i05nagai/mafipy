@@ -1,7 +1,7 @@
 defaults: &defaults
   working_directory: /root/project
   docker:
-    - image: "i05nagai/mafipy-python36:latest"
+    - image: "i05nagai/mafipy-python38:latest"
 environment_default: &environment_default
   environment:
     - BENCHMARK_TEST: "true"
@@ -29,6 +29,19 @@ step_run_print_info: &step_run_print_info
 version: 2
 jobs:
   test:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: *step_run_print_info
+      - run:
+          command: |
+              git submodule sync
+              git submodule update --init
+              bash ci/circle_ci/dependencies.sh
+              bash ci/circle_ci/test.sh
+      - persist_to_workspace: *step_persist_to_workspace_default
+
+  test_benchmark:
     <<: *defaults
     <<: *environment_default
     steps:
@@ -88,7 +101,15 @@ workflows:
   version: 2
   default:
     jobs:
-      - test
+      - test:
+          filters:
+            branches:
+              ignore: /master/
+      - test_benchmark:
+          filters:
+            branches:
+              only:
+                - master
       - deployment:
           filters:
             branches:
