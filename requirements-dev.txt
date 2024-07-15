@@ -10,7 +10,7 @@ pytest-pudb==0.6
 pytest==3.5.1
 
 # packaging
-setuptools==65.5.1
+setuptools==70.0.0
 twine==1.11.0
 wheel==0.38.4
 
